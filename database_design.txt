@@ -1,0 +1,58 @@
+table user {
+  id guid [pk]
+  first_name varchar
+  last_name varchar
+  middle_name varchar
+  email varchar [not null, unique]
+  hashed_password varchar [not null]
+}
+
+table curriculum_vitae {
+  id guid [pk]
+  photo varchar [note: "User update image and link to"]
+  user_id guid [ref: - user.id]
+  first_name varchar
+  last_name varchar
+  middle_name varchar
+  email varchar
+  gender gender
+  date_of_birth varchar [note: "19-08-2000"]
+  nationality varchar
+  phone_number int [note: "country code + phone number"]
+  address varchar
+  summary varchar [note: "Brief description about user"]
+  skills varchar [note: "Hoc gioi, Dep trai"]
+  education varchar [note: "07/2021 - now: An hai, 01/2021 - 07/2021: Cuoc song bap benh"]
+  certification varchar [note: "Ong trum dap da, Ke huy diet su nghiep"]
+  languages varchar [note: "Vietnamese, English"]
+  hobbies varchar [note: "Da bong, choi game, pho da"]
+}
+
+table curriculum_vitae_experience {
+  curriculum_vitae_id guid [ref: > curriculum_vitae.id]
+  index int [increment]
+  experience_type curriculum_vitae_experience_type
+  job_title varchar [note: "Nhan vien hang 2"]
+  
+  company_name varchar
+  company_email varchar
+  company_phone int [note: "country code + phone number"]
+  start_date varchar [note: "01-2021"]
+  end_date varchar [note: "02-2021"]
+  role varchar
+  activites varchar
+  description varchar
+  indexes {
+    (index, curriculum_vitae_id) [pk]
+  }
+}
+
+enum gender {
+  male
+  female
+}
+
+enum curriculum_vitae_experience_type {
+    work
+    volunteer
+}
