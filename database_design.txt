@@ -47,6 +47,65 @@ table curriculum_vitae_experience {
   }
 }
 
+table companies {
+  id guid [pk]
+  logo varchar [note: "link company logo image"]
+  name varchar
+  tax_code varchar
+  phone_number varchar
+  email varchar
+  address varchar
+  website varchar
+  description longtext
+  requirement longtext
+  status int [note: "0: dang hoat dong/1: chua duoc duyet/2: da bi khoa"]
+  total_jobs int
+  total_employee int
+  is_suggest int [note: "0: not suggested, 1: suggested"]
+}
+
+table cities {
+  id guid [pk]
+  name varchar
+}
+
+table fields [note: "chuyen nganh"] {
+  id guid [pk]
+  name varchar
+}
+
+table positions {
+  id guid [pk]
+  name varchar
+}
+
+table jobs {
+  id guid [pk]
+  company_id guid [ref: > companies.id]
+  title varchar
+  description longtext
+  field_id guid [ref: > fields.id]
+  city_id guid [ref: > cities.id]
+  min_salary double
+  max_salary double
+  job_type int [note: "0: Parttime, 1: Fulltime"]
+  year_of_experiences int
+  gender gender
+  quantity int
+  status int [note: "0: da bi khoa, 1: binh thuong"]
+  is_suggest int [note: "0: not suggested, 1: suggested"]
+  view int
+  position_id guid [ref: > positions.id]
+  created_date datetime
+  expired_date datetime
+}
+
+table applies {
+  id guid [pk]
+  user_id guid [ref: > user.id]
+  job_id guid [ref: > jobs.id]
+}
+
 enum gender {
   male
   female
