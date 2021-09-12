@@ -29,6 +29,12 @@ enum job_employment_type  {
   temporary [note: "Tạm thời"]
 }
 
+enum job_status {
+  open
+  close
+  done
+}
+
 enum job_experience_time {
   all [note: "Tất cả"]
   non [note: "Chưa có kinh nghiệm"]
@@ -47,6 +53,13 @@ enum job_level {
   experienced
   manager
   director
+}
+
+enum job_applicant_status {
+  unseen [note: "Chưa được xem"]
+  viewed [note: "Được company xem"]
+  rejected [note: "Bị từ chối"]
+  accpeted [note: "Được chấp nhận"]
 }
 
 table users {
@@ -77,7 +90,7 @@ table curriculum_vitaes {
   skills varchar [note: "Hoc gioi, Dep trai"]
   education varchar [note: "07/2021 - now: An hai, 01/2021 - 07/2021: Cuoc song bap benh"]
   certification varchar [note: "Ong trum dap da, Ke huy diet su nghiep"]
-  languages varchar [note: "Vietnamese, English"]
+  languages varchar [note: "id của language. Ví dụ: 1,2,3"]
   hobbies varchar [note: "Da bong, choi game, pho da"]
 }
 
@@ -125,7 +138,16 @@ table companies {
   bussiness_fields varchar
 }
 
-table fields [note: "chuyen nganh"] {
+table companies_bussiness_fields {
+  company_id guid [ref: > companies.id]
+  bussiness_field_id int [ref: - bussiness_fields.id]
+  
+  indexes {
+    (company_id, bussiness_field_id) [pk]
+  }
+}
+
+table bussiness_fields [note: "chuyen nganh"] {
   id int [pk, increment]
   name varchar
 }
@@ -151,7 +173,7 @@ table jobs {
   company_id guid [ref: > companies.id]
   
   title varchar
-  description longtext
+  description longtext [note: "Mô tả công việc"]
 
   // info
   salary_type job_salary_type
@@ -161,11 +183,13 @@ table jobs {
   level job_level
   
   // Requirements
-  require_gender gender
-  require_quantity int [note: "Số lượng"]
-  require_experience_time job_experience_time
+  gender gender
+  quantity int [note: "Số lượng"]
+  experience_time job_experience_time
+  job_requirements varchar [note: "Các kĩ năng,thông tin kinh nghiệm yêu cầu"]
+  offers varchar [note: "Các lợi ích được nhà tuyển dụng đưa ra"]
   
-  status int [note: "0: da bi khoa, 1: binh thuong"]
+  status job_status
   is_urgent_job boolean [note: "Việc cần người ngay"]
   
   // note xem cái này là gì
@@ -187,12 +211,12 @@ table jobs_languages [note: "Công việc có thể có các yêu cầu về ng�
   }
 }
 
-table jobs_fields [note: "Một công việc có thể liên quan đến nhiều chuyên ngành"] {
+table jobs_bussiness_fields [note: "Một công việc có thể liên quan đến nhiều chuyên ngành"] {
   job_id guid [ref: > jobs.id]
-  field_id int [ref: - fields.id]
+  bussiness_field_id int [ref: - bussiness_fields.id]
   
   indexes {
-    (job_id, field_id) [pk]
+    (job_id, bussiness_field_id) [pk]
   }
 }
 
@@ -205,8 +229,36 @@ table jobs_cities [note: "Có thể tuyển việc cho nhiều chi nhánh khác 
   }
 }
 
-table applies {
-  id guid [pk]
+table jobs_applicants {
+  id guid
   user_id guid [ref: > users.id]
   job_id guid [ref: > jobs.id]
+  created_date datetime
+  status job_applicant_status
+  introduce varchar
+  
+  indexes {
+    (user_id, job_id) [unique]
+    id [pk]
+  }
+}
+
+table users_followed_jobs {
+  user_id guid [ref: > users.id]
+  job_id guid [ref: > jobs.id]
+  created_date datetime
+  
+  indexes {
+    (user_id, job_id) [pk]
+  }
+}
+
+table users_followed_companies {
+  user_id guid [ref: > users.id]
+  company_id guid [ref: > companies.id]
+  created_date datetime
+  
+  indexes {
+    (user_id, company_id) [pk]
+  }
 }
