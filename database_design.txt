@@ -262,3 +262,10 @@ table users_followed_companies {
     (user_id, company_id) [pk]
   }
 }
+
+table messages {
+  send_user_id guid [ref: > users.id]
+  receive_user_id guid [ref: > users.id]
+  created_date datetime
+  content longtext
+}
