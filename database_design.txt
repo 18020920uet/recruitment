@@ -10,6 +10,222 @@ enum curriculum_vitae_experience_type {
 }
 
 enum user_type {
+  freelance [note: "Người tìm việc"]
+  company_owner [note: "Người chủ công ty"]
+  admin
+}
+
+enum job_salary_type {
+  competitive [note: "Thỏa thuận"]
+  detail [note: "Lương được liệt kê rõ"]
+}
+
+enum job_employment_type  {
+  all
+  fulltime
+  parttime
+  remote
+  internship
+  contact [note: "Hợp đồng"]
+  temporary [note: "Tạm thời"]
+}
+
+enum job_status {
+  open
+  close
+  done
+}
+
+enum job_experience_time {
+  all [note: "Tất cả"]
+  non [note: "Chưa có kinh nghiệm"]
+  less_than_six_month [note: "Dưới 6 tháng"]
+  less_than_one_year [note: "Dưới 1 năm"]
+  one_to_two_year [note: "1-2 năm"]
+  two_to_three_year [note: "2-3 năm"]
+  three_to_five_year [note: "3-5 năm"]
+  more_than_five_year [note: "Trên 5 năm"]
+}
+
+enum job_level {
+  all
+  intern
+  fresher
+  experienced
+  manager
+  director
+}
+
+enum job_applicant_status {
+  unseen [note: "Chưa được xem"]
+  viewed [note: "Được company xem"]
+  rejected [note: "Bị từ chối"]
+  accpeted [note: "Được chấp nhận"]
+}
+
+table users {
+  id guid [pk]
+  first_name varchar
+  last_name varchar
+  middle_name varchar
+  email varchar [not null, unique]
+  hashed_password varchar [not null]
+  user_type user_type
+  avatar varchar [note: "Link"]
+
+}
+
+table curriculum_vitaes {
+  id guid [pk]
+  photo varchar [note: "User update image and link to"]
+  user_id guid [ref: - users.id]
+  first_name varchar
+  last_name varchar
+  middle_name varchar
+  email varchar
+  gender gender
+  date_of_birth varchar [note: "19-08-2000"]
+  nationality varchar
+  phone_number varchar
+  address varchar
+  summary varchar [note: "Brief description about user"]
+  skills varchar [note: "Hoc gioi, Dep trai"]
+  education varchar [note: "07/2021 - now: An hai, 01/2021 - 07/2021: Cuoc song bap benh"]
+  certification varchar [note: "Ong trum dap da, Ke huy diet su nghiep"]
+  languages varchar [note: "id của language. Ví dụ: 1,2,3"]
+  hobbies varchar [note: "Da bong, choi game, pho da"]
+}
+
+table curriculum_vitae_experiences {
+  curriculum_vitae_id guid [ref: > curriculum_vitaes.id]
+  index int [increment]
+  experience_type curriculum_vitae_experience_type
+  job_title varchar [note: "Nhan vien hang 2"]
+
+  company_name varchar
+  company_email varchar
+  company_phone_number varchar
+
+  start_date varchar [note: "01-2021"]
+  end_date varchar [note: "02-2021"]
+
+  role varchar [note: "Vai trò trong công ty"]
+  description varchar [note: "Mô tả giới thiệu các hoạt động làm"]
+
+  indexes {
+    (index, curriculum_vitae_id) [pk]
+  }
+}
+
+table companies {
+  owner guid [ref: - users.id]
+  id int [pk, increment]
+  logo varchar [note: "Link"]
+  name varchar
+
+  email varchar [not null, unique]
+  hashed_password varchar [not null]
+
+  address varchar
+  phone_number varchar
+  website varchar
+
+  description longtext
+  requirement longtext
+  // status int [note: "0: dang hoat dong/1: chua duoc duyet/2: da bi khoa"]
+  total_jobs int
+  total_employees int
+  // is_suggest int [note: "0: not suggested, 1: suggested"]
+
+  linkedin varchar
+  bussiness_fields varchar
+}
+
+table companies_bussiness_fields {
+  company_id guid [ref: > companies.id]
+  bussiness_field_id int [ref: - bussiness_fields.id]
+
+  indexes {
+    (company_id, bussiness_field_id) [pk]
+  }
+}
+
+table bussiness_fields [note: "chuyen nganh"] {
+  id int [pk, increment]
+  name varchar
+}
+
+table positions {
+  id guid [pk]
+  name varchar
+}
+
+table cities {
+  id int [pk, increment]
+  name varchar
+}
+
+table languages {
+  id int [pk, increment]
+  language varchar
+}
+
+
+table jobs {
+  id guid [pk]
+  company_id guid [ref: > companies.id]
+
+  title varchar
+  description longtext [note: "Mô tả công việc"]
+
+  // info
+  salary_type job_salary_type
+  min_salary double
+  max_salary double
+  working_type job_employment_type
+  level job_level
+
+  // Requirements
+  gender gender
+  quantity int [note: "Số lượng"]
+  experience_time job_experience_time
+  job_requirements varchar [note: "Các kĩ năng,thông tin kinh nghiệm yêu cầu"]
+  offers varchar [note: "Các lợi ích được nhà tuyển dụng đưa ra"]
+
+  status job_status
+  is_urgent_job boolean [note: "Việc cần người ngay"]
+
+  // note xem cái này là gì
+  // is_suggest int danh sách job đã apply[note: "0: not suggested, 1: suggested"]
+  // view int
+
+  position_id guid [ref: > positions.id]
+
+  created_date datetime
+  deadline_date datetime
+}
+
+table jobs_languages [note: "Công việc có thể có các yêu cầu về ngôn ngữ khác nhau"] {
+  job_id guid [ref: > jobs.id]
+  language_id int [ref: - languages.id]
+
+  indexes {
+    (job_id, language_id) [pk]
+  }
+}
+
+table jobs_bussiness_fields [note: "Một công việc có thể enum gender {
+  non
+  male
+  female
+}
+
+enum curriculum_vitae_experience_type {
+  work
+  volunteer
+}
+
+enum user_type {
   freelance
   admin
 }
@@ -99,17 +315,17 @@ table curriculum_vitae_experiences {
   index int [increment]
   experience_type curriculum_vitae_experience_type
   job_title varchar [note: "Nhan vien hang 2"]
-  
+
   company_name varchar
   company_email varchar
   company_phone_number varchar
-  
+
   start_date varchar [note: "01-2021"]
   end_date varchar [note: "02-2021"]
-  
+
   role varchar [note: "Vai trò trong công ty"]
   description varchar [note: "Mô tả giới thiệu các hoạt động làm"]
-  
+
   indexes {
     (index, curriculum_vitae_id) [pk]
   }
@@ -119,21 +335,21 @@ table companies {
   id int [pk, increment]
   logo varchar [note: "Link"]
   name varchar
-  
+
   email varchar [not null, unique]
   hashed_password varchar [not null]
-  
+
   address varchar
   phone_number varchar
   website varchar
-  
+
   description longtext
   requirement longtext
   // status int [note: "0: dang hoat dong/1: chua duoc duyet/2: da bi khoa"]
   total_jobs int
   total_employees int
   // is_suggest int [note: "0: not suggested, 1: suggested"]
-  
+
   linkedin varchar
   bussiness_fields varchar
 }
@@ -141,7 +357,7 @@ table companies {
 table companies_bussiness_fields {
   company_id guid [ref: > companies.id]
   bussiness_field_id int [ref: - bussiness_fields.id]
-  
+
   indexes {
     (company_id, bussiness_field_id) [pk]
   }
@@ -171,7 +387,7 @@ table languages {
 table jobs {
   id guid [pk]
   company_id guid [ref: > companies.id]
-  
+
   title varchar
   description longtext [note: "Mô tả công việc"]
 
@@ -179,25 +395,25 @@ table jobs {
   salary_type job_salary_type
   min_salary double
   max_salary double
-  working_type job_employment_type 
+  working_type job_employment_type
   level job_level
-  
+
   // Requirements
   gender gender
   quantity int [note: "Số lượng"]
   experience_time job_experience_time
   job_requirements varchar [note: "Các kĩ năng,thông tin kinh nghiệm yêu cầu"]
   offers varchar [note: "Các lợi ích được nhà tuyển dụng đưa ra"]
-  
+
   status job_status
   is_urgent_job boolean [note: "Việc cần người ngay"]
-  
+
   // note xem cái này là gì
   // is_suggest int [note: "0: not suggested, 1: suggested"]
   // view int
-  
+
   position_id guid [ref: > positions.id]
-  
+
   created_date datetime
   deadline_date datetime
 }
@@ -205,7 +421,7 @@ table jobs {
 table jobs_languages [note: "Công việc có thể có các yêu cầu về ngôn ngữ khác nhau"] {
   job_id guid [ref: > jobs.id]
   language_id int [ref: - languages.id]
-  
+
   indexes {
     (job_id, language_id) [pk]
   }
@@ -214,7 +430,7 @@ table jobs_languages [note: "Công việc có thể có các yêu cầu về ng�
 table jobs_bussiness_fields [note: "Một công việc có thể liên quan đến nhiều chuyên ngành"] {
   job_id guid [ref: > jobs.id]
   bussiness_field_id int [ref: - bussiness_fields.id]
-  
+
   indexes {
     (job_id, bussiness_field_id) [pk]
   }
@@ -223,7 +439,7 @@ table jobs_bussiness_fields [note: "Một công việc có thể liên quan đ�
 table jobs_cities [note: "Có thể tuyển việc cho nhiều chi nhánh khác nhau"] {
   job_id guid [ref: > jobs.id]
   city_id int [ref: - cities.id]
-  
+
   indexes {
     (job_id, city_id) [pk]
   }
@@ -236,7 +452,7 @@ table jobs_applicants {
   created_date datetime
   status job_applicant_status
   introduce varchar
-  
+
   indexes {
     (user_id, job_id) [unique]
     id [pk]
@@ -247,7 +463,7 @@ table users_followed_jobs {
   user_id guid [ref: > users.id]
   job_id guid [ref: > jobs.id]
   created_date datetime
-  
+
   indexes {
     (user_id, job_id) [pk]
   }
@@ -257,15 +473,78 @@ table users_followed_companies {
   user_id guid [ref: > users.id]
   company_id guid [ref: > companies.id]
   created_date datetime
-  
+
+  indexes {
+    (user_id, company_id) [pk]
+  }
+}liên quan đến nhiều chuyên ngành"] {
+  job_id guid [ref: > jobs.id]
+  bussiness_field_id int [ref: - bussiness_fields.id]
+
+  indexes {
+    (job_id, bussiness_field_id) [pk]
+  }
+}
+
+table jobs_cities [note: "Có thể tuyển việc cho nhiều chi nhánh khác nhau"] {
+  job_id guid [ref: > jobs.id]
+  city_id int [ref: - cities.id]
+
+  indexes {
+    (job_id, city_id) [pk]
+  }
+}
+
+table jobs_applicants {
+  id guid
+  user_id guid [ref: > users.id]
+  job_id guid [ref: > jobs.id]
+  created_date datetime
+  status job_applicant_status
+  introduce varchar
+
+  indexes {
+    (user_id, job_id) [unique]
+    id [pk]
+  }
+}
+
+table users_followed_jobs {
+  user_id guid [ref: > users.id]
+  job_id guid [ref: > jobs.id]
+  created_date datetime
+
+  indexes {
+    (user_id, job_id) [pk]
+  }
+}
+
+table users_followed_companies {
+  user_id guid [ref: > users.id]
+  company_id guid [ref: > companies.id]
+  created_date datetime
+
   indexes {
     (user_id, company_id) [pk]
   }
 }
 
-table messages {
-  send_user_id guid [ref: > users.id]
-  receive_user_id guid [ref: > users.id]
+table users_reviews {
+  company_id guid [ref: - companies.id]
+  user_id guid [ref: > users.id]
+  star float
+  review string
   created_date datetime
-  content longtext
+  updated_date datetime
+  deleted_date datetime
+}
+
+table companies_reviews {
+  company_id guid [ref: > companies.id]
+  user_id guid [ref: < users.id]
+  star float
+  review string
+  created_date datetime
+  updated_date datetime
+  deleted_date datetime
 }
