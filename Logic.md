@@ -1,7 +1,7 @@
 # File logic của các quy trình
 
 
-# Register
+# Register (Đăng ký)
 
 
-# Login
+# Login (Đăng nhập)
