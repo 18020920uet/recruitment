@@ -21,6 +21,12 @@
     "paths": {
       "@Entities/*": [
         "src/entities/*"
+      ],
+      "@Repositories/*": [
+        "src/repositories/*"
+      ],
+      "@Middlewares/*": [
+        "src/common/middlewares/*"
       ]
     }
   }

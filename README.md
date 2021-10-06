@@ -51,3 +51,10 @@ BCRYPT_SALT_OF_ROUNDS=17
    }
 }
 ```
+
+
+## Phần tìm hiểu thêm
+
+### Request and Response Pipeline
+
+![Request And Respone Pipeline](images/request_response_pipeline.jpg)
