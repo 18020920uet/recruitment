@@ -10,4 +10,4 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(process.env.PORT);
 }
-bootstrap();
+bootstrap().then(() => console.log('Service listening on port:', process.env.PORT));;
