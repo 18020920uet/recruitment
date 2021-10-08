@@ -16,7 +16,7 @@
     nestjs
 
 
-### Cài đặt .env và typeorm.json
+### Một số yêu cầu trước khi cài đặt
 
 - Tạo file **.env** từ file **.env.example**
 ```.env

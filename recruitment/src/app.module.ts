@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 
 import { LoggerMiddleware } from '@Middlewares/logger.middleware'
 
-import { AuthModule } from './modules/auth/auth.module';
+// import { AuthModule } from './modules/auth/auth.module';
 
 import configuration from './config/configuration';
 
@@ -19,7 +19,7 @@ import configuration from './config/configuration';
       load: [configuration]
     }),
     TypeOrmModule.forRoot(),
-    AuthModule
+    // AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
