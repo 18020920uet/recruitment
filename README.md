@@ -16,22 +16,27 @@
     nestjs
 
 
-### Cài đặt .env và typeorm.json
+### Một số yêu cầu trước khi sử dụng
 
-- Tạo file **.env** từ file **.env.example**
+
+Tạo file _recruitment/_**.env**
+
 ```.env
-PORT=400
-BCRYPT_SALT_OF_ROUNDS=17
+PORT=
+BCRYPT_SALT_OF_ROUNDS=15
+DATABASE_NAME=
+DATABASE_USER=
+DATABASE_PASSWORD=
 ```
 
-- Tạo file **ormconfig.json** và sửa config tùy chỉnh
+Tạo file _recruitment/_**ormconfig.json** và sửa config tùy chỉnh
 ```json
 {
    "type": "postgres",
-   "host": <HOST>,
+   "host": <HOST>, // database (nếu dùng docker)
    "port": 5432,
-   "username": <USERNAME>,
-   "password": <PASSWORD>,
+   "username": <DATABASE_USER>,
+   "password": <DATABASE_PASSWORD>,
    "database": <DATABASE_NAME>,
    "synchronize": true,
    "logging": false,
@@ -52,9 +57,26 @@ BCRYPT_SALT_OF_ROUNDS=17
 }
 ```
 
+Tạo 1 thư mục mới: _/database_
 
-## Phần tìm hiểu thêm
+### Chạy ứng dụng với docker
+Yêu cầu:
 
-### Request and Response Pipeline
+      docker
+      docker-compose
 
-![Request And Respone Pipeline](images/request_response_pipeline.jpg)
+Chạy ứng dụng với môi trường development
+
+```bash
+docker-compose --env-file ./recruitment/.env up dev
+```
+
+Chạy ứng dụng với môi trường product
+
+```bash
+docker-compose --env-file ./recruitment/.env up prod
+```
+
+<!-- ## Phần tìm hiểu thêm -->
+<!-- ### Request and Response Pipeline -->
+<!-- ![Request And Respone Pipeline](images/request_response_pipeline.jpg) -->

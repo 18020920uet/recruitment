@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  dev:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: recruitment_api_development
+    working_dir: /home/recruitment
+    volumes:
+      - ./recruitment:/home/recruitment
+    ports:
+      - '${PORT}'
+    command: yarn start:debug
+    restart: unless-stopped
+    depends_on:
+      - database
+    networks:
+      - recruitment_networks
+  prod:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: recruitment_api_product
+    working_dir: /home/recruitment
+    volumes:
+      - ./recruitment:/home/recruitment
+    ports:
+      - '${PORT}'
+    command: yarn start:prod
+    restart: unless-stopped
+    depends_on:
+      - database
+    networks:
+      - recruitment_networks
+  database:
+    container_name: recruitment_database
+    restart: always
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: '${DATABASE_USER}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
+      POSTGRES_DB: '${DATABASE_NAME}'
+    expose:
+        - '5432'
+    volumes:
+        - ./database/:/var/lib/postgresql/data
+    networks:
+        - recruitment_networks
+
+networks:
+  recruitment_networks:
