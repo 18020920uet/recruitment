@@ -9,7 +9,7 @@ services:
     volumes:
       - ./recruitment:/home/recruitment
     ports:
-      - '${PORT}'
+      - '${PORT}:${PORT}'
     command: yarn start:debug
     restart: unless-stopped
     depends_on:
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./recruitment:/home/recruitment
     ports:
-      - '${PORT}'
+      - '${PORT}:${PORT}'
     command: yarn start:prod
     restart: unless-stopped
     depends_on:
