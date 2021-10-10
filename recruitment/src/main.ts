@@ -5,12 +5,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 import { AllExceptionsFilter } from './common/filters/exception.filter';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalFilters(new AllExceptionsFilter());
-
+  app.useGlobalInterceptors(new TransformInterceptor());
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Rescruitment API')
     .setDescription('Recruitment API description')

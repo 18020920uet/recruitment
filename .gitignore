@@ -175,3 +175,4 @@ lerna-debug.log*
 
 /recruitment/public/*
 /database
+/recruitment/product.env
