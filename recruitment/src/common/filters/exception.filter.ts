@@ -11,14 +11,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const statusCode =  exception.getStatus();
-      const message = exception.getResponse();
+      const message = exception.message;
 
       const exceptionResponse = {
         statusCode: statusCode,
-        message: message
+        message: message,
+        status: 0
       };
 
-      response.status(statusCode).json(exceptionResponse);
+      return response.status(statusCode).json(exceptionResponse);
     } else {
       const statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       const message = (exception as Error).message;
@@ -55,12 +56,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       );
 
       if (process.env.NODE_ENV == 'production') {
-        response.status(statusCode).json({
+        return response.status(statusCode).json({
           statusCode: statusCode,
-          message: 'Internal server error'
+          message: 'Internal server error',
+          status: 0
         });
       } else {
-        response.status(statusCode).json(exceptionResponse);
+        return  response.status(statusCode).json(exceptionResponse);
       }
     }
   }

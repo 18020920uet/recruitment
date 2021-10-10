@@ -27,6 +27,12 @@
       ],
       "@Middlewares/*": [
         "src/common/middlewares/*"
+      ],
+      "@Responses/*": [
+        "src/common/responses/*"
+      ],
+      "@Common/*": [
+        "src/common/*"
       ]
     }
   }

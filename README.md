@@ -18,46 +18,10 @@
 
 ### Một số yêu cầu trước khi sử dụng
 
-
-Tạo file _recruitment/_**.env**
-
-```.env
-PORT=
-BCRYPT_SALT_OF_ROUNDS=15
-DATABASE_NAME=
-DATABASE_USER=
-DATABASE_PASSWORD=
-```
-
-Tạo file _recruitment/_**ormconfig.json** và sửa config tùy chỉnh
-```json
-{
-   "type": "postgres",
-   "host": <HOST>, // database (nếu dùng docker)
-   "port": 5432,
-   "username": <DATABASE_USER>,
-   "password": <DATABASE_PASSWORD>,
-   "database": <DATABASE_NAME>,
-   "synchronize": true,
-   "logging": false,
-   "entities": [
-      "dist/**/*.entity{.ts,.js}",
-   ],
-   "migrations": [
-      "src/migrations/**/*.ts"
-   ],
-   "subscribers": [
-      "src/subscriber/**/*.ts"
-   ],
-   "cli": {
-      "entitiesDir": "src/entities",
-      "migrationsDir": "src/migrations",
-      "subscribersDir": "src/subscribers"
-   }
-}
-```
-
 Tạo 1 thư mục mới: _/database_
+
+Nếu chạy product thì tạo file **product.env** từ giống file **development.env** và cấu hình lại thông tin sửa  
+
 
 ### Chạy ứng dụng với docker
 Yêu cầu:
@@ -65,16 +29,24 @@ Yêu cầu:
       docker
       docker-compose
 
+Build
+
+>Nếu đã build rồi thì xóa thư mục _/database_ đi để có thể build lại
+
+```bash
+docker-compose --env-file <path to .env file> build
+```
+
 Chạy ứng dụng với môi trường development
 
 ```bash
-docker-compose --env-file ./recruitment/.env up dev
+docker-compose --env-file ./recruitment/development.env up dev
 ```
 
-Chạy ứng dụng với môi trường product
+Chạy ứng dụng với môi trường product ('Yêu cầu build lại')
 
 ```bash
-docker-compose --env-file ./recruitment/.env up prod
+docker-compose --env-file ./recruitment/product.env up prod
 ```
 
 <!-- ## Phần tìm hiểu thêm -->
