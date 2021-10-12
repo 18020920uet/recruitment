@@ -33,4 +33,19 @@ export class UserEntity {
 
     @Column({ nullable: true, type: 'timestamp', default: null })
     activateDate: Date
+
+    @Column()
+    iv: string;
+
+    @Column({ nullable: true, default: null })
+    resetCode: string
+
+    @Column()
+    isLock: boolean;
+
+    @Column({ type: 'timestamp' })
+    lastLogin: Date;
+
+    @Column()
+    loginFailedStrike: number;
 }

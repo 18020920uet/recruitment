@@ -1,24 +1,26 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { LoggerOptions } from 'typeorm';
+import * as fs from 'fs';
 
 export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
-    return {
+    const config: TypeOrmModuleOptions = {
       type: 'postgres', // Sử dụng postgresql
       host: configService.get('database.host'),
       port: configService.get<number>('database.port'),
       database: configService.get('database.name'),
       username: configService.get('database.username'),
       password: configService.get('database.password'),
+      migrationsTableName: 'migrations',
       entities: [
          "dist/**/*.entity{.ts,.js}",
       ],
       migrations: [
-         "src/migrations/**/*.ts"
+         "dist/migrations/*.js"
       ],
       subscribers: [
-         "src/subscriber/**/*.ts"
+         "dist/subscribers/*.js"
       ],
       cli: {
          "entitiesDir": "src/entities",
@@ -27,6 +29,17 @@ export default class TypeOrmConfig {
       },
       synchronize: true
     };
+
+    if (!fs.existsSync('ormconfig.json')) {
+      fs.writeFile("ormconfig.json", JSON.stringify(config), 'utf8', function (err) {
+        if (err) {
+          console.log("An error occured while writing ormconfig.json");
+          return console.log(err);
+        }
+      });
+      console.log('He');
+    }
+    return config;
   }
 }
 

@@ -23,5 +23,13 @@ export default () => ({
        "migrationsDir": "src/migrations",
        "subscribersDir": "src/subscribers"
     },
+  },
+  secret: {
+    jwt: {
+      accessSecert: process.env.JWT_ACCESS_SECERT,
+      refreshSecert: process.env.JWT_REFRESH_SECERT
+    },
+    activateSecert: process.env.ACTIVATE_SECERT,
+    iv: process.env.IV_START
   }
 });

@@ -7,6 +7,10 @@ COPY ./recruitment /home/recruitment
 
 RUN yarn install
 
+RUN yarn global add ts-node --prefix /usr/local
+
+RUN ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
+
 RUN yarn build
 
 CMD ["node", "dist/main.js"]
