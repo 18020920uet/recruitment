@@ -39,6 +39,7 @@ services:
       POSTGRES_USER: '${DATABASE_USER}'
       POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
       POSTGRES_DB: '${DATABASE_NAME}'
+      TZ: GMT+7
     expose:
         - '5432'
     volumes:

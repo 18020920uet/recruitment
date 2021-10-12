@@ -1,17 +1,24 @@
-import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { VersioningType } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 
-import { AllExceptionsFilter } from './common/filters/exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { AllExceptionsFilter } from './common/filters/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
+  app.setGlobalPrefix('api');
+
+  app.enableVersioning({
+    type: VersioningType.URI
+  })
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Rescruitment API')
     .setDescription('Recruitment API description')
@@ -19,7 +26,7 @@ async function bootstrap() {
     .build();
 
   const doc = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, doc)
+  SwaggerModule.setup('document', app, doc)
 
   await app.listen(process.env.PORT);
 }

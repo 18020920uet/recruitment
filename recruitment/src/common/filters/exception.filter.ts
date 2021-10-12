@@ -26,6 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       const exceptionResponse = {
         statusCode: statusCode,
+        status: 0,
         message: message,
         path: request.path,
         method: request.method,

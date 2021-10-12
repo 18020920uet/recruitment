@@ -33,6 +33,9 @@
       ],
       "@Common/*": [
         "src/common/*"
+      ],
+      "@Decorators/*": [
+        "src/common/decorators/*"
       ]
     }
   }
