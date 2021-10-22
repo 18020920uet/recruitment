@@ -1,5 +1,8 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import {
+  TypeOrmModuleAsyncOptions,
+  TypeOrmModuleOptions,
+} from '@nestjs/typeorm';
 import { LoggerOptions } from 'typeorm';
 import * as fs from 'fs';
 
@@ -13,30 +16,29 @@ export default class TypeOrmConfig {
       username: configService.get('database.username'),
       password: configService.get('database.password'),
       migrationsTableName: 'migrations',
-      entities: [
-         "dist/**/*.entity{.ts,.js}",
-      ],
-      migrations: [
-         "dist/migrations/*.js"
-      ],
-      subscribers: [
-         "dist/subscribers/*.js"
-      ],
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      migrations: ['dist/migrations/*.js'],
+      subscribers: ['dist/subscribers/*.js'],
       cli: {
-         "entitiesDir": "src/entities",
-         "migrationsDir": "src/migrations",
-         "subscribersDir": "src/subscribers"
+        entitiesDir: 'src/entities',
+        migrationsDir: 'src/migrations',
+        subscribersDir: 'src/subscribers',
       },
-      synchronize: true
+      synchronize: true,
     };
 
     if (!fs.existsSync('ormconfig.json')) {
-      fs.writeFile("ormconfig.json", JSON.stringify(config), 'utf8', function (err) {
-        if (err) {
-          console.log("An error occured while writing ormconfig.json");
-          return console.log(err);
-        }
-      });
+      fs.writeFile(
+        'ormconfig.json',
+        JSON.stringify(config),
+        'utf8',
+        function (err) {
+          if (err) {
+            console.log('An error occured while writing ormconfig.json');
+            return console.log(err);
+          }
+        },
+      );
       console.log('He');
     }
     return config;
@@ -45,6 +47,8 @@ export default class TypeOrmConfig {
 
 export const typeOrmConfigAsync: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule],
-  useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => TypeOrmConfig.getOrmConfig(configService),
-  inject: [ConfigService]
+  useFactory: async (
+    configService: ConfigService,
+  ): Promise<TypeOrmModuleOptions> => TypeOrmConfig.getOrmConfig(configService),
+  inject: [ConfigService],
 };

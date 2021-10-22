@@ -11,7 +11,7 @@ import configuration from './common/config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { LoggerMiddleware } from '@Middlewares/logger.middleware'
+import { LoggerMiddleware } from '@Middlewares/logger.middleware';
 
 import { AccountModule } from './modules/account/account.module';
 
@@ -20,11 +20,11 @@ import { AccountModule } from './modules/account/account.module';
     ConfigModule.forRoot({
       envFilePath: `${process.env.NODE_ENV}.env`,
       load: [configuration],
-      isGlobal: true
+      isGlobal: true,
     }),
     AutomapperModule.forRoot({
       options: [{ name: 'classMapper', pluginInitializer: classes }],
-      singular: true
+      singular: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     AccountModule,

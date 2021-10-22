@@ -5,24 +5,20 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { promisify } from 'util';
 import * as bcrypt from 'bcrypt';
-import * as crypto from "crypto";
+import * as crypto from 'crypto';
 
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
 
 import { User } from '@Responses/user';
 
-import {
-  RegisterRequest,
-  LoginRequest
-} from './dtos/requests.dto';
+import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
 
 import {
   ActivateAccountResponse,
   LoginResponse,
   RegisterResponse,
 } from './dtos/responses.dto';
-
 
 @Injectable()
 export class AccountService {
@@ -34,7 +30,9 @@ export class AccountService {
   ) {}
 
   async register(request: RegisterRequest): Promise<RegisterResponse> {
-    const emailExists = await this.userRepository.checkEmailExists(request.email);
+    const emailExists = await this.userRepository.checkEmailExists(
+      request.email,
+    );
 
     if (emailExists != true) {
       throw new HttpException('This email has been used', HttpStatus.CONFLICT);
@@ -56,7 +54,7 @@ export class AccountService {
     _user.iv = crypto.randomBytes(16).toString('hex');
     await this.userRepository.save(_user);
 
-    const encryptedString= this.encrypt(_user);
+    const encryptedString = this.encrypt(_user);
     const host = this.configService.get<string>('host');
     const activateURL = `${host}/account/activate?token=${encryptedString}`;
 
@@ -65,18 +63,21 @@ export class AccountService {
     return {
       user: this.mapper.map(_user, User, UserEntity),
       accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user)
-    }
+      refreshToken: this.signToken('Refresh Token', _user),
+    };
   }
 
   async login(request: LoginRequest): Promise<LoginResponse> {
     const _user = await this.userRepository.findOne({ email: request.email });
 
     if (!_user) {
-      throw new HttpException("Can't find user with email", HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "Can't find user with email",
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    if (!await bcrypt.compare(request.password, _user.password)) {
+    if (!(await bcrypt.compare(request.password, _user.password))) {
       _user.loginFailedStrike++;
 
       if (_user.loginFailedStrike == 3) {
@@ -88,7 +89,8 @@ export class AccountService {
       await this.userRepository.save(_user);
 
       if (_user.loginFailedStrike >= 3) {
-        const message = 'Account has been locked, check email for more instruction';
+        const message =
+          'Account has been locked, check email for more instruction';
         throw new HttpException(message, HttpStatus.FORBIDDEN);
       }
 
@@ -96,7 +98,8 @@ export class AccountService {
     }
 
     if (_user.loginFailedStrike >= 3) {
-      const message = 'Account has been locked, check email for more instruction';
+      const message =
+        'Account has been locked, check email for more instruction';
       throw new HttpException(message, HttpStatus.FORBIDDEN);
     }
 
@@ -108,13 +111,14 @@ export class AccountService {
     return {
       user: this.mapper.map(_user, User, UserEntity),
       accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user)
-    }
+      refreshToken: this.signToken('Refresh Token', _user),
+    };
   }
 
   async activate(encryptedString: string): Promise<ActivateAccountResponse> {
     const decryptedData = this.decrypt(encryptedString);
-    const data: { userId: string, activateCode: string } = JSON.parse(decryptedData);
+    const data: { userId: string; activateCode: string } =
+      JSON.parse(decryptedData);
 
     const _user = await this.userRepository.findOne(data.userId);
 
@@ -130,7 +134,10 @@ export class AccountService {
       } else {
         _user.activateCode = Math.random().toString(36).slice(-10);
         await this.userRepository.save(_user);
-        throw new HttpException('Account were activated before', HttpStatus.NOT_ACCEPTABLE);
+        throw new HttpException(
+          'Account were activated before',
+          HttpStatus.NOT_ACCEPTABLE,
+        );
       }
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
@@ -139,24 +146,36 @@ export class AccountService {
     return {
       user: this.mapper.map(_user, User, UserEntity),
       accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user)
-    }
+      refreshToken: this.signToken('Refresh Token', _user),
+    };
   }
 
   private signToken(type: string, _user: UserEntity): string {
     switch (type) {
-      case 'Access Token':
-      {
+      case 'Access Token': {
         return this.jwtService.sign(
-          { userId: _user.id, userEmai: _user.email, userFirstName: _user.firstName },
-          { secret: this.configService.get('secret.jwt.accessSecert'), expiresIn: '2d' }
+          {
+            userId: _user.id,
+            userEmai: _user.email,
+            userFirstName: _user.firstName,
+          },
+          {
+            secret: this.configService.get('secret.jwt.accessSecert'),
+            expiresIn: '2d',
+          },
         );
       }
-      case 'Refresh Token':
-      {
+      case 'Refresh Token': {
         return this.jwtService.sign(
-          { userId: _user.id, userEmai: _user.email, userFirstName: _user.firstName },
-          { secret: this.configService.get('secret.jwt.refreshSecert'), expiresIn: '30d' }
+          {
+            userId: _user.id,
+            userEmai: _user.email,
+            userFirstName: _user.firstName,
+          },
+          {
+            secret: this.configService.get('secret.jwt.refreshSecert'),
+            expiresIn: '30d',
+          },
         );
       }
       default:
@@ -165,19 +184,21 @@ export class AccountService {
   }
 
   private encrypt(_user: UserEntity): string {
-    const activateSecert = this.configService.get<string>('secret.activateSecert');
+    const activateSecert = this.configService.get<string>(
+      'secret.activateSecert',
+    );
     const ivString = this.configService.get<string>('secret.iv');
 
     const cipher = crypto.createCipheriv(
       'aes-256-cbc',
       Buffer.from(activateSecert, 'utf8'),
-      Buffer.from(ivString, 'utf8')
+      Buffer.from(ivString, 'utf8'),
     );
 
     const data = {
-        userId: _user.id,
-        userEmai: _user.email,
-        activateCode: _user.activateCode,
+      userId: _user.id,
+      userEmai: _user.email,
+      activateCode: _user.activateCode,
     };
 
     let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
@@ -188,13 +209,15 @@ export class AccountService {
   private decrypt(encryptedString: string): string {
     const realEncrypeted = Buffer.from(encryptedString, 'hex');
 
-    const activateSecert = this.configService.get<string>('secret.activateSecert');
+    const activateSecert = this.configService.get<string>(
+      'secret.activateSecert',
+    );
     const ivString = this.configService.get<string>('secret.iv');
 
     const decipher = crypto.createDecipheriv(
       'aes-256-cbc',
       Buffer.from(activateSecert, 'utf8'),
-      Buffer.from(ivString, 'utf8')
+      Buffer.from(ivString, 'utf8'),
     );
 
     let decryptedData = decipher.update(realEncrypeted, 'base64', 'utf8');

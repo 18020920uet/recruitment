@@ -19,7 +19,7 @@ import {
   UnauthorizedResponse,
   ConflictResponse,
   NotFoundResponse,
-  ForbiddenResponse
+  ForbiddenResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 
 import { AccountService } from './account.service';
@@ -27,7 +27,7 @@ import { AccountService } from './account.service';
 import {
   ChangePasswordRequest,
   RegisterRequest,
-  LoginRequest
+  LoginRequest,
 } from './dtos/requests.dto';
 
 import {
@@ -38,16 +38,22 @@ import {
 
 @Controller('account')
 export class AccountController {
-  constructor(
-    private accountService: AccountService
-  ) {}
+  constructor(private accountService: AccountService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register' })
   @ApplicationApiOkResponse(RegisterResponse)
-  @ApiConflictResponse({ description: 'Email has already been used',type: ConflictResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async register(@Body() registerRequest: RegisterRequest): Promise<RegisterResponse> {
+  @ApiConflictResponse({
+    description: 'Email has already been used',
+    type: ConflictResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Server error',
+    type: InternalServerErrorResponse,
+  })
+  async register(
+    @Body() registerRequest: RegisterRequest,
+  ): Promise<RegisterResponse> {
     return await this.accountService.register(registerRequest);
   }
 
@@ -55,9 +61,18 @@ export class AccountController {
   @ApiOperation({ summary: 'Login' })
   @ApplicationApiOkResponse(LoginResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
-  @ApiUnauthorizedResponse({ description: 'Wrong password', type: UnauthorizedResponse })
-  @ApiForbiddenResponse({ description: 'Account locked', type: ForbiddenResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiUnauthorizedResponse({
+    description: 'Wrong password',
+    type: UnauthorizedResponse,
+  })
+  @ApiForbiddenResponse({
+    description: 'Account locked',
+    type: ForbiddenResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Server error',
+    type: InternalServerErrorResponse,
+  })
   async login(@Body() loginRequest: LoginRequest): Promise<LoginResponse> {
     return await this.accountService.login(loginRequest);
   }
@@ -66,10 +81,21 @@ export class AccountController {
   @ApiOperation({ summary: 'Activate account' })
   @ApplicationApiOkResponse(ActivateAccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
-  @ApiForbiddenResponse({ description: 'Wrong activate code', type: ForbiddenResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  @ApiNotAcceptableResponse({ description: 'Account had been activated before', type: NotAcceptableResponse })
-  async activate(@Query('token') encryptedString: string): Promise<ActivateAccountResponse> {
+  @ApiForbiddenResponse({
+    description: 'Wrong activate code',
+    type: ForbiddenResponse,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Server error',
+    type: InternalServerErrorResponse,
+  })
+  @ApiNotAcceptableResponse({
+    description: 'Account had been activated before',
+    type: NotAcceptableResponse,
+  })
+  async activate(
+    @Query('token') encryptedString: string,
+  ): Promise<ActivateAccountResponse> {
     return await this.accountService.activate(encryptedString);
   }
 

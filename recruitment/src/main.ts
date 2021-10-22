@@ -16,8 +16,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableVersioning({
-    type: VersioningType.URI
-  })
+    type: VersioningType.URI,
+  });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Rescruitment API')
@@ -26,8 +26,10 @@ async function bootstrap() {
     .build();
 
   const doc = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('document', app, doc)
+  SwaggerModule.setup('document', app, doc);
 
   await app.listen(process.env.PORT);
 }
-bootstrap().then(() => console.log('Service listening on port:', process.env.PORT));;
+bootstrap().then(() =>
+  console.log('Service listening on port:', process.env.PORT),
+);

@@ -11,13 +11,13 @@ export class LoggerMiddleware implements NestMiddleware {
 
     response.on('finish', () => {
       const { statusCode } = response;
-      const contentLength = response.get("content-length");
+      const contentLength = response.get('content-length');
       const delay = Date.now() - startPoint;
 
       this.logger.log(
         `${method} ${originalUrl} ${statusCode} ${contentLength} - ${delay}ms`,
       );
-    })
+    });
     next();
   }
 }

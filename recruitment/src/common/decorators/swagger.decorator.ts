@@ -2,7 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { applyDecorators, Type } from '@nestjs/common';
 import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 
-export const ApplicationApiOkResponse = <TModel extends Type<any>>(model: TModel) => {
+export const ApplicationApiOkResponse = <TModel extends Type<any>>(
+  model: TModel,
+) => {
   return applyDecorators(
     ApiExtraModels(model),
     ApiOkResponse({
@@ -12,11 +14,11 @@ export const ApplicationApiOkResponse = <TModel extends Type<any>>(model: TModel
           schema: {
             properties: {
               code: { type: 'number', default: 1 },
-              statusCode : { type: 'number'},
+              statusCode: { type: 'number' },
               message: { type: 'string' },
               data: {
-                $ref: getSchemaPath(model)
-              }
+                $ref: getSchemaPath(model),
+              },
             },
           },
         },

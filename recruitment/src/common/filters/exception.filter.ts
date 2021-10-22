@@ -1,6 +1,12 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as fs from "fs";
+import * as fs from 'fs';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -10,13 +16,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     if (exception instanceof HttpException) {
-      const statusCode =  exception.getStatus();
+      const statusCode = exception.getStatus();
       const message = exception.message;
 
       const exceptionResponse = {
         statusCode: statusCode,
         message: message,
-        status: 0
+        status: 0,
       };
 
       return response.status(statusCode).json(exceptionResponse);
@@ -30,7 +36,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message: message,
         path: request.path,
         method: request.method,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       const logDirectory = './logs';
@@ -39,9 +45,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
 
       const log = {
-         ... exceptionResponse,
-         request: request.body,
-         ip: request.ip,
+        ...exceptionResponse,
+        request: request.body,
+        ip: request.ip,
       };
 
       fs.appendFile(
@@ -53,17 +59,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
             throw err;
           }
           console.log('Internal server error has been saved!');
-        }
+        },
       );
 
       if (process.env.NODE_ENV == 'production') {
         return response.status(statusCode).json({
           statusCode: statusCode,
           message: 'Internal server error',
-          status: 0
+          status: 0,
         });
       } else {
-        return  response.status(statusCode).json(exceptionResponse);
+        return response.status(statusCode).json(exceptionResponse);
       }
     }
   }
