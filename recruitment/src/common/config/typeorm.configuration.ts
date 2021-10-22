@@ -6,7 +6,7 @@ import * as fs from 'fs';
 export default class TypeOrmConfig {
   static getOrmConfig(configService: ConfigService): TypeOrmModuleOptions {
     const config: TypeOrmModuleOptions = {
-      type: 'postgres', // Sử dụng postgresql
+      type: 'mysql', // Sử dụng postgresql
       host: configService.get('database.host'),
       port: configService.get<number>('database.port'),
       database: configService.get('database.name'),

@@ -43,7 +43,7 @@ export class UserEntity {
     @Column()
     isLock: boolean;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', nullable: true })
     lastLogin: Date;
 
     @Column()

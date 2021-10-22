@@ -3,7 +3,7 @@ export default () => ({
   bscryptSlatRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS),
   host: process.env.HOST,
   database: {
-    type: 'postgres',
+    type: 'mysql',
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
     name: process.env.DATABASE_NAME,
