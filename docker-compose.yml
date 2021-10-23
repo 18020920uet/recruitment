@@ -2,7 +2,26 @@ version: '3.9'
 
 services:
   dev:
+    image: node:14-alpine3.12
     build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: recruitment_api_development
+    working_dir: /home/recruitment
+    volumes:
+      - ./:/home/recruitment
+    ports:
+      - '${PORT}:${PORT}'
+    command: yarn start:dev
+    restart: unless-stopped
+    depends_on:
+      - database
+    networks:
+      - recruitment_networks
+  debug:
+    image: node:14-alpine3.12
+    build:
+      context: .
       dockerfile: ./Dockerfile
     container_name: recruitment_api_development
     working_dir: /home/recruitment
@@ -17,7 +36,9 @@ services:
     networks:
       - recruitment_networks
   prod:
+    image: node:14-alpine3.12
     build:
+      context: .
       dockerfile: ./Dockerfile
     container_name: recruitment_api_product
     working_dir: /home/recruitment
