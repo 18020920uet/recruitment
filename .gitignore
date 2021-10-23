@@ -156,6 +156,7 @@ typings/
 /recruitment/product.env
 
 # compiled output
+/dist
 /node_modules
 /tmp
 /temp

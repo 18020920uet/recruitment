@@ -34,17 +34,16 @@ services:
   database:
     container_name: recruitment_database
     restart: always
-    image: mysql:5.7.36
+    image: postgres:latest
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
-      MYSQL_USER: '${DATABASE_USER}'
-      MYSQL_PASSWORD: '${DATABASE_PASSWORD}'
-      MYSQL_DATABASE: '${DATABASE_NAME}'
+      POSTGRES_USER: '${DATABASE_USER}'
+      POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
+      POSTGRES_DB: '${DATABASE_NAME}'
       TZ: GMT+7
-    ports:
-      - '${DATABASE_PORT}:${DATABASE_PORT}'
+    expose:
+      - '${DATABASE_PORT}'
     volumes:
-      - ./database/:/var/lib/mysql
+      - ./database/:/var/lib/postgresql/data
     networks:
       - recruitment_networks
 

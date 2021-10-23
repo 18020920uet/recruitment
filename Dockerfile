@@ -3,14 +3,14 @@ FROM node:14-alpine3.12
 
 WORKDIR /home/recruitment
 
-COPY ./recruitment /home/recruitment
+COPY ./ /home/recruitment
 
-RUN yarn install
+RUN mkdir -p database
 
-RUN yarn global add ts-node --prefix /usr/local
+RUN npm install
 
 RUN ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 
-RUN yarn build
+RUN npm build
 
 CMD ["node", "dist/main.js"]
