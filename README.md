@@ -8,9 +8,9 @@
 
     node v14.17.4
     yarn
-    postgresql
+    mysql
 
-### Một số dependencies package mà yêu cầu cài đặt global:
+### Một số node dependencies package mà yêu cầu cài đặt global:
 
     typeorm
     nestjs
@@ -40,13 +40,13 @@ docker-compose --env-file <path to .env file> build
 Chạy ứng dụng với môi trường development
 
 ```bash
-docker-compose --env-file ./recruitment/development.env up dev
+docker-compose --env-file ./development.env up dev
 ```
 
 Chạy ứng dụng với môi trường product ('Yêu cầu build lại')
 
 ```bash
-docker-compose --env-file ./recruitment/product.env up prod
+docker-compose --env-file ./product.env up --build prod
 ```
 
 <!-- ## Phần tìm hiểu thêm -->

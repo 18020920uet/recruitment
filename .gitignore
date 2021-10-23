@@ -1,5 +1,4 @@
 # Logs
-
 logs
 *.log
 npm-debug.log*
@@ -88,7 +87,6 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-
 .env
 .env.test
 
@@ -97,7 +95,6 @@ typings/
 .cache
 
 # Next.js build output
-
 .next
 
 # Nuxt.js build / generate output
@@ -115,38 +112,21 @@ typings/
 # public
 
 # vuepress build output
-
 .vuepress/dist
 
 # Serverless directories
-
 .serverless/
 
 # FuseBox cache
-
 .fusebox/
 
 # DynamoDB Local files
-
 .dynamodb/
 
 # TernJS port file
-
 .tern-port
 
 .vscode
-
-# compiled output
-/node_modules
-
-# Logs
-logs
-*.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
 # OS
 .DS_Store
@@ -174,3 +154,11 @@ lerna-debug.log*
 /recruitment/public/*
 /database
 /recruitment/product.env
+
+# compiled output
+/node_modules
+/tmp
+/temp
+/build
+
+ormconfig.json

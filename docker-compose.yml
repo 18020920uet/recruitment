@@ -7,7 +7,7 @@ services:
     container_name: recruitment_api_development
     working_dir: /home/recruitment
     volumes:
-      - ./recruitment:/home/recruitment
+      - ./:/home/recruitment
     ports:
       - '${PORT}:${PORT}'
     command: yarn start:debug
@@ -22,7 +22,7 @@ services:
     container_name: recruitment_api_product
     working_dir: /home/recruitment
     volumes:
-      - ./recruitment:/home/recruitment
+      - ./:/home/recruitment
     ports:
       - '${PORT}:${PORT}'
     command: yarn start:prod
