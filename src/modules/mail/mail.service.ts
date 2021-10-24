@@ -1,23 +1,24 @@
-// import { MailerService } from '@nestjs-modules/mailer';
-// import { Injectable } from '@nestjs/common';
-// import { User } from '@Entities/user.entity';
-//
-// @Injectable()
-// export class MailService {
-//   constructor(private mailerService: MailerService) {}
-//
-//   async sendUserConfirmation(user: User, token: string) {
-//     const url = `example.com/auth/confirm?token=${token}`;
-//
-//     await this.mailerService.sendMail({
-//       to: user.email,
-//       // from: '"Support Team" <support@example.com>', // override default from
-//       subject: 'Welcome to Nice App! Confirm your Email',
-//       template: './confirmation', // `.hbs` extension is appended automatically
-//       context: { // ✏️ filling curly brackets with content
-//         name: user.name,
-//         url,
-//       },
-//     });
-//   }
-// }
+import { MailerService } from '@nestjs-modules/mailer';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { UserEntity } from '@Entities/user.entity';
+
+@Injectable()
+export class MailService {
+  constructor(private mailerService: MailerService, private configService: ConfigService) {}
+
+  async sendAccountActivationMail(_user: UserEntity, token: string) {
+    const host = this.configService.get<string>('host');
+    const url = `${host}/account/activate?token=${token}`;
+
+    const a = await this.mailerService.sendMail({
+      to: _user.email,
+      subject: 'Welcome to Recruitment! Confirm your Email',
+      template: './activation',
+      context: {
+        name: `${_user.firstName} ${_user.lastName}`,
+        url,
+      },
+    });
+  }
+}

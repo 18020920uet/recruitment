@@ -1,6 +1,24 @@
 version: '3.9'
 
 services:
+  work:
+    image: node:14-alpine3.12
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: recruitment_api_work
+    working_dir: /home/recruitment
+    volumes:
+      - ./:/home/recruitment
+    ports:
+      - '${PORT}:${PORT}'
+    command: yarn start:dev
+    restart: unless-stopped
+    depends_on:
+      - database
+      - adminer
+    networks:
+      - recruitment_networks
   dev:
     image: node:14-alpine3.12
     build:
@@ -12,27 +30,11 @@ services:
       - ./:/home/recruitment
     ports:
       - '${PORT}:${PORT}'
-    command: yarn start:dev
+    command: yarn start
     restart: unless-stopped
     depends_on:
       - database
-    networks:
-      - recruitment_networks
-  debug:
-    image: node:14-alpine3.12
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    container_name: recruitment_api_development
-    working_dir: /home/recruitment
-    volumes:
-      - ./:/home/recruitment
-    ports:
-      - '${PORT}:${PORT}'
-    command: yarn start:debug
-    restart: unless-stopped
-    depends_on:
-      - database
+      - adminer
     networks:
       - recruitment_networks
   prod:
@@ -50,6 +52,7 @@ services:
     restart: unless-stopped
     depends_on:
       - database
+      - adminer
     networks:
       - recruitment_networks
   database:
@@ -65,6 +68,16 @@ services:
       - '${DATABASE_PORT}'
     volumes:
       - ./database/:/var/lib/postgresql/data
+    networks:
+      - recruitment_networks
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    restart: always
+    ports:
+      - 5050:8080
+    depends_on:
+      - database
     networks:
       - recruitment_networks
 

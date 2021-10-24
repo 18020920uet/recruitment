@@ -19,11 +19,14 @@ export default () => ({
     },
   },
   secret: {
-    jwt: {
-      accessSecert: process.env.JWT_ACCESS_SECERT,
-      refreshSecert: process.env.JWT_REFRESH_SECERT,
-    },
+    jwt: process.env.JWT_SECERT,
     activateSecert: process.env.ACTIVATE_SECERT,
     iv: process.env.IV_START,
   },
+  mail: {
+    stmpHost: process.env.MAIL_HOST,
+    user: process.env.MAIL_USER,
+    password: process.env.MAIL_PASSWORD,
+    from: process.env.MAIL_FROM
+  }
 });

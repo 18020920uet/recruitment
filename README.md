@@ -8,7 +8,7 @@
 
     node v14.17.4
     yarn
-    mysql
+    postgres
 
 ### Một số node dependencies package mà yêu cầu cài đặt global:
 
@@ -31,22 +31,43 @@ Yêu cầu:
 
 Build
 
->Nếu đã build rồi thì xóa thư mục _/database_ đi để có thể build lại
+>Nếu đã build rồi thì xóa thư mục _/database_ và _/dist_ đi để có thể build lại
 
 ```bash
 docker-compose --env-file <path to .env file> build
 ```
 
-Chạy ứng dụng với môi trường development
+Chạy ứng dụng với môi trường code
 
 ```bash
-docker-compose --env-file ./development.env up dev
+docker-compose --env-file ./.env.development up work
+```
+
+Chạy ứng dụng với môi trường dev
+
+```bash
+docker-compose --env-file ./.env.development up dev
 ```
 
 Chạy ứng dụng với môi trường product ('Yêu cầu build lại')
 
 ```bash
-docker-compose --env-file ./product.env up --build prod
+mv -r database dist
+docker-compose --env-file ./.env.product up --build prod
+```
+
+### Sử dụng
+
+Sử dụng lấy **Container ID** của
+
+```bash
+docker ps
+```
+
+Lấy host IP bằng lệnh dưới
+
+```bash
+docker inspect {} | grep IPAddress
 ```
 
 <!-- ## Phần tìm hiểu thêm -->

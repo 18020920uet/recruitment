@@ -10,16 +10,20 @@ import { UserRepository } from '@Repositories/user.repository';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 
+import { MailModule } from '@Modules/mail/mail.module';
+import { MailService } from '@Modules/mail/mail.service';
+
 @Module({
   imports: [
+    MailModule,
     ConfigModule,
     TypeOrmModule.forFeature([UserRepository]),
     JwtModule.register({
-      secret: 'aaa',
+      secret: 'aa',
       signOptions: { expiresIn: '60s' },
     }),
   ],
   controllers: [AccountController],
-  providers: [ApplicationMapperProfile, AccountService],
+  providers: [ApplicationMapperProfile, AccountService, MailService],
 })
 export class AccountModule {}

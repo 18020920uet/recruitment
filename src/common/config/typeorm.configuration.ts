@@ -28,10 +28,7 @@ export default class TypeOrmConfig {
     };
 
     if (!fs.existsSync('ormconfig.json')) {
-      fs.writeFile(
-        'ormconfig.json',
-        JSON.stringify(config),
-        'utf8',
+      fs.writeFile('ormconfig.json', JSON.stringify(config), 'utf8',
         function (err) {
           if (err) {
             console.log('An error occured while writing ormconfig.json');
@@ -39,7 +36,6 @@ export default class TypeOrmConfig {
           }
         },
       );
-      console.log('He');
     }
     return config;
   }

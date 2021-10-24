@@ -22,6 +22,9 @@
       "@Entities/*": [
         "src/entities/*"
       ],
+      "@Modules/*":[
+        "src/modules/*"
+      ],
       "@Repositories/*": [
         "src/repositories/*"
       ],

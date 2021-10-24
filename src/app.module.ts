@@ -13,12 +13,12 @@ import { AppService } from './app.service';
 
 import { LoggerMiddleware } from '@Middlewares/logger.middleware';
 
-import { AccountModule } from './modules/account/account.module';
+import { AccountModule } from '@Modules/account/account.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `${process.env.NODE_ENV}.env`,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
       load: [configuration],
       isGlobal: true,
     }),
