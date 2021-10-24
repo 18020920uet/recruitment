@@ -1,35 +1,38 @@
-// import { MailerModule } from '@nestjs-modules/mailer';
-// import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-// import { Module } from '@nestjs/common';
-// import { MailService } from './mail.service';
-// import { join } from 'path';
-//
-// @Module({
-//   imports: [
-//     MailerModule.forRoot({
-//       // transport: 'smtps://user@example.com:topsecret@smtp.example.com',
-//       // or
-//       transport: {
-//         host: 'smtp.example.com',
-//         secure: false,
-//         auth: {
-//           user: 'user@example.com',
-//           pass: 'topsecret',
-//         },
-//       },
-//       defaults: {
-//         from: '"No Reply" <noreply@example.com>',
-//       },
-//       template: {
-//         dir: join(__dirname, 'templates'),
-//         adapter: new HandlebarsAdapter(),
-//         options: {
-//           strict: true,
-//         },
-//       },
-//     }),
-//   ],
-//   providers: [MailService],
-//   exports: [MailService],
-// })
-// export class MailModule {}
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { Module } from '@nestjs/common';
+import { join } from 'path';
+
+import { MailService } from './mail.service';
+
+@Module({
+  imports: [
+    MailerModule.forRootAsync({
+      useFactory: async (config: ConfigService) => ({
+        transport: {
+          host: config.get("mail.stmpHost"),
+          secure: false,
+          auth: {
+            user: config.get("mail.user"),
+            pass: config.get("mail.password"),
+          }
+        },
+        defaults: {
+          from: `"No Reply" <${config.get('mail.from')}>`,
+        },
+        template:{
+          dir: join(__dirname, '/templates/'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+      inject: [ConfigService]
+    })
+  ],
+  providers: [MailService, ConfigService],
+  exports: [MailService],
+})
+export class MailModule {}

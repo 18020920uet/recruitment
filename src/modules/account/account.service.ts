@@ -20,19 +20,87 @@ import {
   RegisterResponse,
 } from './dtos/responses.dto';
 
+
+import { MailService } from '@Modules/mail/mail.service';
+
+
 @Injectable()
 export class AccountService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
     private userRepository: UserRepository,
     private configService: ConfigService,
+    private mailService: MailService,
     private jwtService: JwtService,
   ) {}
 
+  private signToken(type: string, _user: UserEntity): string {
+    const secret = this.configService.get('secret.jwt');
+
+    const payload = {
+        userId: _user.id,
+        userEmai: _user.email,
+        userFirstName: _user.firstName,
+    };
+
+    switch (type) {
+      case 'Access Token': {
+        const options = {
+          secret: secret,
+          expiresIn: '2d'
+        };
+
+        return this.jwtService.sign(payload, options);
+      }
+      case 'Refresh Token': {
+        const options = {
+          secret: secret,
+          expiresIn: '30d',
+        };
+
+        return this.jwtService.sign(payload, options);
+      }
+      default:
+        throw Error('Undefined token');
+    }
+  }
+
+  private encrypt(_user: UserEntity): string {
+    const activateSecert = this.configService.get<string>('secret.activateSecert');
+    const ivString = this.configService.get<string>('secret.iv');
+    const bufferSecret = Buffer.from(activateSecert, 'utf8');
+    const bufferIV = Buffer.from(ivString, 'utf8');
+
+    const cipher = crypto.createCipheriv('aes-256-cbc', bufferSecret, bufferIV);
+
+    const data = {
+      userId: _user.id,
+      userEmai: _user.email,
+      activateCode: _user.activateCode,
+    };
+
+    let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
+    encrypted += cipher.final('base64');
+    return Buffer.from(encrypted, 'base64').toString('hex');
+  }
+
+  private decrypt(encryptedString: string): string {
+    const realEncrypeted = Buffer.from(encryptedString, 'hex');
+
+    const activateSecert = this.configService.get<string>('secret.activateSecert');
+    const ivString = this.configService.get<string>('secret.iv');
+    const bufferSecret = Buffer.from(activateSecert, 'utf8');
+    const bufferIV = Buffer.from(ivString, 'utf8');
+
+    const decipher = crypto.createDecipheriv('aes-256-cbc', bufferSecret, bufferIV);
+
+    let decryptedData = decipher.update(realEncrypeted, 'base64', 'utf8');
+    decryptedData += decipher.final('utf8');
+    return decryptedData;
+  }
+
   async register(request: RegisterRequest): Promise<RegisterResponse> {
-    const emailExists = await this.userRepository.checkEmailExists(
-      request.email,
-    );
+    const emailExists = await this.userRepository.checkEmailExists(request.email);
 
     if (emailExists != true) {
       throw new HttpException('This email has been used', HttpStatus.CONFLICT);
@@ -54,11 +122,11 @@ export class AccountService {
     _user.iv = crypto.randomBytes(16).toString('hex');
     await this.userRepository.save(_user);
 
-    const encryptedString = this.encrypt(_user);
+    const encryptedToken = this.encrypt(_user);
     const host = this.configService.get<string>('host');
-    const activateURL = `${host}/account/activate?token=${encryptedString}`;
 
     // Send active url to user emailExists
+    await this.mailService.sendAccountActivationMail(_user, encryptedToken);
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
@@ -71,10 +139,7 @@ export class AccountService {
     const _user = await this.userRepository.findOne({ email: request.email });
 
     if (!_user) {
-      throw new HttpException(
-        "Can't find user with email",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException("Can't find user with email", HttpStatus.NOT_FOUND);
     }
 
     if (!(await bcrypt.compare(request.password, _user.password))) {
@@ -89,8 +154,7 @@ export class AccountService {
       await this.userRepository.save(_user);
 
       if (_user.loginFailedStrike >= 3) {
-        const message =
-          'Account has been locked, check email for more instruction';
+        const message = 'Account has been locked, check email for more instruction';
         throw new HttpException(message, HttpStatus.FORBIDDEN);
       }
 
@@ -98,8 +162,7 @@ export class AccountService {
     }
 
     if (_user.loginFailedStrike >= 3) {
-      const message =
-        'Account has been locked, check email for more instruction';
+      const message = 'Account has been locked, check email for more instruction';
       throw new HttpException(message, HttpStatus.FORBIDDEN);
     }
 
@@ -117,9 +180,7 @@ export class AccountService {
 
   async activate(encryptedString: string): Promise<ActivateAccountResponse> {
     const decryptedData = this.decrypt(encryptedString);
-    const data: { userId: string; activateCode: string } =
-      JSON.parse(decryptedData);
-
+    const data: { userId: string; activateCode: string } = JSON.parse(decryptedData);
     const _user = await this.userRepository.findOne(data.userId);
 
     if (!_user) {
@@ -134,10 +195,7 @@ export class AccountService {
       } else {
         _user.activateCode = Math.random().toString(36).slice(-10);
         await this.userRepository.save(_user);
-        throw new HttpException(
-          'Account were activated before',
-          HttpStatus.NOT_ACCEPTABLE,
-        );
+        throw new HttpException('Account were activated before', HttpStatus.NOT_ACCEPTABLE);
       }
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
@@ -150,78 +208,5 @@ export class AccountService {
     };
   }
 
-  private signToken(type: string, _user: UserEntity): string {
-    switch (type) {
-      case 'Access Token': {
-        return this.jwtService.sign(
-          {
-            userId: _user.id,
-            userEmai: _user.email,
-            userFirstName: _user.firstName,
-          },
-          {
-            secret: this.configService.get('secret.jwt.accessSecert'),
-            expiresIn: '2d',
-          },
-        );
-      }
-      case 'Refresh Token': {
-        return this.jwtService.sign(
-          {
-            userId: _user.id,
-            userEmai: _user.email,
-            userFirstName: _user.firstName,
-          },
-          {
-            secret: this.configService.get('secret.jwt.refreshSecert'),
-            expiresIn: '30d',
-          },
-        );
-      }
-      default:
-        throw Error('Undefined token');
-    }
-  }
 
-  private encrypt(_user: UserEntity): string {
-    const activateSecert = this.configService.get<string>(
-      'secret.activateSecert',
-    );
-    const ivString = this.configService.get<string>('secret.iv');
-
-    const cipher = crypto.createCipheriv(
-      'aes-256-cbc',
-      Buffer.from(activateSecert, 'utf8'),
-      Buffer.from(ivString, 'utf8'),
-    );
-
-    const data = {
-      userId: _user.id,
-      userEmai: _user.email,
-      activateCode: _user.activateCode,
-    };
-
-    let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-    return Buffer.from(encrypted, 'base64').toString('hex');
-  }
-
-  private decrypt(encryptedString: string): string {
-    const realEncrypeted = Buffer.from(encryptedString, 'hex');
-
-    const activateSecert = this.configService.get<string>(
-      'secret.activateSecert',
-    );
-    const ivString = this.configService.get<string>('secret.iv');
-
-    const decipher = crypto.createDecipheriv(
-      'aes-256-cbc',
-      Buffer.from(activateSecert, 'utf8'),
-      Buffer.from(ivString, 'utf8'),
-    );
-
-    let decryptedData = decipher.update(realEncrypeted, 'base64', 'utf8');
-    decryptedData += decipher.final('utf8');
-    return decryptedData;
-  }
 }

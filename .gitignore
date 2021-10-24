@@ -162,4 +162,6 @@ typings/
 /temp
 /build
 
+.env.development
+
 ormconfig.json
