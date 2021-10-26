@@ -11,12 +11,15 @@ import { MailService } from './mail.service';
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
-          host: config.get("mail.stmpHost"),
+          host: config.get("mail.host"),
           secure: false,
           auth: {
             user: config.get("mail.user"),
             pass: config.get("mail.password"),
-          }
+          },
+          tls: {
+            rejectUnauthorized: false
+        }
         },
         defaults: {
           from: `"No Reply" <${config.get('mail.from')}>`,

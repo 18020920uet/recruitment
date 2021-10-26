@@ -1,0 +1,13 @@
+<p>Hey {{ fullName }},</p>
+<p>Please click below to confirm your email</p>
+
+<p>
+  <a href="{{actiaveUrl}}">Confirm</a>
+</p>
+
+{{#if isDevelopmentMode}}
+<p> For development test </p>
+<p> {{actiaveUrl}} </p>
+{{/if}}
+
+<p>If you did not request this email you can safely ignore it.</p>

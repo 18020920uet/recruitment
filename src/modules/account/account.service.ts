@@ -15,14 +15,14 @@ import { User } from '@Responses/user';
 import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
 
 import {
+  RequestResetPasswordResponse,
   ActivateAccountResponse,
-  LoginResponse,
+  UnlockAccountResponse,
   RegisterResponse,
+  LoginResponse,
 } from './dtos/responses.dto';
 
-
 import { MailService } from '@Modules/mail/mail.service';
-
 
 @Injectable()
 export class AccountService {
@@ -65,23 +65,40 @@ export class AccountService {
     }
   }
 
-  private encrypt(_user: UserEntity): string {
+  private encrypt(_user: UserEntity, purpose: string): string {
     const activateSecert = this.configService.get<string>('secret.activateSecert');
     const ivString = this.configService.get<string>('secret.iv');
     const bufferSecret = Buffer.from(activateSecert, 'utf8');
     const bufferIV = Buffer.from(ivString, 'utf8');
-
     const cipher = crypto.createCipheriv('aes-256-cbc', bufferSecret, bufferIV);
 
-    const data = {
-      userId: _user.id,
-      userEmai: _user.email,
-      activateCode: _user.activateCode,
-    };
-
-    let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-    encrypted += cipher.final('base64');
-    return Buffer.from(encrypted, 'base64').toString('hex');
+    switch (purpose) {
+      case "Activate":
+        {
+          const data = {
+            userId: _user.id,
+            userEmai: _user.email,
+            activateCode: _user.activateCode,
+          };
+          let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
+          encrypted += cipher.final('base64');
+          return Buffer.from(encrypted, 'base64').toString('hex');
+        }
+      case "Unlock":
+      case "ResetPassword":
+        {
+          const data = {
+            userId: _user.id,
+            userEmai: _user.email,
+            resetCode: _user.resetCode,
+          };
+          let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
+          encrypted += cipher.final('base64');
+          return Buffer.from(encrypted, 'base64').toString('hex');
+        }
+      default:
+        throw Error('Undefined token');
+    }
   }
 
   private decrypt(encryptedString: string): string {
@@ -91,7 +108,6 @@ export class AccountService {
     const ivString = this.configService.get<string>('secret.iv');
     const bufferSecret = Buffer.from(activateSecert, 'utf8');
     const bufferIV = Buffer.from(ivString, 'utf8');
-
     const decipher = crypto.createDecipheriv('aes-256-cbc', bufferSecret, bufferIV);
 
     let decryptedData = decipher.update(realEncrypeted, 'base64', 'utf8');
@@ -119,13 +135,12 @@ export class AccountService {
     _user.loginFailedStrike = 0;
     _user.isLock = false;
     _user.lastLogin = new Date();
-    _user.iv = crypto.randomBytes(16).toString('hex');
     await this.userRepository.save(_user);
 
-    const encryptedToken = this.encrypt(_user);
-    const host = this.configService.get<string>('host');
+    // Encrypt token
+    const encryptedToken = this.encrypt(_user, 'Activate');
 
-    // Send active url to user emailExists
+    // Send mail
     await this.mailService.sendAccountActivationMail(_user, encryptedToken);
 
     return {
@@ -139,7 +154,7 @@ export class AccountService {
     const _user = await this.userRepository.findOne({ email: request.email });
 
     if (!_user) {
-      throw new HttpException("Can't find user with email", HttpStatus.NOT_FOUND);
+      throw new HttpException("No account", HttpStatus.NOT_FOUND);
     }
 
     if (!(await bcrypt.compare(request.password, _user.password))) {
@@ -148,7 +163,10 @@ export class AccountService {
       if (_user.loginFailedStrike == 3) {
         _user.isLock = true;
         _user.resetCode = Math.random().toString(36).slice(-10);
+        // Encrypt token
+        const encryptedToken = this.encrypt(_user, 'Unlock')
         // Send mail
+        await this.mailService.sendAccountUnlockMail(_user, encryptedToken);
       }
 
       await this.userRepository.save(_user);
@@ -169,7 +187,7 @@ export class AccountService {
     _user.loginFailedStrike = 0;
     _user.lastLogin = new Date();
 
-    this.userRepository.save(_user);
+    await this.userRepository.save(_user);
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
@@ -184,19 +202,15 @@ export class AccountService {
     const _user = await this.userRepository.findOne(data.userId);
 
     if (!_user) {
-      throw new HttpException("Can't find user", HttpStatus.NOT_FOUND);
+      throw new HttpException("No user", HttpStatus.NOT_FOUND);
     }
 
-    if (_user.activateCode == data.activateCode) {
-      if (!_user.isActivated) {
+    if (_user.activateCode == data.activateCode && !_user.isActivated) {
         _user.isActivated = true;
         _user.activateDate = new Date();
         await this.userRepository.save(_user);
-      } else {
-        _user.activateCode = Math.random().toString(36).slice(-10);
-        await this.userRepository.save(_user);
-        throw new HttpException('Account were activated before', HttpStatus.NOT_ACCEPTABLE);
-      }
+    } else if(_user.isActivated) {
+      throw new HttpException('Account has been activated', HttpStatus.BAD_REQUEST);
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
     }
@@ -208,5 +222,47 @@ export class AccountService {
     };
   }
 
+  async unlock(encryptedString: string): Promise<UnlockAccountResponse> {
+    const decryptedData = this.decrypt(encryptedString);
+    const data: { userId: string; resetCode: string } = JSON.parse(decryptedData);
+    const _user = await this.userRepository.findOne(data.userId);
 
+    if (!_user) {
+      throw new HttpException("No account", HttpStatus.NOT_FOUND);
+    }
+
+    if (_user.isLock && _user.resetCode == data.resetCode) {
+        _user.isLock = false;
+        _user.resetCode = Math.random().toString(36).slice(-10);
+        _user.loginFailedStrike = 0;
+        await this.userRepository.save(_user);
+    } else if(!_user.isLock) {
+      throw new HttpException('Account has been unlocked', HttpStatus.BAD_REQUEST);
+    } else {
+      throw new HttpException('Wrong unlock code', HttpStatus.FORBIDDEN);
+    }
+
+    return {
+      user: this.mapper.map(_user, User, UserEntity),
+      accessToken: this.signToken('Access Token', _user),
+      refreshToken: this.signToken('Refresh Token', _user),
+    };
+  }
+
+  async requestResetPassword(email: string): Promise<RequestResetPasswordResponse> {
+    const _user = await this.userRepository.findOne({ email: email });
+
+    if (!_user) {
+      throw new HttpException("No user", HttpStatus.NOT_FOUND);
+    }
+
+    // Encrypt data
+    const encryptedToken = this.encrypt(_user, 'ResetPassword')
+    // Send mail
+    await this.mailService.sendAccountRequestResetPasswordMail(_user, encryptedToken);
+
+    return {
+      status: true
+    }
+  }
 }

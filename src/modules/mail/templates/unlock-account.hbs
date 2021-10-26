@@ -1,0 +1,16 @@
+<p>Hey {{ fullName }},</p>
+
+<p>You account had been locked because too many failed login attemps</p>
+
+<p>Please click below to unlock your account</p>
+
+<p>
+  <a href="{{unlockUrl}}">Unlock</a>
+</p>
+
+{{#if isDevelopmentMode}}
+<p> For development test </p>
+<p> {{unlockUrl}} </p>
+{{/if}}
+
+<p>- The Recruitment team -</p>
