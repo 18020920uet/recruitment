@@ -2,6 +2,7 @@ export default () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   bscryptSlatRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS),
   host: process.env.HOST,
+  clientHost: process.env.CLIENT_HOST,
   database: {
     type: 'postgres',
     host: process.env.DATABASE_HOST,
@@ -18,13 +19,14 @@ export default () => ({
       subscribersDir: 'src/subscribers',
     },
   },
+  node_env: process.env.NODE_ENV,
   secret: {
     jwt: process.env.JWT_SECERT,
     activateSecert: process.env.ACTIVATE_SECERT,
     iv: process.env.IV_START,
   },
   mail: {
-    stmpHost: process.env.MAIL_HOST,
+    host: process.env.MAIL_HOST,
     user: process.env.MAIL_USER,
     password: process.env.MAIL_PASSWORD,
     from: process.env.MAIL_FROM

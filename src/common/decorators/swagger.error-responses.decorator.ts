@@ -37,3 +37,8 @@ export class NotAcceptableResponse extends ErrorResponse {
   @ApiProperty({ default: 406 })
   statusCode: number = 500;
 }
+
+export class BadRequestResponse extends ErrorResponse {
+  @ApiProperty({ default: 400 })
+  statusCode: number = 400;
+}

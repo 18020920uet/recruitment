@@ -34,3 +34,19 @@ export class ActivateAccountResponse {
   @ApiProperty()
   refreshToken: string;
 }
+
+export class UnlockAccountResponse {
+  @ApiProperty()
+  user: User;
+
+  @ApiProperty()
+  accessToken: string;
+
+  @ApiProperty()
+  refreshToken: string;
+}
+
+export class RequestResetPasswordResponse {
+  @ApiProperty()
+  status: boolean
+}
