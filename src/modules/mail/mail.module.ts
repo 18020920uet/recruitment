@@ -1,5 +1,5 @@
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
@@ -11,20 +11,20 @@ import { MailService } from './mail.service';
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
-          host: config.get("mail.host"),
+          host: config.get('mail.host'),
           secure: false,
           auth: {
-            user: config.get("mail.user"),
-            pass: config.get("mail.password"),
+            user: config.get('mail.user'),
+            pass: config.get('mail.password'),
           },
           tls: {
-            rejectUnauthorized: false
-        }
+            rejectUnauthorized: false,
+          },
         },
         defaults: {
           from: `"No Reply" <${config.get('mail.from')}>`,
         },
-        template:{
+        template: {
           dir: join(__dirname, '/templates/'),
           adapter: new HandlebarsAdapter(),
           options: {
@@ -32,8 +32,8 @@ import { MailService } from './mail.service';
           },
         },
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
   providers: [MailService, ConfigService],
   exports: [MailService],

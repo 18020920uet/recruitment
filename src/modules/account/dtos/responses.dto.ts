@@ -48,5 +48,5 @@ export class UnlockAccountResponse {
 
 export class RequestResetPasswordResponse {
   @ApiProperty()
-  status: boolean
+  status: boolean;
 }

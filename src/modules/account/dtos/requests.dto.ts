@@ -21,11 +21,3 @@ export class LoginRequest {
   @ApiProperty()
   password: string;
 }
-
-export class ChangePasswordRequest {
-  @ApiProperty()
-  oldPassword: string;
-
-  @ApiProperty()
-  newPassword: string;
-}

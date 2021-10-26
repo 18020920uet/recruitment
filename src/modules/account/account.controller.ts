@@ -2,21 +2,18 @@ import { Controller, Post, Put, Body, Query } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,
-  ApiNotAcceptableResponse,
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiForbiddenResponse,
   ApiOperation,
-  ApiProperty,
 } from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
 
 import {
   InternalServerErrorResponse,
-  NotAcceptableResponse,
   UnauthorizedResponse,
   BadRequestResponse,
   ForbiddenResponse,
@@ -26,11 +23,7 @@ import {
 
 import { AccountService } from './account.service';
 
-import {
-  ChangePasswordRequest,
-  RegisterRequest,
-  LoginRequest,
-} from './dtos/requests.dto';
+import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
 
 import {
   RequestResetPasswordResponse,

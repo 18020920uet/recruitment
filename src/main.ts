@@ -30,6 +30,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT);
 }
-bootstrap().then(() =>
-  console.log('Service listening on port:', process.env.PORT),
-);
+bootstrap().then(() => console.log('Service listening on port:', process.env.PORT));

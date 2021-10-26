@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 
@@ -50,17 +44,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ip: request.ip,
       };
 
-      fs.appendFile(
-        'logs/error.log',
-        JSON.stringify(log) + '\n',
-        { flag: 'a' },
-        (err) => {
-          if (err) {
-            throw err;
-          }
-          console.log('Internal server error has been saved!');
-        },
-      );
+      fs.appendFile('logs/error.log', JSON.stringify(log) + '\n', { flag: 'a' }, (err) => {
+        if (err) {
+          throw err;
+        }
+        console.log('Internal server error has been saved!');
+      });
 
       if (process.env.NODE_ENV == 'production') {
         return response.status(statusCode).json({

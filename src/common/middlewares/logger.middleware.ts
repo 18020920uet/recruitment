@@ -6,7 +6,7 @@ export class LoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
 
   use(request: Request, response: Response, next: NextFunction) {
-    const { ip, method, originalUrl } = request;
+    const { method, originalUrl } = request;
     const startPoint = Date.now();
 
     response.on('finish', () => {
@@ -14,9 +14,7 @@ export class LoggerMiddleware implements NestMiddleware {
       const contentLength = response.get('content-length');
       const delay = Date.now() - startPoint;
 
-      this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${delay}ms`,
-      );
+      this.logger.log(`${method} ${originalUrl} ${statusCode} ${contentLength} - ${delay}ms`);
     });
     next();
   }

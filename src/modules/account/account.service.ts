@@ -3,7 +3,6 @@ import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { promisify } from 'util';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -38,16 +37,16 @@ export class AccountService {
     const secret = this.configService.get('secret.jwt');
 
     const payload = {
-        userId: _user.id,
-        userEmai: _user.email,
-        userFirstName: _user.firstName,
+      userId: _user.id,
+      userEmai: _user.email,
+      userFirstName: _user.firstName,
     };
 
     switch (type) {
       case 'Access Token': {
         const options = {
           secret: secret,
-          expiresIn: '2d'
+          expiresIn: '2d',
         };
 
         return this.jwtService.sign(payload, options);
@@ -73,29 +72,27 @@ export class AccountService {
     const cipher = crypto.createCipheriv('aes-256-cbc', bufferSecret, bufferIV);
 
     switch (purpose) {
-      case "Activate":
-        {
-          const data = {
-            userId: _user.id,
-            userEmai: _user.email,
-            activateCode: _user.activateCode,
-          };
-          let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-          encrypted += cipher.final('base64');
-          return Buffer.from(encrypted, 'base64').toString('hex');
-        }
-      case "Unlock":
-      case "ResetPassword":
-        {
-          const data = {
-            userId: _user.id,
-            userEmai: _user.email,
-            resetCode: _user.resetCode,
-          };
-          let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-          encrypted += cipher.final('base64');
-          return Buffer.from(encrypted, 'base64').toString('hex');
-        }
+      case 'Activate': {
+        const data = {
+          userId: _user.id,
+          userEmai: _user.email,
+          activateCode: _user.activateCode,
+        };
+        let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
+        encrypted += cipher.final('base64');
+        return Buffer.from(encrypted, 'base64').toString('hex');
+      }
+      case 'Unlock':
+      case 'ResetPassword': {
+        const data = {
+          userId: _user.id,
+          userEmai: _user.email,
+          resetCode: _user.resetCode,
+        };
+        let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
+        encrypted += cipher.final('base64');
+        return Buffer.from(encrypted, 'base64').toString('hex');
+      }
       default:
         throw Error('Undefined token');
     }
@@ -154,7 +151,7 @@ export class AccountService {
     const _user = await this.userRepository.findOne({ email: request.email });
 
     if (!_user) {
-      throw new HttpException("No account", HttpStatus.NOT_FOUND);
+      throw new HttpException('No account', HttpStatus.NOT_FOUND);
     }
 
     if (!(await bcrypt.compare(request.password, _user.password))) {
@@ -164,7 +161,7 @@ export class AccountService {
         _user.isLock = true;
         _user.resetCode = Math.random().toString(36).slice(-10);
         // Encrypt token
-        const encryptedToken = this.encrypt(_user, 'Unlock')
+        const encryptedToken = this.encrypt(_user, 'Unlock');
         // Send mail
         await this.mailService.sendAccountUnlockMail(_user, encryptedToken);
       }
@@ -202,14 +199,14 @@ export class AccountService {
     const _user = await this.userRepository.findOne(data.userId);
 
     if (!_user) {
-      throw new HttpException("No user", HttpStatus.NOT_FOUND);
+      throw new HttpException('No user', HttpStatus.NOT_FOUND);
     }
 
     if (_user.activateCode == data.activateCode && !_user.isActivated) {
-        _user.isActivated = true;
-        _user.activateDate = new Date();
-        await this.userRepository.save(_user);
-    } else if(_user.isActivated) {
+      _user.isActivated = true;
+      _user.activateDate = new Date();
+      await this.userRepository.save(_user);
+    } else if (_user.isActivated) {
       throw new HttpException('Account has been activated', HttpStatus.BAD_REQUEST);
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
@@ -228,15 +225,15 @@ export class AccountService {
     const _user = await this.userRepository.findOne(data.userId);
 
     if (!_user) {
-      throw new HttpException("No account", HttpStatus.NOT_FOUND);
+      throw new HttpException('No account', HttpStatus.NOT_FOUND);
     }
 
     if (_user.isLock && _user.resetCode == data.resetCode) {
-        _user.isLock = false;
-        _user.resetCode = Math.random().toString(36).slice(-10);
-        _user.loginFailedStrike = 0;
-        await this.userRepository.save(_user);
-    } else if(!_user.isLock) {
+      _user.isLock = false;
+      _user.resetCode = Math.random().toString(36).slice(-10);
+      _user.loginFailedStrike = 0;
+      await this.userRepository.save(_user);
+    } else if (!_user.isLock) {
       throw new HttpException('Account has been unlocked', HttpStatus.BAD_REQUEST);
     } else {
       throw new HttpException('Wrong unlock code', HttpStatus.FORBIDDEN);
@@ -253,16 +250,16 @@ export class AccountService {
     const _user = await this.userRepository.findOne({ email: email });
 
     if (!_user) {
-      throw new HttpException("No user", HttpStatus.NOT_FOUND);
+      throw new HttpException('No user', HttpStatus.NOT_FOUND);
     }
 
     // Encrypt data
-    const encryptedToken = this.encrypt(_user, 'ResetPassword')
+    const encryptedToken = this.encrypt(_user, 'ResetPassword');
     // Send mail
     await this.mailService.sendAccountRequestResetPasswordMail(_user, encryptedToken);
 
     return {
-      status: true
-    }
+      status: true,
+    };
   }
 }

@@ -1,6 +1,6 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { AutomapperModule, InjectMapper } from '@automapper/nestjs';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { Mapper } from '@automapper/types';
 import { classes } from '@automapper/classes';

@@ -30,7 +30,7 @@ export class MailService {
   async sendAccountUnlockMail(_user: UserEntity, token: string) {
     const clientHost = this.configService.get<string>('clientHost');
 
-    const unlockUrl = `${clientHost}/account/unlock?token=${token}`
+    const unlockUrl = `${clientHost}/account/unlock?token=${token}`;
 
     const mode = this.configService.get('node_env');
     const isDevelopmentMode = mode == 'development' ? true : false;
