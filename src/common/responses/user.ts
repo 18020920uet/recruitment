@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
+import { UserRole } from '@Entities/user.entity';
+
 export class User {
   @ApiProperty()
   @AutoMap()
@@ -17,4 +19,8 @@ export class User {
   @ApiProperty()
   @AutoMap()
   lastName: string;
+
+  @ApiProperty()
+  @AutoMap()
+  role: UserRole;
 }

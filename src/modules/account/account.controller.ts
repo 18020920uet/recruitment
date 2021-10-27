@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Body, Query } from '@nestjs/common';
+import { Controller, Post, Put, Body, Query, HttpCode } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,
@@ -10,7 +10,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
+import { ApplicationApiOkResponse, ApplicationApiCreateResponse } from '@Decorators/swagger.decorator';
 
 import {
   InternalServerErrorResponse,
@@ -39,7 +39,7 @@ export class AccountController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register' })
-  @ApplicationApiOkResponse(RegisterResponse)
+  @ApplicationApiCreateResponse(RegisterResponse)
   @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async register(@Body() registerRequest: RegisterRequest): Promise<RegisterResponse> {
@@ -47,6 +47,7 @@ export class AccountController {
   }
 
   @Post('login')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Login' })
   @ApplicationApiOkResponse(LoginResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
@@ -57,7 +58,7 @@ export class AccountController {
     return await this.accountService.login(loginRequest);
   }
 
-  @Post('activate')
+  @Put('activate')
   @ApiOperation({ summary: 'Activate account' })
   @ApplicationApiOkResponse(ActivateAccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
@@ -68,16 +69,16 @@ export class AccountController {
     return await this.accountService.activate(encryptedString);
   }
 
-  @Put('request-reset-password')
+  @Post('request-reset-password')
   @ApiOperation({ summary: 'Request for reset password' })
-  @ApplicationApiOkResponse(RequestResetPasswordResponse)
+  @ApplicationApiCreateResponse(RequestResetPasswordResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async resetPassword(@Query('email') email: string): Promise<RequestResetPasswordResponse> {
     return await this.accountService.requestResetPassword(email);
   }
 
-  @Post('unlock')
+  @Put('unlock')
   @ApiOperation({ summary: 'Unlock account' })
   @ApplicationApiOkResponse(UnlockAccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })

@@ -14,6 +14,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.setGlobalPrefix('api');
+  app.enableCors();
 
   app.enableVersioning({
     type: VersioningType.URI,
