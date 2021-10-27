@@ -7,8 +7,6 @@ COPY ./ /home/recruitment
 
 RUN mkdir -p database
 
-RUN npm install
-
 RUN ln -sf /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 
 RUN npm build
