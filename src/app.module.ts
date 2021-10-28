@@ -14,6 +14,8 @@ import { AppService } from './app.service';
 import { LoggerMiddleware } from '@Middlewares/logger.middleware';
 
 import { AccountModule } from '@Modules/account/account.module';
+import { AuthenticationModule } from '@Modules/authentication/authentication.module';
+import { UserModule } from '@Modules/user/user.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { AccountModule } from '@Modules/account/account.module';
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     AccountModule,
+    AuthenticationModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

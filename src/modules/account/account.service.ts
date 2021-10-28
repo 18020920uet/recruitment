@@ -6,9 +6,12 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
+import { AuthenticationService } from '@Modules/authentication/authentication.service';
+
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
 
+import { Payload } from '@Responses/payload';
 import { User } from '@Responses/user';
 
 import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
@@ -27,42 +30,11 @@ import { MailService } from '@Modules/mail/mail.service';
 export class AccountService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
+    private authenticationService: AuthenticationService,
     private userRepository: UserRepository,
     private configService: ConfigService,
     private mailService: MailService,
-    private jwtService: JwtService,
   ) {}
-
-  private signToken(type: string, _user: UserEntity): string {
-    const secret = this.configService.get('secret.jwt');
-
-    const payload = {
-      userId: _user.id,
-      userEmai: _user.email,
-      userFirstName: _user.firstName,
-    };
-
-    switch (type) {
-      case 'Access Token': {
-        const options = {
-          secret: secret,
-          expiresIn: '2d',
-        };
-
-        return this.jwtService.sign(payload, options);
-      }
-      case 'Refresh Token': {
-        const options = {
-          secret: secret,
-          expiresIn: '30d',
-        };
-
-        return this.jwtService.sign(payload, options);
-      }
-      default:
-        throw Error('Undefined token');
-    }
-  }
 
   private encrypt(_user: UserEntity, purpose: string): string {
     const activateSecert = this.configService.get<string>('secret.activateSecert');
@@ -142,8 +114,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user),
+      accessToken: await this.authenticationService.getAcessToken(_user),
+      refreshToken:  await this.authenticationService.getRefreshToken(_user),
     };
   }
 
@@ -188,8 +160,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user),
+      accessToken: await this.authenticationService.getAcessToken(_user),
+      refreshToken:  await this.authenticationService.getRefreshToken(_user),
     };
   }
 
@@ -214,8 +186,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user),
+      accessToken: await this.authenticationService.getAcessToken(_user),
+      refreshToken:  await this.authenticationService.getRefreshToken(_user),
     };
   }
 
@@ -241,8 +213,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: this.signToken('Access Token', _user),
-      refreshToken: this.signToken('Refresh Token', _user),
+      accessToken: await this.authenticationService.getAcessToken(_user),
+      refreshToken:  await this.authenticationService.getRefreshToken(_user),
     };
   }
 
