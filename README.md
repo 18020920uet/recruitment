@@ -7,7 +7,7 @@
 ### Môi trường chạy
 
     node v14.17.4
-    yarn
+    npm
     postgres
 
 ### Một số node dependencies package mà yêu cầu cài đặt global:
