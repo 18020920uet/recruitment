@@ -31,7 +31,7 @@ async function bootstrap() {
         bearerFormat: 'Bearer',
         scheme: 'Bearer',
         type: 'http',
-        in: 'Header'
+        in: 'Header',
       },
       'access-token', // This name here is important for matching up with @ApiBearerAuth() in your controller!
     )

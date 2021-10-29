@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UserRepository } from '@Repositories/user.repository';
@@ -8,43 +8,47 @@ import { UserEntity } from '@Entities/user.entity';
 
 import { Payload } from '@Responses/payload';
 
+import { RefreshAccessTokenResponse } from './dtos/responses';
+
 @Injectable()
 export class AuthenticationService {
   constructor(
     private userRepository: UserRepository,
     private configService: ConfigService,
-    private jwtService: JwtService
-  ) { }
+    private jwtService: JwtService,
+  ) {}
 
-  async getAcessToken(_user: UserEntity): Promise<string> {
-    const secret = this.configService.get('secret.jwt');
-
+  async generateAccessToken(_user: UserEntity): Promise<string> {
     const payload: Payload = {
       id: _user.id,
       email: _user.email,
       firstName: _user.firstName,
     };
-
-    const options = {
-      expiresIn: '2d',
-    }
-
-    return this.jwtService.sign(payload, options);
+    return this.jwtService.sign(payload, { expiresIn: '300s' });
   }
 
-  async getRefreshToken(_user: UserEntity): Promise<string> {
-    const secret = this.configService.get('secret.jwt');
-
+  async generateRefreshToken(_user: UserEntity): Promise<string> {
     const payload: Payload = {
       id: _user.id,
       email: _user.email,
       firstName: _user.firstName,
     };
+    return this.jwtService.sign(payload, { expiresIn: '600s' });
+  }
 
-    const options = {
-      expiresIn: '7d',
+  async generateNewAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
+    try {
+      const { iat, exp, ...payload } = await this.jwtService.verifyAsync(refreshToken);
+      delete iat;
+      delete exp;
+      const accessToken = await this.jwtService.sign(payload, { expiresIn: '300s' });
+      return {
+        newAccessToken: accessToken,
+      };
+    } catch (error) {
+      if (error.name == 'TokenExpiredError') {
+        throw new UnauthorizedException('Token Expired');
+      }
     }
-
-    return this.jwtService.sign(payload, options);
   }
 }

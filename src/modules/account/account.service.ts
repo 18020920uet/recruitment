@@ -2,7 +2,6 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 
@@ -11,10 +10,9 @@ import { AuthenticationService } from '@Modules/authentication/authentication.se
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
 
-import { Payload } from '@Responses/payload';
 import { User } from '@Responses/user';
 
-import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
+import { RegisterRequest, LoginRequest } from './dtos/requests';
 
 import {
   RequestResetPasswordResponse,
@@ -22,7 +20,7 @@ import {
   UnlockAccountResponse,
   RegisterResponse,
   LoginResponse,
-} from './dtos/responses.dto';
+} from './dtos/responses';
 
 import { MailService } from '@Modules/mail/mail.service';
 
@@ -114,8 +112,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.getAcessToken(_user),
-      refreshToken:  await this.authenticationService.getRefreshToken(_user),
+      accessToken: await this.authenticationService.generateAccessToken(_user),
+      refreshToken: await this.authenticationService.generateRefreshToken(_user),
     };
   }
 
@@ -160,8 +158,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.getAcessToken(_user),
-      refreshToken:  await this.authenticationService.getRefreshToken(_user),
+      accessToken: await this.authenticationService.generateAccessToken(_user),
+      refreshToken: await this.authenticationService.generateRefreshToken(_user),
     };
   }
 
@@ -186,8 +184,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.getAcessToken(_user),
-      refreshToken:  await this.authenticationService.getRefreshToken(_user),
+      accessToken: await this.authenticationService.generateAccessToken(_user),
+      refreshToken: await this.authenticationService.generateRefreshToken(_user),
     };
   }
 
@@ -213,8 +211,8 @@ export class AccountService {
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.getAcessToken(_user),
-      refreshToken:  await this.authenticationService.getRefreshToken(_user),
+      accessToken: await this.authenticationService.generateAccessToken(_user),
+      refreshToken: await this.authenticationService.generateRefreshToken(_user),
     };
   }
 
