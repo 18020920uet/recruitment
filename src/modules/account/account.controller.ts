@@ -8,6 +8,7 @@ import {
   ApiNotFoundResponse,
   ApiForbiddenResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse, ApplicationApiCreateResponse } from '@Decorators/swagger.decorator';
@@ -23,7 +24,7 @@ import {
 
 import { AccountService } from './account.service';
 
-import { RegisterRequest, LoginRequest } from './dtos/requests.dto';
+import { RegisterRequest, LoginRequest } from './dtos/requests';
 
 import {
   RequestResetPasswordResponse,
@@ -31,8 +32,9 @@ import {
   UnlockAccountResponse,
   RegisterResponse,
   LoginResponse,
-} from './dtos/responses.dto';
+} from './dtos/responses';
 
+@ApiTags('account')
 @Controller('account')
 export class AccountController {
   constructor(private accountService: AccountService) {}
