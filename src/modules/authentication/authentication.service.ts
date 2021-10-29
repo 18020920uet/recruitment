@@ -39,8 +39,6 @@ export class AuthenticationService {
   async generateNewAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
     try {
       const { iat, exp, ...payload } = await this.jwtService.verifyAsync(refreshToken);
-      delete iat;
-      delete exp;
       const accessToken = await this.jwtService.sign(payload, { expiresIn: '300s' });
       return {
         newAccessToken: accessToken,
