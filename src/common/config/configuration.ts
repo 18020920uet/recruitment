@@ -22,7 +22,7 @@ export default () => ({
   node_env: process.env.NODE_ENV,
   secret: {
     jwt: process.env.JWT_SECERT,
-    activateSecert: process.env.ACTIVATE_SECERT,
+    encrypt: process.env.ENCRYPT_SECERT,
     iv: process.env.IV_START,
   },
   mail: {
