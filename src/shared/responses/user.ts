@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-import { UserRole } from '@Entities/user.entity';
+import { Role } from '../enums/role';
 
 export class User {
   @ApiProperty()
@@ -22,5 +22,5 @@ export class User {
 
   @ApiProperty()
   @AutoMap()
-  role: UserRole;
+  role: Role;
 }

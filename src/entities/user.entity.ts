@@ -1,11 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
-export enum UserRole {
-  ADMIN = 'admin',
-  FREELANCE = 'freelance',
-  COMPANY = 'company',
-}
+import { Role } from '@Shared/enums/role';
 
 @Entity('users')
 export class UserEntity {
@@ -53,6 +49,6 @@ export class UserEntity {
   loginFailedStrike: number;
 
   @AutoMap()
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.FREELANCE })
-  role: UserRole;
+  @Column({ type: 'enum', enum: Role, default: Role.FREELANCE })
+  role: Role;
 }
