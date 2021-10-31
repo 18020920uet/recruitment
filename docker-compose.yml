@@ -63,7 +63,8 @@ services:
       POSTGRES_USER: '${DATABASE_USER}'
       POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
       POSTGRES_DB: '${DATABASE_NAME}'
-      TZ: GMT+7
+      TZ: 'Asia/Ho_Chi_Minh'
+      PGTZ: 'Asia/Ho_Chi_Minh'
     expose:
       - '${DATABASE_PORT}'
     volumes:
