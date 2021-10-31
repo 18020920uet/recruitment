@@ -8,7 +8,7 @@ import { UserEntity } from '@Entities/user.entity';
 export class EncryptService {
   constructor(private configService: ConfigService) {}
 
-  public encryptActivateToken(_user: UserEntity): string {
+  encryptActivateToken(_user: UserEntity): string {
     const encryptSecert = this.configService.get<string>('secret.encrypt');
     const ivString = this.configService.get<string>('secret.iv');
     const bufferSecret = Buffer.from(encryptSecert, 'utf8');
@@ -26,7 +26,7 @@ export class EncryptService {
     return Buffer.from(encrypted, 'base64').toString('hex');
   }
 
-  public encryptUnlockOrResetPasswordToken(_user: UserEntity): string {
+  encryptUnlockOrResetPasswordToken(_user: UserEntity): string {
     const encryptSecert = this.configService.get<string>('secret.encrypt');
     const ivString = this.configService.get<string>('secret.iv');
     const bufferSecret = Buffer.from(encryptSecert, 'utf8');
@@ -44,7 +44,7 @@ export class EncryptService {
     return Buffer.from(encrypted, 'base64').toString('hex');
   }
 
-  public decryptToken(encryptedString: string): string {
+  decryptToken(encryptedString: string): string {
     const realEncrypeted = Buffer.from(encryptedString, 'hex');
 
     const encryptSecert = this.configService.get<string>('secret.encrypt');
