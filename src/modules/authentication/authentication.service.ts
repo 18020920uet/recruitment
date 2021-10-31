@@ -6,7 +6,7 @@ import { UserRepository } from '@Repositories/user.repository';
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { Payload } from '@Responses/payload';
+import { Payload } from '@Shared/responses/payload';
 
 import { RefreshAccessTokenResponse } from './dtos/responses';
 

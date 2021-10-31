@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { User } from '@Responses/user';
+import { User } from '@Shared/responses/user';
 
 export class RegisterResponse {
   @ApiProperty()

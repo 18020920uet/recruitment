@@ -14,9 +14,11 @@ import { AccountService } from './account.service';
 import { MailModule } from '@Modules/mail/mail.module';
 import { MailService } from '@Modules/mail/mail.service';
 
+import { EncryptService } from '@Shared/services/encrypt.service';
+
 @Module({
   imports: [MailModule, ConfigModule, AuthenticationModule, TypeOrmModule.forFeature([UserRepository])],
   controllers: [AccountController],
-  providers: [ApplicationMapperProfile, AccountService, MailService],
+  providers: [ApplicationMapperProfile, AccountService, MailService, EncryptService],
 })
 export class AccountModule {}
