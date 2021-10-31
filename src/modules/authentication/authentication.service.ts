@@ -18,13 +18,17 @@ export class AuthenticationService {
     private jwtService: JwtService,
   ) {}
 
+  async validateUser(userId: string): Promise<UserEntity> {
+    return await this.userRepository.findOne(userId);
+  }
+
   async generateAccessToken(_user: UserEntity): Promise<string> {
     const payload: Payload = {
       id: _user.id,
       email: _user.email,
       firstName: _user.firstName,
     };
-    return this.jwtService.sign(payload, { expiresIn: '300s' });
+    return this.jwtService.sign(payload, { expiresIn: '600s' });
   }
 
   async generateRefreshToken(_user: UserEntity): Promise<string> {
@@ -33,7 +37,7 @@ export class AuthenticationService {
       email: _user.email,
       firstName: _user.firstName,
     };
-    return this.jwtService.sign(payload, { expiresIn: '600s' });
+    return this.jwtService.sign(payload, { expiresIn: '1200s' });
   }
 
   async generateNewAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
