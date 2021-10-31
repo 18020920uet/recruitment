@@ -5,9 +5,9 @@ WORKDIR /home/recruitment
 
 COPY ./ /home/recruitment
 
-RUN mkdir -p database
-
 RUN ln -sf /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
+
+RUN npm install -g nest @nestjs/cli typeorm
 
 RUN npm build
 
