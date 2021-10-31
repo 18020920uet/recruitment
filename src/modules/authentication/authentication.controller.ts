@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Body } from '@nestjs/common';
 import { ApiInternalServerErrorResponse, ApiUnauthorizedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
@@ -7,6 +7,7 @@ import { InternalServerErrorResponse, UnauthorizedResponse } from '@Decorators/s
 
 import { AuthenticationService } from './authentication.service';
 
+import { GenerateNewAccessTokenRequest } from './dtos/requests';
 import { RefreshAccessTokenResponse } from './dtos/responses';
 
 @ApiTags('authentication')
@@ -19,7 +20,7 @@ export class AuthenticationController {
   @ApplicationApiOkResponse(RefreshAccessTokenResponse)
   @ApiUnauthorizedResponse({ description: 'Refresh token expired', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async generateNewAccessToken(@Query('refreshToken') refreshToken: string): Promise<RefreshAccessTokenResponse> {
-    return await this.authenticationService.generateNewAccessToken(refreshToken);
+  async generateNewAccessToken(@Body() request: GenerateNewAccessTokenRequest): Promise<RefreshAccessTokenResponse> {
+    return await this.authenticationService.generateNewAccessToken(request.token);
   }
 }

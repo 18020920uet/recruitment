@@ -24,7 +24,7 @@ import {
 
 import { AccountService } from './account.service';
 
-import { RegisterRequest, LoginRequest } from './dtos/requests';
+import { RegisterRequest, LoginRequest, ActivateRequest, UnlockRequest } from './dtos/requests';
 
 import {
   RequestResetPasswordResponse,
@@ -67,8 +67,8 @@ export class AccountController {
   @ApiForbiddenResponse({ description: 'Wrong activate code', type: ForbiddenResponse })
   @ApiBadRequestResponse({ description: 'Already activated', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async activate(@Query('token') encryptedString: string): Promise<ActivateAccountResponse> {
-    return await this.accountService.activate(encryptedString);
+  async activate(@Body() activateRequest: ActivateRequest): Promise<ActivateAccountResponse> {
+    return await this.accountService.activate(activateRequest.token);
   }
 
   @Post('request-reset-password')
@@ -87,7 +87,7 @@ export class AccountController {
   @ApiForbiddenResponse({ description: 'Wrong unlock code', type: ForbiddenResponse })
   @ApiBadRequestResponse({ description: 'Already unlocked', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async unlock(@Query('token') unlockToken: string): Promise<UnlockAccountResponse> {
-    return await this.accountService.unlock(unlockToken);
+  async unlock(@Body() unlockRequest: UnlockRequest): Promise<UnlockAccountResponse> {
+    return await this.accountService.unlock(unlockRequest.token);
   }
 }

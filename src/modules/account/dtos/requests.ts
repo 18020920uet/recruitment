@@ -21,3 +21,13 @@ export class LoginRequest {
   @ApiProperty()
   password: string;
 }
+
+export class ActivateRequest {
+  @ApiProperty()
+  token: string;
+}
+
+export class UnlockRequest {
+  @ApiProperty()
+  token: string;
+}
