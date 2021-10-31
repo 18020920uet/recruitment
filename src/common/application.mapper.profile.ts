@@ -3,7 +3,7 @@ import { InjectMapper, AutomapperProfile } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 
 import { UserEntity } from '@Entities/user.entity';
-import { User } from '@Responses/user';
+import { User } from '@Shared/responses/user';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {

@@ -3,16 +3,15 @@ import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
 
 import { AuthenticationService } from '@Modules/authentication/authentication.service';
+import { EncryptService } from '@Shared/services/encrypt.service';
 
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
 
-import { User } from '@Responses/user';
-
 import { RegisterRequest, LoginRequest } from './dtos/requests';
+import { User } from '@Shared/responses/user';
 
 import {
   RequestResetPasswordResponse,
@@ -30,57 +29,10 @@ export class AccountService {
     @InjectMapper() private readonly mapper: Mapper,
     private authenticationService: AuthenticationService,
     private userRepository: UserRepository,
+    private encryptService: EncryptService,
     private configService: ConfigService,
     private mailService: MailService,
   ) {}
-
-  private encrypt(_user: UserEntity, purpose: string): string {
-    const activateSecert = this.configService.get<string>('secret.activateSecert');
-    const ivString = this.configService.get<string>('secret.iv');
-    const bufferSecret = Buffer.from(activateSecert, 'utf8');
-    const bufferIV = Buffer.from(ivString, 'utf8');
-    const cipher = crypto.createCipheriv('aes-256-cbc', bufferSecret, bufferIV);
-
-    switch (purpose) {
-      case 'Activate': {
-        const data = {
-          userId: _user.id,
-          userEmai: _user.email,
-          activateCode: _user.activateCode,
-        };
-        let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-        encrypted += cipher.final('base64');
-        return Buffer.from(encrypted, 'base64').toString('hex');
-      }
-      case 'Unlock':
-      case 'ResetPassword': {
-        const data = {
-          userId: _user.id,
-          userEmai: _user.email,
-          resetCode: _user.resetCode,
-        };
-        let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'base64');
-        encrypted += cipher.final('base64');
-        return Buffer.from(encrypted, 'base64').toString('hex');
-      }
-      default:
-        throw Error('Undefined token');
-    }
-  }
-
-  private decrypt(encryptedString: string): string {
-    const realEncrypeted = Buffer.from(encryptedString, 'hex');
-
-    const activateSecert = this.configService.get<string>('secret.activateSecert');
-    const ivString = this.configService.get<string>('secret.iv');
-    const bufferSecret = Buffer.from(activateSecert, 'utf8');
-    const bufferIV = Buffer.from(ivString, 'utf8');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', bufferSecret, bufferIV);
-
-    let decryptedData = decipher.update(realEncrypeted, 'base64', 'utf8');
-    decryptedData += decipher.final('utf8');
-    return decryptedData;
-  }
 
   async register(request: RegisterRequest): Promise<RegisterResponse> {
     const emailExists = await this.userRepository.checkEmailExists(request.email);
@@ -105,7 +57,7 @@ export class AccountService {
     await this.userRepository.save(_user);
 
     // Encrypt token
-    const encryptedToken = this.encrypt(_user, 'Activate');
+    const encryptedToken = this.encryptService.encryptActivateToken(_user);
 
     // Send mail
     await this.mailService.sendAccountActivationMail(_user, encryptedToken);
@@ -130,8 +82,10 @@ export class AccountService {
       if (_user.loginFailedStrike == 3) {
         _user.isLock = true;
         _user.resetCode = Math.random().toString(36).slice(-10);
+
         // Encrypt token
-        const encryptedToken = this.encrypt(_user, 'Unlock');
+        const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
+
         // Send mail
         await this.mailService.sendAccountUnlockMail(_user, encryptedToken);
       }
@@ -164,7 +118,7 @@ export class AccountService {
   }
 
   async activate(encryptedString: string): Promise<ActivateAccountResponse> {
-    const decryptedData = this.decrypt(encryptedString);
+    const decryptedData = this.encryptService.decryptToken(encryptedString);
     const data: { userId: string; activateCode: string } = JSON.parse(decryptedData);
     const _user = await this.userRepository.findOne(data.userId);
 
@@ -190,7 +144,7 @@ export class AccountService {
   }
 
   async unlock(encryptedString: string): Promise<UnlockAccountResponse> {
-    const decryptedData = this.decrypt(encryptedString);
+    const decryptedData = this.encryptService.decryptToken(encryptedString);
     const data: { userId: string; resetCode: string } = JSON.parse(decryptedData);
     const _user = await this.userRepository.findOne(data.userId);
 
@@ -224,7 +178,7 @@ export class AccountService {
     }
 
     // Encrypt data
-    const encryptedToken = this.encrypt(_user, 'ResetPassword');
+    const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
     // Send mail
     await this.mailService.sendAccountRequestResetPasswordMail(_user, encryptedToken);
 

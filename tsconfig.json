@@ -31,14 +31,14 @@
       "@Middlewares/*": [
         "src/common/middlewares/*"
       ],
-      "@Responses/*": [
-        "src/common/responses/*"
-      ],
       "@Common/*": [
         "src/common/*"
       ],
       "@Decorators/*": [
         "src/common/decorators/*"
+      ],
+      "@Shared/*": [
+        "src/shared/*"
       ]
     }
   }
