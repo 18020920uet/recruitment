@@ -16,7 +16,7 @@ services:
       TZ: '${TIMEZONE}'
     ports:
       - '${PORT}:${PORT}'
-    command: sh -c "yarn build && yarn start:dev"
+    command: sh -c "yarn build && yarn start"
     restart: unless-stopped
     depends_on:
       - database
