@@ -8,8 +8,14 @@ import { AuthenticationModule } from '@Modules/authentication/authentication.mod
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 
+import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([UserRepository]), AuthenticationModule],
+  imports: [
+    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([CurriculumVitaeRepository]),
+    AuthenticationModule // JwtAuthenticationGuard
+  ],
   controllers: [UserController],
   providers: [UserService],
 })

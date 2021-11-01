@@ -7,13 +7,21 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 
+import { GetProfileResponse } from './dtos/responses';
+import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
+
+import { UserService } from './user.service';
+
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-  @Get('')
-  @ApiBearerAuth('access-token') //edit here
+  constructor(private userService: UserService) { }
+
+  @Get('profile')
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(GetProfileResponse)
   @UseGuards(JwtAuthenticationGuard)
-  getProfile(@CurrentUser() _currentUser: UserEntity): string {
-    return 'a';
+  async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<GetProfileResponse>  {
+    return this.userService.getProfile(_currentUser);
   }
 }
