@@ -40,7 +40,6 @@ async function bootstrap() {
   const doc = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('document', app, doc);
 
-  console.log(process.env.PORT);
   await app.listen(process.env.PORT);
 }
 bootstrap().then(() => console.log('Service listening on port:', process.env.PORT));
