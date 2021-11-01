@@ -28,7 +28,7 @@ export class AuthenticationService {
       email: _user.email,
       firstName: _user.firstName,
     };
-    return this.jwtService.sign(payload, { expiresIn: '600s' });
+    return this.jwtService.sign(payload, { expiresIn: '3600s' });
   }
 
   async generateRefreshToken(_user: UserEntity): Promise<string> {
@@ -37,7 +37,7 @@ export class AuthenticationService {
       email: _user.email,
       firstName: _user.firstName,
     };
-    return this.jwtService.sign(payload, { expiresIn: '1200s' });
+    return this.jwtService.sign(payload, { expiresIn: '36000s' });
   }
 
   async generateNewAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
