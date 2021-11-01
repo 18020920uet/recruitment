@@ -88,6 +88,7 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.product
 .env.test
 
 # parcel-bundler cache (<https://parceljs.org/>)
@@ -165,3 +166,8 @@ typings/
 .env.development
 
 ormconfig.json
+
+/public
+/data
+
+code.sh

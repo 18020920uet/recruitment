@@ -16,7 +16,7 @@ services:
       TZ: '${TIMEZONE}'
     ports:
       - '${PORT}:${PORT}'
-    command: sh -c "yarn build && yarn start:dev"
+    command: sh -c "yarn build && yarn start:prod"
     restart: unless-stopped
     depends_on:
       - database
@@ -36,19 +36,6 @@ services:
     expose:
       - '${DATABASE_PORT}'
     volumes:
-      - ./data/development:/var/lib/postgresql/data
+      - ./data/product:/var/lib/postgresql/data
     networks:
       - recruitment_networks
-  adminer:
-    container_name: adminer
-    image: adminer:latest
-    restart: always
-    ports:
-      - 5050:8080
-    depends_on:
-      - database
-    networks:
-      - recruitment_networks
-
-networks:
-  recruitment_networks:

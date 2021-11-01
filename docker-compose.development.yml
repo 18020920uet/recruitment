@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  application:
+    image: node:14-alpine3.12
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: application
+    working_dir: /home/recruitment
+    volumes:
+      - ./src:/home/recruitment/src
+      - ./public:/home/recruitment/public
+      - ./logs:/home/recruitment/logs
+    environment:
+      TZ: '${TIMEZONE}'
+    ports:
+      - '${PORT}:${PORT}'
+    command: sh -c "yarn build && yarn start"
+    restart: unless-stopped
+    depends_on:
+      - database
+      - adminer
+    networks:
+      - recruitment_networks
