@@ -1,4 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { getManager } from "typeorm";
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +10,7 @@ import { EncryptService } from '@Shared/services/encrypt.service';
 
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
+import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 
 import { RegisterRequest, LoginRequest } from './dtos/requests';
 import { User } from '@Shared/responses/user';
@@ -54,13 +56,20 @@ export class AccountService {
     _user.loginFailedStrike = 0;
     _user.isLock = false;
     _user.lastLogin = new Date();
-    await this.userRepository.save(_user);
 
-    // Encrypt token
-    const encryptedToken = this.encryptService.encryptActivateToken(_user);
+    const _cv = new CurriculumVitaeEntity();
+    _cv.user = _user;
 
-    // Send mail
-    await this.mailService.sendAccountActivationMail(_user, encryptedToken);
+    await getManager().transaction(async transactionalEntityManager => {
+      await transactionalEntityManager.save(_user);
+      await transactionalEntityManager.save(_cv);
+      // Encrypt token
+      const encryptedToken = this.encryptService.encryptActivateToken(_user);
+      // Send mail
+      await this.mailService.sendAccountActivationMail(_user, encryptedToken);
+    });
+
+    // const encryptedToken = this.encryptService.encryptActivateToken(_user);
 
     return {
       user: this.mapper.map(_user, User, UserEntity),
