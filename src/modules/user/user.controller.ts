@@ -42,6 +42,8 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
   @UseGuards(JwtAuthenticationGuard)
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<ProfileResponse>  {
     return await this.userService.getProfile(_currentUser);
   }
