@@ -12,6 +12,12 @@ services:
       - ./src:/home/recruitment/src
       - ./public:/home/recruitment/public
       - ./logs:/home/recruitment/logs
+      - ./package.json:/home/recruitment/package.json
+      - ./tsconfig.json:/home/recruitment/tsconfig.json
+      - ./tsconfig.build.json:/home/recruitment/tsconfig.build.json
+      - ./nest-cli.json:/home/recruitment/nest-cli.json
+      - ./.env.development:/home/recruitment/.env.development
+      - ./.env.product:/home/recruitment/.env.product
     environment:
       TZ: '${TIMEZONE}'
     ports:
