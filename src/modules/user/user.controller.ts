@@ -27,7 +27,7 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 import { UserEntity } from '@Entities/user.entity';
 
 import { ProfileResponse, ChangePasswordResponse } from './dtos/responses';
-import { ChangePasswordRequest } from './dtos/requests';
+import { ChangePasswordRequest, UpdateProfileRequest } from './dtos/requests';
 
 import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 
@@ -60,5 +60,20 @@ export class UserController {
     @Body() changePasswordRequest: ChangePasswordRequest
   ): Promise<ChangePasswordResponse>  {
     return await this.userService.changePassword(_currentUser, changePasswordRequest);
+  }
+
+
+  @Put('profile')
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(ProfileResponse)
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
+  async updateProfile(
+   @CurrentUser() _currentUser: UserEntity,
+   @Body() updateProfileRequest: UpdateProfileRequest
+  ): Promise<ProfileResponse>  {
+   return await this.userService.updateProfile(_currentUser, updateProfileRequest);
   }
 }
