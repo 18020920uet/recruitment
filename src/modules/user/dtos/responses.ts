@@ -4,7 +4,7 @@ import { AutoMap } from '@automapper/classes';
 import { Role } from '@Shared/enums/role';
 import { User } from '@Shared/responses/user';
 
-export class GetProfileResponse {
+export class ProfileResponse {
   @AutoMap()
   @ApiProperty()
   user: User;
@@ -24,4 +24,9 @@ export class GetProfileResponse {
   @AutoMap()
   @ApiProperty()
   introduce: string;
+}
+
+export class ChangePasswordResponse {
+  @ApiProperty()
+  status: boolean
 }
