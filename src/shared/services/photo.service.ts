@@ -1,0 +1,19 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
+
+import { UserEntity } from '@Entities/user.entity';
+
+@Injectable()
+export class PhotoService {
+  constructor(private configService: ConfigService) {}
+
+  getAvatar(_user: UserEntity): string {
+    console.log(_user.avatar);
+    const host = this.configService.get<string>('host');
+    if (_user.avatar == '') {
+      return host + '/resource/images/avatar.png';
+    }
+    return host + _user.avatar;
+  }
+}

@@ -1,8 +1,9 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { AutomapperModule, InjectMapper } from '@automapper/nestjs';
-import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import type { Mapper } from '@automapper/types';
+import { ConfigModule } from '@nestjs/config';
 import { classes } from '@automapper/classes';
 
 import { typeOrmConfigAsync } from './common/config/typeorm.configuration';
@@ -19,6 +20,9 @@ import { UserModule } from '@Modules/user/user.module';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: 'public'
+    }),
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV}`,
       load: [configuration],

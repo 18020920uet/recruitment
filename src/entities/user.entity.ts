@@ -52,6 +52,7 @@ export class UserEntity {
   @Column({ type: 'enum', enum: Role, default: Role.FREELANCE })
   role: Role;
 
+  @AutoMap()
   @Column({ default: '' })
   avatar: string;
 }

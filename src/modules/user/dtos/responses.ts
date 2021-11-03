@@ -30,3 +30,8 @@ export class ChangePasswordResponse {
   @ApiProperty()
   status: boolean
 }
+
+export class ChangeAvatarResponse {
+  @ApiProperty()
+  avatar: string;
+}

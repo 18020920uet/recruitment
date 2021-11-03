@@ -42,3 +42,8 @@ export class BadRequestResponse extends ErrorResponse {
   @ApiProperty({ default: 400 })
   statusCode = 400;
 }
+
+export class UnsupportedMediaTypeResponse extends ErrorResponse {
+  @ApiProperty({ default: 415 })
+  statusCode = 415;
+}

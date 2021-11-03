@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 
 import { AuthenticationService } from '@Modules/authentication/authentication.service';
 import { EncryptService } from '@Shared/services/encrypt.service';
+import { PhotoService } from '@Shared/services/photo.service';
 
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
@@ -15,13 +16,7 @@ import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { RegisterRequest, LoginRequest } from './dtos/requests';
 import { User } from '@Shared/responses/user';
 
-import {
-  RequestResetPasswordResponse,
-  ActivateAccountResponse,
-  UnlockAccountResponse,
-  RegisterResponse,
-  LoginResponse,
-} from './dtos/responses';
+import { RequestResetPasswordResponse, AccountResponse } from './dtos/responses';
 
 import { MailService } from '@Modules/mail/mail.service';
 
@@ -33,10 +28,21 @@ export class AccountService {
     private userRepository: UserRepository,
     private encryptService: EncryptService,
     private configService: ConfigService,
+    private photoService: PhotoService,
     private mailService: MailService,
   ) {}
 
-  async register(request: RegisterRequest): Promise<RegisterResponse> {
+  private async getAccountResponse(_user: UserEntity): Promise<AccountResponse> {
+    _user.avatar = this.photoService.getAvatar(_user);
+    const response: AccountResponse = {
+      user: this.mapper.map(_user, User, UserEntity),
+      accessToken: await this.authenticationService.generateAccessToken(_user),
+      refreshToken: await this.authenticationService.generateRefreshToken(_user),
+    };
+    return response;
+  }
+
+  async register(request: RegisterRequest): Promise<AccountResponse> {
     const emailExists = await this.userRepository.checkEmailExists(request.email);
 
     if (emailExists != true) {
@@ -69,16 +75,10 @@ export class AccountService {
       await this.mailService.sendAccountActivationMail(_user, encryptedToken);
     });
 
-    // const encryptedToken = this.encryptService.encryptActivateToken(_user);
-
-    return {
-      user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.generateAccessToken(_user),
-      refreshToken: await this.authenticationService.generateRefreshToken(_user),
-    };
+    return await this.getAccountResponse(_user);
   }
 
-  async login(request: LoginRequest): Promise<LoginResponse> {
+  async login(request: LoginRequest): Promise<AccountResponse> {
     const _user = await this.userRepository.findOne({ email: request.email });
 
     if (!_user) {
@@ -119,14 +119,10 @@ export class AccountService {
 
     await this.userRepository.save(_user);
 
-    return {
-      user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.generateAccessToken(_user),
-      refreshToken: await this.authenticationService.generateRefreshToken(_user),
-    };
+    return await this.getAccountResponse(_user);
   }
 
-  async activate(encryptedString: string): Promise<ActivateAccountResponse> {
+  async activate(encryptedString: string): Promise<AccountResponse> {
     const decryptedData = this.encryptService.decryptToken(encryptedString);
     const data: { userId: string; activateCode: string } = JSON.parse(decryptedData);
     const _user = await this.userRepository.findOne(data.userId);
@@ -145,14 +141,10 @@ export class AccountService {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
     }
 
-    return {
-      user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.generateAccessToken(_user),
-      refreshToken: await this.authenticationService.generateRefreshToken(_user),
-    };
+    return await this.getAccountResponse(_user);
   }
 
-  async unlock(encryptedString: string): Promise<UnlockAccountResponse> {
+  async unlock(encryptedString: string): Promise<AccountResponse> {
     const decryptedData = this.encryptService.decryptToken(encryptedString);
     const data: { userId: string; resetCode: string } = JSON.parse(decryptedData);
     const _user = await this.userRepository.findOne(data.userId);
@@ -172,11 +164,8 @@ export class AccountService {
       throw new HttpException('Wrong unlock code', HttpStatus.FORBIDDEN);
     }
 
-    return {
-      user: this.mapper.map(_user, User, UserEntity),
-      accessToken: await this.authenticationService.generateAccessToken(_user),
-      refreshToken: await this.authenticationService.generateRefreshToken(_user),
-    };
+    return await this.getAccountResponse(_user);
+
   }
 
   async requestResetPassword(email: string): Promise<RequestResetPasswordResponse> {

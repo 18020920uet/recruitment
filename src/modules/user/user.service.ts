@@ -5,6 +5,8 @@ import type { Mapper } from '@automapper/types';
 import { getManager } from "typeorm";
 import * as bcrypt from 'bcrypt';
 
+import { PhotoService } from '@Shared/services/photo.service';
+
 import { UserRepository } from '@Repositories/user.repository';
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
 
@@ -13,7 +15,7 @@ import { UserEntity } from '@Entities/user.entity';
 
 import { User } from '@Shared/responses/user';
 
-import { ProfileResponse, ChangePasswordResponse } from './dtos/responses';
+import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import { ChangePasswordRequest, UpdateProfileRequest } from './dtos/requests';
 
 @Injectable()
@@ -23,6 +25,7 @@ export class UserService {
     private curriculumnVitaeRepository: CurriculumVitaeRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
+    private photoService: PhotoService,
   ) { }
 
   async getProfile(_currentUser: UserEntity): Promise<ProfileResponse> {
@@ -30,6 +33,8 @@ export class UserService {
       where: { user: _currentUser },
       relations: ["experiences", "user"]
     });
+    const avatar = this.photoService.getAvatar(_cv.user);
+    _cv.user.avatar = avatar;
     return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity)
   }
 
@@ -83,5 +88,13 @@ export class UserService {
     });
 
     return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity)
+  }
+
+  async updateAvatar(_currentUser: UserEntity, file: Express.Multer.File): Promise<ChangeAvatarResponse> {
+    _currentUser.avatar = file.filename;
+    await this.userRepository.save(_currentUser);
+    return {
+      avatar: this.photoService.getAvatar(_currentUser),
+    }
   }
 }

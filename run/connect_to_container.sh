@@ -1,2 +1,2 @@
 #!/bin/sh
-docker-compose exec -it application sh
+docker-compose exec application sh

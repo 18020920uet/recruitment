@@ -1,5 +1,10 @@
-import { Controller, Get, UseGuards, Put, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Put, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { saveAvatarStorage } from '@Common/storages/images.storage';
+import { Express } from 'express';
+
 import {
+  ApiUnsupportedMediaTypeResponse,
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
@@ -8,10 +13,12 @@ import {
   ApiNotFoundResponse,
   ApiBearerAuth,
   ApiOperation,
+  ApiConsumes,
   ApiTags,
 } from '@nestjs/swagger';
 
 import {
+  UnsupportedMediaTypeResponse,
   InternalServerErrorResponse,
   UnauthorizedResponse,
   BadRequestResponse,
@@ -26,8 +33,8 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { ProfileResponse, ChangePasswordResponse } from './dtos/responses';
-import { ChangePasswordRequest, UpdateProfileRequest } from './dtos/requests';
+import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
+import { ChangeAvatarRequest, ChangePasswordRequest, UpdateProfileRequest } from './dtos/requests';
 
 import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 
@@ -41,9 +48,9 @@ export class UserController {
   @Get('profile')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
-  @UseGuards(JwtAuthenticationGuard)
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @UseGuards(JwtAuthenticationGuard)
   async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<ProfileResponse>  {
     return await this.userService.getProfile(_currentUser);
   }
@@ -51,10 +58,10 @@ export class UserController {
   @Put('change-password')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ChangePasswordResponse)
-  @UseGuards(JwtAuthenticationGuard)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiForbiddenResponse({ description: 'Wrong password', type: ForbiddenResponse })
+  @UseGuards(JwtAuthenticationGuard)
   async changePassword(
     @CurrentUser() _currentUser: UserEntity,
     @Body() changePasswordRequest: ChangePasswordRequest
@@ -66,14 +73,33 @@ export class UserController {
   @Put('profile')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
-  @UseGuards(JwtAuthenticationGuard)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
+  @UseGuards(JwtAuthenticationGuard)
   async updateProfile(
    @CurrentUser() _currentUser: UserEntity,
    @Body() updateProfileRequest: UpdateProfileRequest
   ): Promise<ProfileResponse>  {
    return await this.userService.updateProfile(_currentUser, updateProfileRequest);
   }
+
+  @Put('avatar')
+  @ApiBearerAuth('access-token')
+  @ApiConsumes('multipart/form-data')
+  @ApplicationApiOkResponse(ChangeAvatarResponse)
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
+  @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(FileInterceptor('file', saveAvatarStorage))
+  async updateAvatar(
+    @CurrentUser() _currentUser: UserEntity,
+    @Body() changeAvatarRequest: ChangeAvatarRequest,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<ChangeAvatarResponse> {
+    console.log(file);
+    return await this.userService.updateAvatar(_currentUser, file);
+  }
+
 }

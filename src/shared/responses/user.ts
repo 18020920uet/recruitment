@@ -23,4 +23,8 @@ export class User {
   @ApiProperty()
   @AutoMap()
   role: Role;
+
+  @AutoMap()
+  @ApiProperty()
+  avatar: string;
 }

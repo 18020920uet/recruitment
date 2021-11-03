@@ -4,12 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserRepository } from '@Repositories/user.repository';
 
+import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
 
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 
-import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+import { PhotoService } from '@Shared/services/photo.service';
 
 @Module({
   imports: [
@@ -19,6 +21,6 @@ import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.reposi
     ConfigModule,
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, PhotoService],
 })
 export class UserModule {}

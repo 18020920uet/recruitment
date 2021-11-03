@@ -30,3 +30,8 @@ export class UpdateProfileRequest {
   @ApiProperty()
   lastName: string;
 }
+
+export class ChangeAvatarRequest {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
+}

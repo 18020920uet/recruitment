@@ -2,6 +2,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
+import express from 'express'
 
 import { AppModule } from './app.module';
 
@@ -10,6 +12,8 @@ import { AllExceptionsFilter } from './common/filters/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.use('/public', express.static(join(__dirname, '..', 'public')));
 
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
