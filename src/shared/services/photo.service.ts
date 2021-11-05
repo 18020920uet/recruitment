@@ -9,11 +9,10 @@ export class PhotoService {
   constructor(private configService: ConfigService) {}
 
   getAvatar(_user: UserEntity): string {
-    console.log(_user.avatar);
     const host = this.configService.get<string>('host');
     if (_user.avatar == '') {
       return host + '/resource/images/avatar.png';
     }
-    return host + _user.avatar;
+    return `${host}/public/images/${_user.avatar}`;
   }
 }
