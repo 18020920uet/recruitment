@@ -1,14 +1,16 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+import { VersioningType, ValidationPipe, ValidationError } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
 import express from 'express'
 
 import { AppModule } from './app.module';
 
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { AllExceptionsFilter } from './common/filters/exception.filter';
+import { TransformInterceptor } from '@Common/interceptors/transform.interceptor';
+import { AllExceptionsFilter } from '@Common/filters/exception.filter';
+
+import { ValidationExeption } from '@Common/exceptions/validation.exception';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,10 +22,22 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
 
+  app.useGlobalPipes(new ValidationPipe({
+    exceptionFactory: (errors: ValidationError[]) => {
+      const message = errors.map(
+        error => `${error.property} has wrong value '${error.value}', ${Object.values(error.constraints).join(', ')}`
+      )
+      return new ValidationExeption(message);
+    }
+  }))
+
   app.enableVersioning({
     type: VersioningType.URI,
   });
 
+
+
+  // Swagger
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Rescruitment API')
     .setDescription('Recruitment API description')
@@ -37,7 +51,7 @@ async function bootstrap() {
         type: 'http',
         in: 'Header',
       },
-      'access-token', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+      'access-token',
     )
     .build();
 

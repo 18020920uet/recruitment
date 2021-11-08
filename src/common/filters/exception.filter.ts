@@ -2,6 +2,8 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 
+import { ValidationExeption } from '@Common/exceptions/validation.exception';
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -9,7 +11,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof ValidationExeption) {
+      const statusCode = exception.getStatus()
+      if (process.env.NODE_ENV == 'production') {
+        const exceptionResponse = {
+          statusCode: statusCode,
+          message: 'BadRequest',
+          status: 0,
+        };
+        return response.status(statusCode).json(exceptionResponse);
+      } else {
+        const exceptionResponse = {
+          statusCode: statusCode,
+          validationErrors: exception.validationErrors,
+          message: 'ValidationError',
+          status: 0,
+        };
+        return response.status(statusCode).json(exceptionResponse);
+      }
+    } else if (exception instanceof HttpException) {
       const statusCode = exception.getStatus();
       const message = exception.message;
 
@@ -38,17 +58,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         fs.mkdirSync(logDirectory);
       }
 
-      const log = {
-        ...exceptionResponse,
-        request: request.body,
-        ip: request.ip,
-      };
+      const log = { ...exceptionResponse, request: request.body, ip: request.ip };
 
       fs.appendFile('logs/error.log', JSON.stringify(log) + '\n', { flag: 'a' }, (err) => {
-        if (err) {
-          throw err;
-        }
-        console.log('Internal server error has been saved!');
+        if (err) { throw err; }
       });
 
       if (process.env.NODE_ENV == 'production') {
