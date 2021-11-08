@@ -29,7 +29,10 @@ import { UserModule } from '@Modules/user/user.module';
       isGlobal: true,
     }),
     AutomapperModule.forRoot({
-      options: [{ name: 'classMapper', pluginInitializer: classes }],
+      options: [{
+          name: 'classMapper',
+          pluginInitializer: classes
+      }],
       singular: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),

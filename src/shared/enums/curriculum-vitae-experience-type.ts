@@ -1,4 +1,4 @@
 export enum CurriculumVitaeExperienceType {
-  WORK,
-  VOLUNTEER
+  WORK = 'work',
+  VOLUNTEER = 'volunteer'
 }

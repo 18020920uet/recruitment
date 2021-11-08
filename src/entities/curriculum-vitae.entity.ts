@@ -10,6 +10,7 @@ import { UserEntity } from '@Entities/user.entity';
 
 @Entity('curriculum-vitaes')
 export class CurriculumVitaeEntity {
+  @AutoMap()
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,12 +19,15 @@ export class CurriculumVitaeEntity {
   @JoinColumn({ name: 'user_id'})
   user: UserEntity;
 
+  @AutoMap()
   @Column({ type: 'enum', enum: Gender, default: Gender.UNDEFINED })
   gender: Gender;
 
+  @AutoMap()
   @Column({ nullable: true, type: 'timestamp', default: null, name: 'date_of_birth' })
-  dateOfBirth: Date
+  dateOfBirth: Date;
 
+  @AutoMap()
   @Column({ nullable: true, name: 'phone_number' })
   phoneNumber: string;
 
@@ -31,25 +35,27 @@ export class CurriculumVitaeEntity {
   @Column({ default: null, nullable: true })
   nationality: number;
 
+  @AutoMap()
   @Column({ default: '' })
   address: string;
-
-  @Column({ default: '' })
-  summary: string;
 
   @AutoMap()
   @Column({ default: '' })
   skills: string;
 
+  @AutoMap()
   @Column({ default: '' })
   educations: string;
 
+  @AutoMap()
   @Column({ default: '' })
   certifications: string;
 
+  @AutoMap()
   @Column({ default: '' })
   languages: string;
 
+  @AutoMap()
   @Column({ default: '' })
   hobbies: string;
 
@@ -63,6 +69,7 @@ export class CurriculumVitaeEntity {
   @Column({ default: '' })
   introduce: string;
 
+  @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
   @OneToMany(() => CurriculumVitaeExperienceEntity, experience => experience.curriculumnVitae)
   experiences: CurriculumVitaeExperienceEntity[]
 

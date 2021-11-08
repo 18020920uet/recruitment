@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class RegisterRequest {
+  @IsEmail()
   @ApiProperty()
   readonly email: string;
 

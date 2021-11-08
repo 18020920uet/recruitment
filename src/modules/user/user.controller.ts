@@ -34,11 +34,17 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 import { UserEntity } from '@Entities/user.entity';
 
 import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
-import { ChangeAvatarRequest, ChangePasswordRequest, UpdateProfileRequest } from './dtos/requests';
+import {
+  ChangeAvatarRequest, ChangePasswordRequest,
+  UpdateProfileRequest, UpdateCurriculumnVitaeRequest
+} from './dtos/requests';
+
+import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 
 import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 
 import { UserService } from './user.service';
+
 
 @ApiTags('user')
 @Controller('user')
@@ -69,7 +75,6 @@ export class UserController {
     return await this.userService.changePassword(_currentUser, changePasswordRequest);
   }
 
-
   @Put('profile')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
@@ -86,20 +91,42 @@ export class UserController {
 
   @Put('avatar')
   @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(FileInterceptor('file', saveAvatarStorage))
   @ApiConsumes('multipart/form-data')
   @ApplicationApiOkResponse(ChangeAvatarResponse)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
-  @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FileInterceptor('file', saveAvatarStorage))
   async updateAvatar(
     @CurrentUser() _currentUser: UserEntity,
     @Body() changeAvatarRequest: ChangeAvatarRequest,
     @UploadedFile() file: Express.Multer.File
   ): Promise<ChangeAvatarResponse> {
-    console.log(file);
     return await this.userService.updateAvatar(_currentUser, file);
+  }
+
+  @Get('cv')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApplicationApiOkResponse(CurriculumVitae)
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getCurriculumnVitae(@CurrentUser() _currentUser: UserEntity): Promise<CurriculumVitae> {
+    return await this.userService.getCurriculumnVitae(_currentUser);
+  }
+
+  @Put('cv')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApplicationApiOkResponse(UpdateCurriculumnVitaeRequest)
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async updateCurriculumnVitae(
+    @CurrentUser() _currentUser: UserEntity,
+    @Body() updateCurriculumnVitaeRequest: UpdateCurriculumnVitaeRequest
+  ): Promise<CurriculumVitae> {
+    return await this.userService.updateCurriculumnVitae(_currentUser, updateCurriculumnVitaeRequest);
   }
 
 }
