@@ -5,10 +5,10 @@ import { UserEntity } from '@Entities/user.entity';
 
 @Injectable()
 export class PhotoService {
-  constructor(private configService: ConfigService) {}
+  constructor() {}
 
   getAvatar(_user: UserEntity): string {
-    const host = this.configService.get<string>('host');
+    const host = process.env.HOST;
     if (_user.avatar == '') {
       return host + '/resource/images/avatar.png';
     }
