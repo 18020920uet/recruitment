@@ -17,6 +17,7 @@ import { LoggerMiddleware } from '@Middlewares/logger.middleware';
 import { AccountModule } from '@Modules/account/account.module';
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
 import { UserModule } from '@Modules/user/user.module';
+import { ResourcesModule } from './modules/resources/resources.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { UserModule } from '@Modules/user/user.module';
     AccountModule,
     AuthenticationModule,
     UserModule,
+    ResourcesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
