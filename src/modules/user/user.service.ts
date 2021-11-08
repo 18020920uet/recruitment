@@ -5,26 +5,33 @@ import type { Mapper } from '@automapper/types';
 import { getManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-import { PhotoService } from '@Shared/services/photo.service';
-
-import { UserRepository } from '@Repositories/user.repository';
-import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
-
-import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
+import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
+import { ReviewEntity } from '@Entities/review.entity';
 import { UserEntity } from '@Entities/user.entity';
 
-import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+import { ReviewRepository } from '@Repositories/review.repository';
+import { UserRepository } from '@Repositories/user.repository';
+
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
+import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { Review } from '@Shared/responses/review';
 
 import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
-import { ChangePasswordRequest, UpdateProfileRequest, UpdateCurriculumnVitaeRequest } from './dtos/requests';
+import {
+  ChangePasswordRequest, UpdateProfileRequest,
+  UpdateCurriculumnVitaeRequest
+} from './dtos/requests';
+
+import { PhotoService } from '@Shared/services/photo.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
     private curriculumnVitaeRepository: CurriculumVitaeRepository,
+    private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
     private photoService: PhotoService,
@@ -35,8 +42,6 @@ export class UserService {
       where: { user: _currentUser },
       relations: ['user'],
     });
-    const avatar = this.photoService.getAvatar(_cv.user);
-    _cv.user.avatar = avatar;
     return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity);
   }
 
@@ -151,7 +156,6 @@ export class UserService {
       await transactionalEntityManager.insert(CurriculumVitaeExperienceEntity, _experiences);
     });
 
-    _cv.user.avatar = this.photoService.getAvatar(_currentUser);
     return await this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }
 
@@ -161,7 +165,21 @@ export class UserService {
       relations: ['experiences', 'user'],
     });
 
-    _cv.user.avatar = this.photoService.getAvatar(_currentUser);
     return await this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
+  }
+
+  async getReviews(_currentUser: UserEntity, page: number): Promise<Review[]> {
+    const _reviews = await this.reviewRepository.find({
+        where: { reviewee: _currentUser }, relations: ['reviewer', 'reviewee'],
+        order: { createdAt: "ASC" },
+        skip: page * 10, take: 10,
+    });
+
+    const reviews: Review[] = [];
+    for (const _review of _reviews) {
+      const review = await this.mapper.map(_review, Review, ReviewEntity);
+      reviews.push(review);
+    }
+    return reviews;
   }
 }

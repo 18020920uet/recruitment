@@ -74,7 +74,7 @@ export class CurriculumVitaeEntity {
   updatedAt: Date;
 
   @AutoMap()
-  @Column({ default: '' })
+  @Column({ type: 'varchar', length: 500, default: '' })
   introduce: string;
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })

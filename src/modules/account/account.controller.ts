@@ -36,6 +36,7 @@ export class AccountController {
   @Post('register')
   @ApiOperation({ summary: 'Register' })
   @ApplicationApiCreateResponse(AccountResponse)
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
   @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async register(@Body() registerRequest: RegisterRequest): Promise<AccountResponse> {
@@ -47,6 +48,7 @@ export class AccountController {
   @ApiOperation({ summary: 'Login' })
   @ApplicationApiOkResponse(AccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
   @ApiUnauthorizedResponse({ description: 'Wrong password', type: UnauthorizedResponse })
   @ApiForbiddenResponse({ description: 'Account locked', type: ForbiddenResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -58,6 +60,7 @@ export class AccountController {
   @ApiOperation({ summary: 'Activate account' })
   @ApplicationApiOkResponse(AccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
   @ApiForbiddenResponse({ description: 'Wrong activate code', type: ForbiddenResponse })
   @ApiBadRequestResponse({ description: 'Already activated', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -69,6 +72,7 @@ export class AccountController {
   @ApiOperation({ summary: 'Request for reset password' })
   @ApplicationApiCreateResponse(RequestResetPasswordResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async resetPassword(@Query('email') email: string): Promise<RequestResetPasswordResponse> {
     return await this.accountService.requestResetPassword(email);
@@ -78,6 +82,7 @@ export class AccountController {
   @ApiOperation({ summary: 'Unlock account' })
   @ApplicationApiOkResponse(AccountResponse)
   @ApiNotFoundResponse({ description: 'No account', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
   @ApiForbiddenResponse({ description: 'Wrong unlock code', type: ForbiddenResponse })
   @ApiBadRequestResponse({ description: 'Already unlocked', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })

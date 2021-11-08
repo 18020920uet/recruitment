@@ -4,24 +4,24 @@ import { AutoMap } from '@automapper/classes';
 import { Role } from '../enums/role';
 
 export class User {
-  @ApiProperty()
   @AutoMap()
+  @ApiProperty()
   id: string;
 
-  @ApiProperty()
   @AutoMap()
+  @ApiProperty()
   email: string;
 
   @AutoMap()
   @ApiProperty()
   firstName: string;
 
-  @ApiProperty()
   @AutoMap()
+  @ApiProperty()
   lastName: string;
 
-  @ApiProperty()
   @AutoMap()
+  @ApiProperty()
   role: Role;
 
   @AutoMap()

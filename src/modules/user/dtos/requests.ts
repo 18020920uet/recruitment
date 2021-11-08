@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, MinLength, IsString, Matches, Min, Max } from 'class-validator';
+import { IsEmail, IsNotEmpty, MinLength, IsString, Matches, Min, Max, IsPositive, IsInt } from 'class-validator';
 
 import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
@@ -153,4 +153,15 @@ export class UpdateCurriculumnVitaeRequest {
 
   @ApiProperty({ type: [UpdateCurriculumnVitaeExperienceRequest] })
   experiences: UpdateCurriculumnVitaeExperienceRequest[];
+}
+
+export class GetReviewsQuery {
+  @IsInt()
+  @Min(0)
+  @ApiProperty({
+    type: 'integer',
+    minimum: 0
+  })
+  page: number;
+
 }
