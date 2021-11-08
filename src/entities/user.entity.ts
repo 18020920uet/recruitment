@@ -30,7 +30,7 @@ export class UserEntity {
   @Column({ nullable: true, type: 'timestamp', default: null, name: 'last_reset_password' })
   lastResetPassword: Date;
 
-  @Column({ name: 'activate_code'})
+  @Column({ name: 'activate_code' })
   activateCode: string;
 
   @Column({ nullable: true, type: 'timestamp', default: null, name: 'activate_date' })
@@ -45,7 +45,7 @@ export class UserEntity {
   @Column({ type: 'timestamp', nullable: true, name: 'last_login' })
   lastLogin: Date;
 
-  @Column({ name: 'login_failed_strike'})
+  @Column({ name: 'login_failed_strike' })
   loginFailedStrike: number;
 
   @AutoMap()

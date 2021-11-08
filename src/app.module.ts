@@ -21,7 +21,7 @@ import { UserModule } from '@Modules/user/user.module';
 @Module({
   imports: [
     MulterModule.register({
-      dest: 'public'
+      dest: 'public',
     }),
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -29,10 +29,12 @@ import { UserModule } from '@Modules/user/user.module';
       isGlobal: true,
     }),
     AutomapperModule.forRoot({
-      options: [{
+      options: [
+        {
           name: 'classMapper',
-          pluginInitializer: classes
-      }],
+          pluginInitializer: classes,
+        },
+      ],
       singular: true,
     }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),

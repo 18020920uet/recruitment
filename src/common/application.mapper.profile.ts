@@ -11,7 +11,6 @@ import { User } from '@Shared/responses/user';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 
-
 import { ProfileResponse } from '@Modules/user/dtos/responses';
 
 @Injectable()
@@ -25,27 +24,28 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(UserEntity, User);
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper.createMap(CurriculumVitaeEntity, ProfileResponse);
-      mapper.createMap(CurriculumVitaeEntity, CurriculumVitae)
+      mapper
+        .createMap(CurriculumVitaeEntity, CurriculumVitae)
         .forMember(
           (curriculumVitae) => curriculumVitae.email,
-          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.email)
+          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.email),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.firstName,
-          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.firstName)
+          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.firstName),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.lastName,
-          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.lastName)
+          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.lastName),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.avatar,
-          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.avatar)
+          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.user.avatar),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.experiences,
-          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.experiences)
-        )
+          mapFrom((curriculumVitaeEntity) => curriculumVitaeEntity.experiences),
+        );
     };
   }
 }

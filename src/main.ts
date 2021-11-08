@@ -3,7 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { VersioningType, ValidationPipe, ValidationError } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
-import express from 'express'
+import express from 'express';
 
 import { AppModule } from './app.module';
 
@@ -22,20 +22,21 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
 
-  app.useGlobalPipes(new ValidationPipe({
-    exceptionFactory: (errors: ValidationError[]) => {
-      const message = errors.map(
-        error => `${error.property} has wrong value '${error.value}', ${Object.values(error.constraints).join(', ')}`
-      )
-      return new ValidationExeption(message);
-    }
-  }))
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors: ValidationError[]) => {
+        const message = errors.map(
+          (error) =>
+            `${error.property} has wrong value '${error.value}', ${Object.values(error.constraints).join(', ')}`,
+        );
+        return new ValidationExeption(message);
+      },
+    }),
+  );
 
   app.enableVersioning({
     type: VersioningType.URI,
   });
-
-
 
   // Swagger
   const swaggerConfig = new DocumentBuilder()

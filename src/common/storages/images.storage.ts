@@ -1,7 +1,6 @@
 import { UnsupportedMediaTypeException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
 import path from 'path';
 
 const filenameConvert = (req, file, cb) => {
@@ -11,13 +10,13 @@ const filenameConvert = (req, file, cb) => {
   if (['image/png', 'image/jpeg', 'image/jpg'].includes(mimetype)) {
     cb(null, fileName);
   } else {
-    cb(new UnsupportedMediaTypeException('File extensions must be .png, .jpg or .jpeg'), null)
+    cb(new UnsupportedMediaTypeException('File extensions must be .png, .jpg or .jpeg'), null);
   }
-}
+};
 
 export const saveAvatarStorage = {
   storage: diskStorage({
     destination: 'public/avatar',
-    filename: filenameConvert
-  })
-}
+    filename: filenameConvert,
+  }),
+};

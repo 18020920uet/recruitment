@@ -26,10 +26,7 @@ import { AccountService } from './account.service';
 
 import { RegisterRequest, LoginRequest, ActivateRequest, UnlockRequest } from './dtos/requests';
 
-import {
-  RequestResetPasswordResponse,
-  AccountResponse
-} from './dtos/responses';
+import { RequestResetPasswordResponse, AccountResponse } from './dtos/responses';
 
 @ApiTags('account')
 @Controller('account')

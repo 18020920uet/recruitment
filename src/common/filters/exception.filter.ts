@@ -12,7 +12,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     if (exception instanceof ValidationExeption) {
-      const statusCode = exception.getStatus()
+      const statusCode = exception.getStatus();
       if (process.env.NODE_ENV == 'production') {
         const exceptionResponse = {
           statusCode: statusCode,
@@ -61,7 +61,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const log = { ...exceptionResponse, request: request.body, ip: request.ip };
 
       fs.appendFile('logs/error.log', JSON.stringify(log) + '\n', { flag: 'a' }, (err) => {
-        if (err) { throw err; }
+        if (err) {
+          throw err;
+        }
       });
 
       if (process.env.NODE_ENV == 'production') {

@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-import { Role } from '@Shared/enums/role';
 import { User } from '@Shared/responses/user';
 
 export class ProfileResponse {
@@ -28,7 +27,7 @@ export class ProfileResponse {
 
 export class ChangePasswordResponse {
   @ApiProperty()
-  status: boolean
+  status: boolean;
 }
 
 export class ChangeAvatarResponse {

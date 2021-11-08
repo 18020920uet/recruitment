@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { getManager } from "typeorm";
+import { getManager } from 'typeorm';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { ConfigService } from '@nestjs/config';
@@ -66,7 +66,7 @@ export class AccountService {
     const _cv = new CurriculumVitaeEntity();
     _cv.user = _user;
 
-    await getManager().transaction(async transactionalEntityManager => {
+    await getManager().transaction(async (transactionalEntityManager) => {
       await transactionalEntityManager.save(_user);
       await transactionalEntityManager.save(_cv);
       // Encrypt token
@@ -165,7 +165,6 @@ export class AccountService {
     }
 
     return await this.getAccountResponse(_user);
-
   }
 
   async requestResetPassword(email: string): Promise<RequestResetPasswordResponse> {

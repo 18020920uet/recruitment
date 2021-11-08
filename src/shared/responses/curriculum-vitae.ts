@@ -51,7 +51,7 @@ export class CurriculumVitae {
 
   @AutoMap()
   @ApiProperty({
-    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"'
+    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"',
   })
   educations: string;
 
@@ -60,11 +60,11 @@ export class CurriculumVitae {
   certifications: string;
 
   @AutoMap()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"'})
+  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })
   languages: string;
 
   @AutoMap()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"'})
+  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"' })
   hobbies: string;
 
   @AutoMap()
@@ -73,7 +73,7 @@ export class CurriculumVitae {
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperience })
   @ApiProperty({ type: [CurriculumVitaeExperience] })
-  experiences: CurriculumVitaeExperience[]
+  experiences: CurriculumVitaeExperience[];
 
   @AutoMap()
   @ApiProperty({ minimum: 5, maximum: 150 })

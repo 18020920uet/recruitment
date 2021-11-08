@@ -82,28 +82,28 @@ export class UpdateCurriculumnVitaeRequest {
   nationality: number | null;
 
   @ApiProperty({ enum: [2, 3] })
-  gender: Gender
+  gender: Gender;
 
   @ApiProperty()
   address: string;
 
   @ApiProperty({
-    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"'
+    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"',
   })
   educations: string;
 
   @ApiProperty({ description: 'Split by "|". Exapmple: "Alogirthm|OOP|Unity"' })
   certifications: string;
 
-  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"'})
+  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })
   languages: string;
 
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"'})
+  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"' })
   hobbies: string;
 
   @ApiProperty()
   introduce: string;
 
   @ApiProperty({ type: [UpdateCurriculumnVitaeExperienceRequest] })
-  experiences: UpdateCurriculumnVitaeExperienceRequest[]
+  experiences: UpdateCurriculumnVitaeExperienceRequest[];
 }
