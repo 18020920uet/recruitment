@@ -136,7 +136,7 @@ export class AccountService {
       _user.activateDate = new Date();
       await this.userRepository.save(_user);
     } else if (_user.isActivated) {
-      throw new HttpException('Account has been activated', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Account has been activated', HttpStatus.NOT_ACCEPTABLE);
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
     }
@@ -159,7 +159,7 @@ export class AccountService {
       _user.loginFailedStrike = 0;
       await this.userRepository.save(_user);
     } else if (!_user.isLock) {
-      throw new HttpException('Account has been unlocked', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Account has been unlocked', HttpStatus.NOT_ACCEPTABLE);
     } else {
       throw new HttpException('Wrong unlock code', HttpStatus.FORBIDDEN);
     }

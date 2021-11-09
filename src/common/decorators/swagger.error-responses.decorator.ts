@@ -35,12 +35,15 @@ export class UnauthorizedResponse extends ErrorResponse {
 
 export class NotAcceptableResponse extends ErrorResponse {
   @ApiProperty({ default: 406 })
-  statusCode = 500;
+  statusCode = 406;
 }
 
 export class BadRequestResponse extends ErrorResponse {
   @ApiProperty({ default: 400 })
   statusCode = 400;
+
+  @ApiProperty({ type: [String] })
+  errors = [];
 }
 
 export class UnsupportedMediaTypeResponse extends ErrorResponse {

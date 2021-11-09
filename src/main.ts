@@ -24,12 +24,12 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      exceptionFactory: (errors: ValidationError[]) => {
-        const message = errors.map(
-          (error) =>
-            `${error.property} has wrong value '${error.value}', ${Object.values(error.constraints).join(', ')}`,
-        );
-        return new ValidationExeption(message);
+      exceptionFactory: (_errors: ValidationError[]) => {
+        const errors = [];
+        _errors.forEach((_error) => {
+          errors.push(...Object.values(_error.constraints));
+        });
+        return new ValidationExeption(errors);
       },
     }),
   );

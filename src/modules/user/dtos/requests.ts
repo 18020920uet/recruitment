@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, MinLength, IsString, Matches, Min, Max, IsPositive, IsInt } from 'class-validator';
+import {
+  IsEmail, IsNotEmpty, MinLength, IsString, IsNumberString,
+  Matches, Min, Max, IsPositive, IsInt, NotContains
+} from 'class-validator';
 
 import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
@@ -8,18 +11,28 @@ export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/^(?=.*[@$!%*#?&])(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, {
-    message: 'Password must contain aleast 1 number, 1 uppercase letter, 1 lowercase letter and 1 special character'
-  })
+  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
+  @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
+  @Matches(
+    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    { message: 'password must contain at least 1 special character' }
+  )
+  @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   oldPassword: string;
 
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/^(?=.*[@$!%*#?&])(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, {
-    message: 'Password must contain aleast 1 number, 1 uppercase letter, 1 lowercase letter and 1 special character'
-  })
+  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
+  @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
+  @Matches(
+    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    { message: 'password must contain at least 1 special character' }
+  )
+  @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   newPassword: string;
 }
@@ -48,13 +61,21 @@ export class UpdateProfileRequest {
   @ApiProperty()
   email: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
+  @Matches(
+    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    { message: 'firstName must contain only alphabet' }
+  )
   @ApiProperty()
   firstName: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
+  @Matches(
+    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    { message: 'firstName must contain only alphabet' }
+  )
   @ApiProperty()
   lastName: string;
 }
@@ -94,17 +115,25 @@ export class UpdateCurriculumnVitaeExperienceRequest {
 }
 
 export class UpdateCurriculumnVitaeRequest {
-  @IsString()
   @IsNotEmpty()
-  @ApiProperty()
-  firstName: string;
+  @IsString()
+  @Matches(
+    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    { message: 'firstName must contain only alphabet' }
+  )
+  @ApiProperty()  firstName: string;
 
-  @IsString()
   @IsNotEmpty()
+  @IsString()
+  @Matches(
+    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    { message: 'lastName must contain only alphabet' }
+  )
   @ApiProperty()
   lastName: string;
 
   @IsString()
+  @IsNumberString()
   @ApiProperty()
   phoneNumber: string | null;
 
@@ -158,10 +187,6 @@ export class UpdateCurriculumnVitaeRequest {
 export class GetReviewsQuery {
   @IsInt()
   @Min(0)
-  @ApiProperty({
-    type: 'integer',
-    minimum: 0
-  })
+  @ApiProperty({ type: 'integer',  minimum: 0 })
   page: number;
-
 }
