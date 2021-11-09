@@ -11,7 +11,7 @@ import { AuthenticationModule } from '@Modules/authentication/authentication.mod
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 
-import { PhotoService } from '@Shared/services/photo.service';
+import { FileService } from '@Shared/services/file.service';
 
 @Module({
   imports: [
@@ -24,6 +24,6 @@ import { PhotoService } from '@Shared/services/photo.service';
     ConfigModule,
   ],
   controllers: [UserController],
-  providers: [UserService, PhotoService],
+  providers: [UserService, FileService],
 })
 export class UserModule {}

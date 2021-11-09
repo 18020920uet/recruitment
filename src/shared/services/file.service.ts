@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '@Entities/user.entity';
 
 @Injectable()
-export class PhotoService {
+export class FileService {
   constructor() {}
 
   getAvatar(_user: UserEntity): string {
@@ -13,5 +13,10 @@ export class PhotoService {
       return host + '/resource/images/avatar.png';
     }
     return `${host}/public/images/${_user.avatar}`;
+  }
+
+  getCertification(certificationID: string) {
+    const host = process.env.HOST;
+    return `${host}/public/certifications/${certificationID}`;
   }
 }

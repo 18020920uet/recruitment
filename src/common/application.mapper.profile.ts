@@ -14,11 +14,11 @@ import { Review } from '@Shared/responses/review';
 import { User } from '@Shared/responses/user';
 
 import { ProfileResponse } from '@Modules/user/dtos/responses';
-import { PhotoService } from '@Shared/services/photo.service';
+import { FileService } from '@Shared/services/file.service';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {
-  constructor(@InjectMapper() mapper: Mapper, private photoService: PhotoService) {
+  constructor(@InjectMapper() mapper: Mapper, private fileService: FileService) {
     super(mapper);
   }
 
@@ -27,18 +27,18 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(UserEntity, User)
         .forMember(
           (user) => user.avatar,
-          mapFrom((_user) => this.photoService.getAvatar(_user))
+          mapFrom((_user) => this.fileService.getAvatar(_user))
         );
       // mapper.createMap(UserEntity, Company)
       //   .forMember(
       //     (compnay) => compnay.avatar,
-      //     mapFrom((_user) => this.photoService.getAvatar(_user))
+      //     mapFrom((_user) => this.fileService.getAvatar(_user))
       //   );
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper.createMap(CurriculumVitaeEntity, ProfileResponse)
         .forMember(
           (profile) => profile.avatar,
-          mapFrom((_curriculumVitae) => this.photoService.getAvatar(_curriculumVitae.user))
+          mapFrom((_curriculumVitae) => this.fileService.getAvatar(_curriculumVitae.user))
         );
       mapper.createMap(CurriculumVitaeEntity, CurriculumVitae)
         .forMember(
@@ -55,11 +55,18 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.avatar,
-          mapFrom((_curriculumVitae) => this.photoService.getAvatar(_curriculumVitae.user)),
+          mapFrom((_curriculumVitae) => this.fileService.getAvatar(_curriculumVitae.user)),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.experiences,
           mapFrom((_curriculumVitae) => _curriculumVitae.experiences),
+        )
+        .forMember(
+          (curriculumVitae) => curriculumVitae.certifications,
+          mapFrom((_curriculumVitae) => {
+            return _curriculumVitae.certifications.split(',')
+                  .map(certification => this.fileService.getCertification(certification))
+          }),
         );
       mapper.createMap(ReviewEntity, Review);
     };

@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 
 import { AuthenticationService } from '@Modules/authentication/authentication.service';
 import { EncryptService } from '@Shared/services/encrypt.service';
-import { PhotoService } from '@Shared/services/photo.service';
+import { FileService } from '@Shared/services/file.service';
 
 import { UserRepository } from '@Repositories/user.repository';
 import { UserEntity } from '@Entities/user.entity';
@@ -28,12 +28,12 @@ export class AccountService {
     private userRepository: UserRepository,
     private encryptService: EncryptService,
     private configService: ConfigService,
-    private photoService: PhotoService,
+    private fileService: FileService,
     private mailService: MailService,
   ) {}
 
   private async getAccountResponse(_user: UserEntity): Promise<AccountResponse> {
-    _user.avatar = this.photoService.getAvatar(_user);
+    _user.avatar = this.fileService.getAvatar(_user);
     const response: AccountResponse = {
       user: this.mapper.map(_user, User, UserEntity),
       accessToken: await this.authenticationService.generateAccessToken(_user),
