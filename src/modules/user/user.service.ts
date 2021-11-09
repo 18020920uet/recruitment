@@ -1,9 +1,12 @@
-import { Injectable, ForbiddenException, ConflictException } from '@nestjs/common';
+import { Injectable, ForbiddenException, ConflictException, HttpStatus, HttpException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { getManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import path from 'path';
+import fs from 'fs';
+
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
@@ -18,13 +21,20 @@ import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-ex
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { Review } from '@Shared/responses/review';
 
-import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import {
-  ChangePasswordRequest, UpdateProfileRequest,
-  UpdateCurriculumnVitaeRequest
+  UpdateCertificationsResponse,
+  ChangePasswordResponse,
+  ChangeAvatarResponse,
+  ProfileResponse,
+} from './dtos/responses';
+import {
+  UpdateCurriculumnVitaeRequest,
+  UpdateCertificationsRequest,
+  ChangePasswordRequest,
+  UpdateProfileRequest,
 } from './dtos/requests';
 
-import { PhotoService } from '@Shared/services/photo.service';
+import { FileService } from '@Shared/services/file.service';
 
 @Injectable()
 export class UserService {
@@ -34,7 +44,7 @@ export class UserService {
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
-    private photoService: PhotoService,
+    private fileService: FileService,
   ) {}
 
   async getProfile(_currentUser: UserEntity): Promise<ProfileResponse> {
@@ -102,7 +112,7 @@ export class UserService {
     _currentUser.avatar = file.filename;
     await this.userRepository.save(_currentUser);
     return {
-      avatar: this.photoService.getAvatar(_currentUser),
+      avatar: this.fileService.getAvatar(_currentUser),
     };
   }
 
@@ -131,7 +141,6 @@ export class UserService {
       _cv.gender = updateCurriculumnVitaeRequest.gender;
       _cv.nationality = updateCurriculumnVitaeRequest.nationality;
       _cv.educations = updateCurriculumnVitaeRequest.educations;
-      _cv.certifications = updateCurriculumnVitaeRequest.certifications;
       _cv.languages = updateCurriculumnVitaeRequest.languages;
       _cv.hobbies = updateCurriculumnVitaeRequest.hobbies;
       _cv.introduce = updateCurriculumnVitaeRequest.introduce;
@@ -181,5 +190,28 @@ export class UserService {
       reviews.push(review);
     }
     return reviews;
+  }
+
+  async updateCertifications(
+    _currentUser: UserEntity, files: Express.Multer.File[],
+  ): Promise<UpdateCertificationsResponse> {
+    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _certifications = _cv.certifications.split(',');
+
+    /// Remove old file
+    for (const _certification of _certifications) {
+      if (_certification != '') {
+        const path = `./public/certifications/${_certification}`;
+        fs.unlinkSync(path);
+      }
+    }
+
+    const certifications = files.map(file => file.filename);
+    _cv.certifications = certifications.join(',')
+    await this.curriculumnVitaeRepository.save(_cv);
+
+    return {
+      certifications: _cv.certifications.split(',').map(_c => this.fileService.getCertification(_c)),
+    };
   }
 }

@@ -41,12 +41,17 @@ export class NotAcceptableResponse extends ErrorResponse {
 export class BadRequestResponse extends ErrorResponse {
   @ApiProperty({ default: 400 })
   statusCode = 400;
-
-  @ApiProperty({ type: [String] })
-  errors = [];
 }
 
 export class UnsupportedMediaTypeResponse extends ErrorResponse {
   @ApiProperty({ default: 415 })
   statusCode = 415;
+}
+
+export class ValidationFailResponse extends ErrorResponse {
+  @ApiProperty({ default: 400 })
+  statusCode = 400;
+
+  @ApiProperty({ type: [String] })
+  errors = [];
 }

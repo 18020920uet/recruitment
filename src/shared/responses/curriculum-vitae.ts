@@ -56,8 +56,8 @@ export class CurriculumVitae {
   educations: string;
 
   @AutoMap()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Alogirthm|OOP|Unity"' })
-  certifications: string;
+  @ApiProperty({ type: [String] })
+  certifications: string[];
 
   @AutoMap()
   @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })

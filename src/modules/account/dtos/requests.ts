@@ -10,7 +10,7 @@ export class RegisterRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
   @Matches(
@@ -24,7 +24,7 @@ export class RegisterRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'firstName must contain only alphabet' }
   )
   @ApiProperty()
@@ -33,7 +33,7 @@ export class RegisterRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'lastName must contain only alphabet' }
   )
   @ApiProperty()
@@ -49,7 +49,7 @@ export class LoginRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
   @Matches(

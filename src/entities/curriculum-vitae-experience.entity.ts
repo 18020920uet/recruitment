@@ -23,11 +23,11 @@ export class CurriculumVitaeExperienceEntity {
   index: number;
 
   @AutoMap()
-  @Column({ name: 'company-email' })
+  @Column({ name: 'company_email' })
   companyEmail: string;
 
   @AutoMap()
-  @Column({ name: 'company-name' })
+  @Column({ name: 'company_name' })
   companyName: string;
 
   @AutoMap()

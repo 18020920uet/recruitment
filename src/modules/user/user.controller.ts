@@ -1,8 +1,10 @@
-import { Controller, Get, UseGuards, Put, Body, UploadedFile, UseInterceptors, Query } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { saveAvatarStorage } from '@Common/storages/images.storage';
+import {
+  Controller, Get, UseGuards, Put, Body,
+  UploadedFile, UseInterceptors, Query, Delete,
+  UploadedFiles
+} from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-
 import {
   ApiUnsupportedMediaTypeResponse,
   ApiInternalServerErrorResponse,
@@ -17,9 +19,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { saveAvatarStorage } from '@Common/storages/images.storage';
+import { saveCertificationsStorage } from '@Common/storages/certifications.storage';
+
 import {
   UnsupportedMediaTypeResponse,
   InternalServerErrorResponse,
+  ValidationFailResponse,
   UnauthorizedResponse,
   BadRequestResponse,
   ForbiddenResponse,
@@ -34,9 +40,16 @@ import { ApplicationApiOkResponse, ApplicationArrayApiOkResponse } from '@Common
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { ProfileResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
+import {
+  UpdateCertificationsResponse,
+  ChangePasswordResponse,
+  ChangeAvatarResponse,
+  ProfileResponse,
+} from './dtos/responses';
+
 import {
   UpdateCurriculumnVitaeRequest,
+  UpdateCertificationsRequest,
   ChangePasswordRequest,
   UpdateProfileRequest,
   ChangeAvatarRequest,
@@ -52,7 +65,7 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-
+Put
   @Get('profile')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
@@ -66,7 +79,7 @@ export class UserController {
   @Put('change-password')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ChangePasswordResponse)
-  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiForbiddenResponse({ description: 'Wrong password', type: ForbiddenResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -81,7 +94,7 @@ export class UserController {
   @Put('profile')
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ProfileResponse)
-  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -125,7 +138,7 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
   @ApplicationApiOkResponse(CurriculumVitae)
-  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async updateCurriculumnVitae(
@@ -139,7 +152,7 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
   @ApplicationArrayApiOkResponse(Review)
-  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviews(
@@ -147,5 +160,23 @@ export class UserController {
     @Query() getReviewsQuery: GetReviewsQuery)
   : Promise<Review[]> {
     return await this.userService.getReviews(_currentUser, getReviewsQuery.page);
+  }
+
+  @Put('certifications')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(FilesInterceptor('files', 3 , saveCertificationsStorage))
+  @ApiConsumes('multipart/form-data')
+  @ApplicationApiOkResponse(UpdateCertificationsResponse)
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
+  async updateCertifications(
+    @CurrentUser() _currentUser: UserEntity,
+    @Body() addCertificationRequest: UpdateCertificationsRequest,
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<UpdateCertificationsResponse> {
+    return await this.userService.updateCertifications(_currentUser, files);
   }
 }

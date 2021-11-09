@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail, IsNotEmpty, MinLength, IsString, IsNumberString,
-  Matches, Min, Max, IsPositive, IsInt, NotContains
+  Matches, Min, Max, IsPositive, IsInt, NotContains, IsArray, ArrayMaxSize
 } from 'class-validator';
 
 import { Gender } from '@Shared/enums/gender';
@@ -11,11 +11,11 @@ export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
   @Matches(
-    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
     { message: 'password must contain at least 1 special character' }
   )
   @NotContains(' ', { message: 'password must not contain white space' })
@@ -25,11 +25,11 @@ export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\\d.*/g, { message: 'password must contain at least 1 number' })
+  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
   @Matches(
-    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
     { message: 'password must contain at least 1 special character' }
   )
   @NotContains(' ', { message: 'password must not contain white space' })
@@ -64,7 +64,7 @@ export class UpdateProfileRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'firstName must contain only alphabet' }
   )
   @ApiProperty()
@@ -73,16 +73,11 @@ export class UpdateProfileRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'firstName must contain only alphabet' }
   )
   @ApiProperty()
   lastName: string;
-}
-
-export class ChangeAvatarRequest {
-  @ApiProperty({ type: 'string', format: 'binary' })
-  file: any;
 }
 
 export class UpdateCurriculumnVitaeExperienceRequest {
@@ -118,7 +113,7 @@ export class UpdateCurriculumnVitaeRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'firstName must contain only alphabet' }
   )
   @ApiProperty()  firstName: string;
@@ -126,7 +121,7 @@ export class UpdateCurriculumnVitaeRequest {
   @IsNotEmpty()
   @IsString()
   @Matches(
-    /[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
+    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
     { message: 'lastName must contain only alphabet' }
   )
   @ApiProperty()
@@ -164,10 +159,6 @@ export class UpdateCurriculumnVitaeRequest {
   })
   educations: string;
 
-  @IsString()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Alogirthm|OOP|Unity"' })
-  certifications: string;
-
   @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })
   @IsString()
   languages: string;
@@ -189,4 +180,14 @@ export class GetReviewsQuery {
   @Min(0)
   @ApiProperty({ type: 'integer',  minimum: 0 })
   page: number;
+}
+
+export class ChangeAvatarRequest {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
+}
+
+export class UpdateCertificationsRequest {
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }})
+  files: any[];
 }
