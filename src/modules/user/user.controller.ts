@@ -44,14 +44,14 @@ import {
   UpdateCertificationsResponse,
   ChangePasswordResponse,
   ChangeAvatarResponse,
-  ProfileResponse,
+  // ProfileResponse,
 } from './dtos/responses';
 
 import {
   UpdateCurriculumnVitaeRequest,
   UpdateCertificationsRequest,
   ChangePasswordRequest,
-  UpdateProfileRequest,
+  // UpdateProfileRequest,
   ChangeAvatarRequest,
   GetReviewsQuery,
 } from './dtos/requests';
@@ -65,16 +65,16 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-Put
-  @Get('profile')
-  @ApiBearerAuth('access-token')
-  @ApplicationApiOkResponse(ProfileResponse)
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  @UseGuards(JwtAuthenticationGuard)
-  async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<ProfileResponse> {
-    return await this.userService.getProfile(_currentUser);
-  }
+
+  // @Get('profile')
+  // @ApiBearerAuth('access-token')
+  // @ApplicationApiOkResponse(ProfileResponse)
+  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  // @UseGuards(JwtAuthenticationGuard)
+  // async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<ProfileResponse> {
+  //   return await this.userService.getProfile(_currentUser);
+  // }
 
   @Put('change-password')
   @ApiBearerAuth('access-token')
@@ -91,20 +91,20 @@ Put
     return await this.userService.changePassword(_currentUser, changePasswordRequest);
   }
 
-  @Put('profile')
-  @ApiBearerAuth('access-token')
-  @ApplicationApiOkResponse(ProfileResponse)
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  @UseGuards(JwtAuthenticationGuard)
-  async updateProfile(
-    @CurrentUser() _currentUser: UserEntity,
-    @Body() updateProfileRequest: UpdateProfileRequest,
-  ): Promise<ProfileResponse> {
-    return await this.userService.updateProfile(_currentUser, updateProfileRequest);
-  }
+  // @Put('profile')
+  // @ApiBearerAuth('access-token')
+  // @ApplicationApiOkResponse(ProfileResponse)
+  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
+  // @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
+  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  // @UseGuards(JwtAuthenticationGuard)
+  // async updateProfile(
+  //   @CurrentUser() _currentUser: UserEntity,
+  //   @Body() updateProfileRequest: UpdateProfileRequest,
+  // ): Promise<ProfileResponse> {
+  //   return await this.userService.updateProfile(_currentUser, updateProfileRequest);
+  // }
 
   @Put('avatar')
   @ApiBearerAuth('access-token')

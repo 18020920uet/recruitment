@@ -11,11 +11,11 @@ export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
-  @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
-  @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
+  @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
+  @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
+  @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
   @Matches(
-    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
     { message: 'password must contain at least 1 special character' }
   )
   @NotContains(' ', { message: 'password must not contain white space' })
@@ -25,11 +25,11 @@ export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
-  @Matches(/.*\d.*/g, { message: 'password must contain at least 1 number' })
-  @Matches(/.*[A-Z].*/g, { message: 'password must contain at least 1 uppercase character' })
-  @Matches(/.*[a-z].*/g, { message: 'password must contain at least 1 lowercase character' })
+  @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
+  @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
+  @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
   @Matches(
-    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/g,
+    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
     { message: 'password must contain at least 1 special character' }
   )
   @NotContains(' ', { message: 'password must not contain white space' })
@@ -37,48 +37,40 @@ export class ChangePasswordRequest {
   newPassword: string;
 }
 
-export class UpdateProfileRequest {
-  @IsString()
-  @ApiProperty({ description: 'Các skill tách nhau bởi ký tự "|". Ví dụ: "React Redux|OOP|Problem-solving"' })
-  skills: string;
-
-  @IsPositive()
-  @Min(5)
-  @Max(150)
-  @ApiProperty({ minimum: 5, maximum: 150 })
-  minimalHourlyRate: number;
-
-  @IsPositive()
-  @ApiProperty()
-  nationality: number | null;
-
-  @IsString()
-  @ApiProperty()
-  introduce: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty()
-  email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Matches(
-    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
-    { message: 'firstName must contain only alphabet' }
-  )
-  @ApiProperty()
-  firstName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @Matches(
-    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
-    { message: 'firstName must contain only alphabet' }
-  )
-  @ApiProperty()
-  lastName: string;
-}
+// export class UpdateProfileRequest {
+//   @IsString()
+//   @ApiProperty({ type: [String] })
+//   skills: string[];
+//
+//   @IsPositive()
+//   @Min(5)
+//   @Max(150)
+//   @ApiProperty({ minimum: 5, maximum: 150 })
+//   minimalHourlyRate: number;
+//
+//   @IsPositive()
+//   @ApiProperty()
+//   nationality: number | null;
+//
+//   @IsString()
+//   @ApiProperty()
+//   introduce: string;
+//
+//   @IsEmail()
+//   @IsNotEmpty()
+//   @ApiProperty()
+//   email: string;
+//
+//   @IsNotEmpty()
+//   @IsString()
+//   @ApiProperty()
+//   firstName: string;
+//
+//   @IsNotEmpty()
+//   @IsString()
+//   @ApiProperty()
+//   lastName: string;
+// }
 
 export class UpdateCurriculumnVitaeExperienceRequest {
   @IsEmail()
@@ -112,18 +104,10 @@ export class UpdateCurriculumnVitaeExperienceRequest {
 export class UpdateCurriculumnVitaeRequest {
   @IsNotEmpty()
   @IsString()
-  @Matches(
-    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
-    { message: 'firstName must contain only alphabet' }
-  )
-  @ApiProperty()  firstName: string;
+  @ApiProperty() firstName: string;
 
   @IsNotEmpty()
   @IsString()
-  @Matches(
-    /[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\=\|\\\\]/g,
-    { message: 'lastName must contain only alphabet' }
-  )
   @ApiProperty()
   lastName: string;
 
@@ -131,10 +115,6 @@ export class UpdateCurriculumnVitaeRequest {
   @IsNumberString()
   @ApiProperty()
   phoneNumber: string | null;
-
-  @IsString()
-  @ApiProperty({ description: 'Các skill tách nhau bởi ký tự "|". Ví dụ: "React Redux|OOP|Problem-solving"' })
-  skills: string;
 
   @IsPositive()
   @Min(5)
@@ -146,7 +126,10 @@ export class UpdateCurriculumnVitaeRequest {
   @ApiProperty()
   nationality: number | null;
 
-  @ApiProperty({ enum: [2, 3] })
+  @ApiProperty({ description: 'month/date/year. new Date("MM/DD/YYYY").toLocaleDateString("en-Us")'})
+  dateOfBirth: string;
+
+  @ApiProperty({ enum: [2, 3], description: '2: FEMALE, 3: MALE' })
   gender: Gender;
 
   @IsString()
@@ -154,22 +137,21 @@ export class UpdateCurriculumnVitaeRequest {
   address: string;
 
   @IsString()
-  @ApiProperty({
-    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"',
-  })
+  @ApiProperty()
   educations: string;
-
-  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })
-  @IsString()
-  languages: string;
-
-  @IsString()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"' })
-  hobbies: string;
 
   @IsString()
   @ApiProperty()
   introduce: string;
+
+  @ApiProperty({ type: [String] })
+  skills: string[];
+
+  @ApiProperty({ type: [String] })
+  languages: string[];
+
+  @ApiProperty({ type: [String] })
+  hobbies: string[];
 
   @ApiProperty({ type: [UpdateCurriculumnVitaeExperienceRequest] })
   experiences: UpdateCurriculumnVitaeExperienceRequest[];

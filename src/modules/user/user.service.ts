@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import path from 'path';
 import fs from 'fs';
 
-
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { ReviewEntity } from '@Entities/review.entity';
@@ -25,13 +24,13 @@ import {
   UpdateCertificationsResponse,
   ChangePasswordResponse,
   ChangeAvatarResponse,
-  ProfileResponse,
+  // ProfileResponse,
 } from './dtos/responses';
 import {
   UpdateCurriculumnVitaeRequest,
   UpdateCertificationsRequest,
   ChangePasswordRequest,
-  UpdateProfileRequest,
+  // UpdateProfileRequest,
 } from './dtos/requests';
 
 import { FileService } from '@Shared/services/file.service';
@@ -46,14 +45,14 @@ export class UserService {
     private configService: ConfigService,
     private fileService: FileService,
   ) {}
-
-  async getProfile(_currentUser: UserEntity): Promise<ProfileResponse> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({
-      where: { user: _currentUser },
-      relations: ['user'],
-    });
-    return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity);
-  }
+  //
+  // async getProfile(_currentUser: UserEntity): Promise<ProfileResponse> {
+  //   const _cv = await this.curriculumnVitaeRepository.findOne({
+  //     where: { user: _currentUser },
+  //     relations: ['user'],
+  //   });
+  //   return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity);
+  // }
 
   async changePassword(
     _currentUser: UserEntity,
@@ -78,35 +77,35 @@ export class UserService {
     return changePasswordResponse;
   }
 
-  async updateProfile(_currentUser: UserEntity, updateProfileRequest: UpdateProfileRequest): Promise<ProfileResponse> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
-
-    await getManager().transaction(async (transactionalEntityManager) => {
-      if (_currentUser.email != updateProfileRequest.email) {
-        const email = updateProfileRequest.email;
-        const userWithEmail = await this.userRepository.find({ email: email });
-
-        if (userWithEmail) {
-          throw new ConflictException('Email has been used');
-        }
-
-        // TO DO SEND MAIL TO CONFIRM;
-      }
-
-      _currentUser.firstName = updateProfileRequest.firstName;
-      _currentUser.lastName = updateProfileRequest.lastName;
-
-      _cv.introduce = updateProfileRequest.introduce;
-      _cv.minimalHourlyRate = updateProfileRequest.minimalHourlyRate;
-      _cv.skills = updateProfileRequest.skills;
-      _cv.nationality = updateProfileRequest.nationality;
-
-      await transactionalEntityManager.save(_currentUser);
-      await transactionalEntityManager.save(_cv);
-    });
-
-    return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity);
-  }
+  // async updateProfile(_currentUser: UserEntity, updateProfileRequest: UpdateProfileRequest): Promise<ProfileResponse> {
+  //   const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+  //
+  //   await getManager().transaction(async (transactionalEntityManager) => {
+  //     if (_currentUser.email != updateProfileRequest.email) {
+  //       const email = updateProfileRequest.email;
+  //       const userWithEmail = await this.userRepository.find({ email: email });
+  //
+  //       if (userWithEmail) {
+  //         throw new ConflictException('Email has been used');
+  //       }
+  //
+  //       // TO DO SEND MAIL TO CONFIRM;
+  //     }
+  //
+  //     _currentUser.firstName = updateProfileRequest.firstName;
+  //     _currentUser.lastName = updateProfileRequest.lastName;
+  //
+  //     _cv.introduce = updateProfileRequest.introduce;
+  //     _cv.minimalHourlyRate = updateProfileRequest.minimalHourlyRate;
+  //     _cv.skills = updateProfileRequest.skills;
+  //     _cv.nationality = updateProfileRequest.nationality;
+  //
+  //     await transactionalEntityManager.save(_currentUser);
+  //     await transactionalEntityManager.save(_cv);
+  //   });
+  //
+  //   return await this.mapper.map(_cv, ProfileResponse, CurriculumVitaeEntity);
+  // }
 
   async updateAvatar(_currentUser: UserEntity, file: Express.Multer.File): Promise<ChangeAvatarResponse> {
     _currentUser.avatar = file.filename;
@@ -136,34 +135,39 @@ export class UserService {
       await transactionalEntityManager.save(_currentUser);
 
       _cv.phoneNumber = updateCurriculumnVitaeRequest.phoneNumber;
+      _cv.dateOfBirth = new Date(updateCurriculumnVitaeRequest.dateOfBirth);
       _cv.minimalHourlyRate = updateCurriculumnVitaeRequest.minimalHourlyRate;
-      _cv.skills = updateCurriculumnVitaeRequest.skills;
       _cv.gender = updateCurriculumnVitaeRequest.gender;
       _cv.nationality = updateCurriculumnVitaeRequest.nationality;
       _cv.educations = updateCurriculumnVitaeRequest.educations;
-      _cv.languages = updateCurriculumnVitaeRequest.languages;
-      _cv.hobbies = updateCurriculumnVitaeRequest.hobbies;
       _cv.introduce = updateCurriculumnVitaeRequest.introduce;
+      _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join(',');
+      _cv.skills = updateCurriculumnVitaeRequest.skills.join(',');
+      _cv.languages = updateCurriculumnVitaeRequest.languages.join(',');
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
-      updateCurriculumnVitaeRequest.experiences.forEach((experience: CurriculumVitaeExperience, index: number) => {
-        const _experience = new CurriculumVitaeExperienceEntity();
-        _experience.companyEmail = experience.companyEmail;
-        _experience.companyName = experience.companyName;
-        _experience.description = experience.description;
-        _experience.startDate = experience.startDate;
-        _experience.endDate = experience.endDate;
-        _experience.role = experience.role;
-        _experience.type = experience.type;
-        _experience.index = index;
-        _experience.cvId = _cv.id;
-        _experiences.push(_experience);
-      });
+      if(updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
+        updateCurriculumnVitaeRequest.experiences.forEach((experience: CurriculumVitaeExperience, index: number) => {
+          const _experience = new CurriculumVitaeExperienceEntity();
+          _experience.companyEmail = experience.companyEmail;
+          _experience.companyName = experience.companyName;
+          _experience.description = experience.description;
+          _experience.startDate = experience.startDate;
+          _experience.endDate = experience.endDate;
+          _experience.role = experience.role;
+          _experience.type = experience.type;
+          _experience.index = index;
+          _experience.cvId = _cv.id;
+          _experiences.push(_experience);
+        });
+      }
 
       _cv.experiences = _experiences;
       await transactionalEntityManager.save(_cv);
       await transactionalEntityManager.insert(CurriculumVitaeExperienceEntity, _experiences);
     });
+
+    console.log(_cv.dateOfBirth);
 
     return await this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }

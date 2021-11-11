@@ -69,10 +69,12 @@ export class AccountService {
     await getManager().transaction(async (transactionalEntityManager) => {
       await transactionalEntityManager.save(_user);
       await transactionalEntityManager.save(_cv);
+
+      // Stop send mail
       // Encrypt token
-      const encryptedToken = this.encryptService.encryptActivateToken(_user);
+      // const encryptedToken = this.encryptService.encryptActivateToken(_user);
       // Send mail
-      await this.mailService.sendAccountActivationMail(_user, encryptedToken);
+      // await this.mailService.sendAccountActivationMail(_user, encryptedToken);
     });
 
     return await this.getAccountResponse(_user);
@@ -93,10 +95,10 @@ export class AccountService {
         _user.resetCode = Math.random().toString(36).slice(-10);
 
         // Encrypt token
-        const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
+        // const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
 
         // Send mail
-        await this.mailService.sendAccountUnlockMail(_user, encryptedToken);
+        // await this.mailService.sendAccountUnlockMail(_user, encryptedToken);
       }
 
       await this.userRepository.save(_user);
@@ -140,7 +142,6 @@ export class AccountService {
     } else {
       throw new HttpException('Wrong activate code', HttpStatus.FORBIDDEN);
     }
-
     return await this.getAccountResponse(_user);
   }
 
@@ -174,10 +175,11 @@ export class AccountService {
       throw new HttpException('No user', HttpStatus.NOT_FOUND);
     }
 
+    // Stop send mail
     // Encrypt data
-    const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
+    // const encryptedToken = this.encryptService.encryptUnlockOrResetPasswordToken(_user);
     // Send mail
-    await this.mailService.sendAccountRequestResetPasswordMail(_user, encryptedToken);
+    // await this.mailService.sendAccountRequestResetPasswordMail(_user, encryptedToken);
 
     return {
       status: true,

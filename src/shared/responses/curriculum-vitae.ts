@@ -26,12 +26,12 @@ export class CurriculumVitae {
   email: string;
 
   @AutoMap()
-  @ApiProperty()
+  @ApiProperty({ enum: [1, 2, 3], description: '1: UNDEFINED, 2: FEMALE, 3: MALE' })
   gender: Gender;
 
   @AutoMap()
-  @ApiProperty()
-  dateOfBirth: Date;
+  @ApiProperty({ description: 'string "MM/DD/YYYY"'})
+  dateOfBirth: string;
 
   @AutoMap()
   @ApiProperty()
@@ -46,36 +46,34 @@ export class CurriculumVitae {
   address: string;
 
   @AutoMap()
-  @ApiProperty({ description: 'Skills split by "|". Example: "React Redux|OOP|Problem-solving"' })
-  skills: string;
+  @ApiProperty()
+  educations: string;
 
   @AutoMap()
-  @ApiProperty({
-    description: 'Start - End: Place; split by "|". Example: "08/2015 - 05/2018: Highschool|01/2021 - 07/2021: UET"',
-  })
-  educations: string;
+  @ApiProperty({ minimum: 5, maximum: 150 })
+  minimalHourlyRate: number;
+
+  @AutoMap()
+  @ApiProperty()
+  introduce: string;
 
   @AutoMap()
   @ApiProperty({ type: [String] })
   certifications: string[];
 
   @AutoMap()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "1|2|3"' })
-  languages: string;
+  @ApiProperty({ type: [String] })
+  languages: string[];
 
   @AutoMap()
-  @ApiProperty({ description: 'Split by "|". Exapmple: "Football|Video Games|Listen to music"' })
-  hobbies: string;
+  @ApiProperty({ type: [String] })
+  hobbies: string[];
 
   @AutoMap()
-  @ApiProperty()
-  introduce: string;
+  @ApiProperty({ type: [String] })
+  skills: string;
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperience })
   @ApiProperty({ type: [CurriculumVitaeExperience] })
   experiences: CurriculumVitaeExperience[];
-
-  @AutoMap()
-  @ApiProperty({ minimum: 5, maximum: 150 })
-  minimalHourlyRate: number;
 }

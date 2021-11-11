@@ -12,7 +12,7 @@ export class FileService {
     if (_user.avatar == '') {
       return host + '/resource/images/avatar.png';
     }
-    return `${host}/public/images/${_user.avatar}`;
+    return `${host}/public/avatars/${_user.avatar}`;
   }
 
   getCertification(certificationID: string) {
