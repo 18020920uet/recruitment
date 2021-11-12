@@ -1,8 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEmail, IsNotEmpty, MinLength, IsString, IsNumberString,
-  Matches, Min, Max, IsPositive, IsInt, NotContains, IsArray, ArrayMaxSize
+  IsEmail,
+  IsNotEmpty,
+  MinLength,
+  IsString,
+  IsNumberString,
+  Matches,
+  Min,
+  Max,
+  IsPositive,
+  NotContains,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
@@ -14,10 +23,9 @@ export class ChangePasswordRequest {
   @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
-  @Matches(
-    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
-    { message: 'password must contain at least 1 special character' }
-  )
+  @Matches(/.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/, {
+    message: 'password must contain at least 1 special character',
+  })
   @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   oldPassword: string;
@@ -28,49 +36,13 @@ export class ChangePasswordRequest {
   @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
-  @Matches(
-    /.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
-    { message: 'password must contain at least 1 special character' }
-  )
+  @Matches(/.*[^\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/, {
+    message: 'password must contain at least 1 special character',
+  })
   @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   newPassword: string;
 }
-
-// export class UpdateProfileRequest {
-//   @IsString()
-//   @ApiProperty({ type: [String] })
-//   skills: string[];
-//
-//   @IsPositive()
-//   @Min(5)
-//   @Max(150)
-//   @ApiProperty({ minimum: 5, maximum: 150 })
-//   minimalHourlyRate: number;
-//
-//   @IsPositive()
-//   @ApiProperty()
-//   nationality: number | null;
-//
-//   @IsString()
-//   @ApiProperty()
-//   introduce: string;
-//
-//   @IsEmail()
-//   @IsNotEmpty()
-//   @ApiProperty()
-//   email: string;
-//
-//   @IsNotEmpty()
-//   @IsString()
-//   @ApiProperty()
-//   firstName: string;
-//
-//   @IsNotEmpty()
-//   @IsString()
-//   @ApiProperty()
-//   lastName: string;
-// }
 
 export class UpdateCurriculumnVitaeExperienceRequest {
   @IsEmail()
@@ -104,7 +76,8 @@ export class UpdateCurriculumnVitaeExperienceRequest {
 export class UpdateCurriculumnVitaeRequest {
   @IsNotEmpty()
   @IsString()
-  @ApiProperty() firstName: string;
+  @ApiProperty()
+  firstName: string;
 
   @IsNotEmpty()
   @IsString()
@@ -126,7 +99,7 @@ export class UpdateCurriculumnVitaeRequest {
   @ApiProperty()
   nationality: number | null;
 
-  @ApiProperty({ description: 'month/date/year. new Date("MM/DD/YYYY").toLocaleDateString("en-Us")'})
+  @ApiProperty({ description: 'month/date/year. new Date("MM/DD/YYYY").toLocaleDateString("en-Us")' })
   dateOfBirth: string;
 
   @ApiProperty({ enum: [2, 3], description: '2: FEMALE, 3: MALE' })
@@ -158,9 +131,9 @@ export class UpdateCurriculumnVitaeRequest {
 }
 
 export class GetReviewsQuery {
-  @IsInt()
   @Min(0)
-  @ApiProperty({ type: 'integer',  minimum: 0 })
+  @Type(() => Number)
+  @ApiProperty({ type: 'number' })
   page: number;
 }
 
@@ -170,6 +143,6 @@ export class ChangeAvatarRequest {
 }
 
 export class UpdateCertificationsRequest {
-  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }})
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   files: any[];
 }

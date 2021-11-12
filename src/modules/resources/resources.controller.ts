@@ -13,7 +13,7 @@ import { ResourcesService } from './resources.service';
 @ApiTags('resources')
 @Controller('resources')
 export class ResourcesController {
-  constructor(private resourcesService: ResourcesService) { }
+  constructor(private resourcesService: ResourcesService) {}
 
   @Get('languages')
   @ApplicationArrayApiOkResponse(LanguageEntity)

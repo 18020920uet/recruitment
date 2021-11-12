@@ -15,6 +15,6 @@ export const saveAvatarStorage = {
       } else {
         cb(new UnsupportedMediaTypeException('File extensions must be .png, .jpg or .jpeg'), null);
       }
-    }
+    },
   }),
 };

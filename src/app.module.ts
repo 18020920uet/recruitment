@@ -18,6 +18,7 @@ import { AccountModule } from '@Modules/account/account.module';
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
 import { UserModule } from '@Modules/user/user.module';
 import { ResourcesModule } from './modules/resources/resources.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ResourcesModule } from './modules/resources/resources.module';
     AuthenticationModule,
     UserModule,
     ResourcesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

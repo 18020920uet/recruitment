@@ -25,6 +25,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (_errors: ValidationError[]) => {
+        console.log(_errors);
         const errors = [];
         _errors.forEach((_error) => {
           errors.push(...Object.values(_error.constraints));

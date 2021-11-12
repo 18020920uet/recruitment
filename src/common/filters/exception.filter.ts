@@ -18,7 +18,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const message = exception.message;
       if (exception instanceof ValidationExeption) {
         return response.status(statusCode).json({
-          errors: exception.validationErrors, message: message, statusCode: statusCode, status: 0,
+          errors: exception.validationErrors,
+          message: message,
+          statusCode: statusCode,
+          status: 0,
         });
       } else {
         return response.status(statusCode).json({ statusCode: statusCode, message: message, status: 0 });
@@ -39,7 +42,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.writeLogs(exceptionResponse, request);
       if (process.env.NODE_ENV == 'production') {
         return response.status(statusCode).json({
-          message: 'Internal server error', statusCode: statusCode, status: 0
+          message: 'Internal server error',
+          statusCode: statusCode,
+          status: 0,
         });
       } else {
         return response.status(statusCode).json(exceptionResponse);

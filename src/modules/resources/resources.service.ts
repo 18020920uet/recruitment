@@ -7,8 +7,6 @@ import { CountryEntity } from '@Entities/country.entity';
 
 @Injectable()
 export class ResourcesService {
-  constructor() {}
-
   async getLanguages(): Promise<LanguageEntity[]> {
     return await getRepository(LanguageEntity).find();
   }

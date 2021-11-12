@@ -1,7 +1,13 @@
 import {
-  Controller, Get, UseGuards, Put, Body,
-  UploadedFile, UseInterceptors, Query, Delete,
-  UploadedFiles
+  Controller,
+  Get,
+  UseGuards,
+  Put,
+  Body,
+  UploadedFile,
+  UseInterceptors,
+  Query,
+  UploadedFiles,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
@@ -11,10 +17,7 @@ import {
   ApiUnauthorizedResponse,
   ApiBadRequestResponse,
   ApiForbiddenResponse,
-  ApiConflictResponse,
-  ApiNotFoundResponse,
   ApiBearerAuth,
-  ApiOperation,
   ApiConsumes,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,8 +32,6 @@ import {
   UnauthorizedResponse,
   BadRequestResponse,
   ForbiddenResponse,
-  ConflictResponse,
-  NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 
 import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
@@ -40,18 +41,12 @@ import { ApplicationApiOkResponse, ApplicationArrayApiOkResponse } from '@Common
 
 import { UserEntity } from '@Entities/user.entity';
 
-import {
-  UpdateCertificationsResponse,
-  ChangePasswordResponse,
-  ChangeAvatarResponse,
-  // ProfileResponse,
-} from './dtos/responses';
+import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 
 import {
   UpdateCurriculumnVitaeRequest,
   UpdateCertificationsRequest,
   ChangePasswordRequest,
-  // UpdateProfileRequest,
   ChangeAvatarRequest,
   GetReviewsQuery,
 } from './dtos/requests';
@@ -65,16 +60,6 @@ import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-
-  // @Get('profile')
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiOkResponse(ProfileResponse)
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // @UseGuards(JwtAuthenticationGuard)
-  // async getProfile(@CurrentUser() _currentUser: UserEntity): Promise<ProfileResponse> {
-  //   return await this.userService.getProfile(_currentUser);
-  // }
 
   @Put('change-password')
   @ApiBearerAuth('access-token')
@@ -90,21 +75,6 @@ export class UserController {
   ): Promise<ChangePasswordResponse> {
     return await this.userService.changePassword(_currentUser, changePasswordRequest);
   }
-
-  // @Put('profile')
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiOkResponse(ProfileResponse)
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiConflictResponse({ description: 'Email has already been used', type: ConflictResponse })
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // @UseGuards(JwtAuthenticationGuard)
-  // async updateProfile(
-  //   @CurrentUser() _currentUser: UserEntity,
-  //   @Body() updateProfileRequest: UpdateProfileRequest,
-  // ): Promise<ProfileResponse> {
-  //   return await this.userService.updateProfile(_currentUser, updateProfileRequest);
-  // }
 
   @Put('avatar')
   @ApiBearerAuth('access-token')
@@ -157,15 +127,15 @@ export class UserController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviews(
     @CurrentUser() _currentUser: UserEntity,
-    @Query() getReviewsQuery: GetReviewsQuery)
-  : Promise<Review[]> {
+    @Query() getReviewsQuery: GetReviewsQuery,
+  ): Promise<Review[]> {
     return await this.userService.getReviews(_currentUser, getReviewsQuery.page);
   }
 
   @Put('certifications')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FilesInterceptor('files', 3 , saveCertificationsStorage))
+  @UseInterceptors(FilesInterceptor('files', 3, saveCertificationsStorage))
   @ApiConsumes('multipart/form-data')
   @ApplicationApiOkResponse(UpdateCertificationsResponse)
   @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })

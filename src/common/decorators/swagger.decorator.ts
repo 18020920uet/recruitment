@@ -36,7 +36,7 @@ export const ApplicationArrayApiOkResponse = <TModel extends Type<any>>(model: T
               message: { type: 'string' },
               data: {
                 type: 'array',
-                items: { $ref: getSchemaPath(model) }
+                items: { $ref: getSchemaPath(model) },
               },
             },
           },

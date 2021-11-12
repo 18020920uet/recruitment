@@ -8,8 +8,8 @@ import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.reposi
 
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
 
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 
 import { FileService } from '@Shared/services/file.service';
 
@@ -19,7 +19,7 @@ import { FileService } from '@Shared/services/file.service';
     AuthenticationModule, // JwtAuthenticationGuard
     ConfigModule,
   ],
-  controllers: [UserController],
-  providers: [UserService, FileService],
+  controllers: [UsersController],
+  providers: [UsersService, FileService],
 })
-export class UserModule {}
+export class UsersModule {}

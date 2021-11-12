@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { UserEntity } from '@Entities/user.entity';
 
 @Injectable()
 export class FileService {
-  constructor() {}
-
   getAvatar(_user: UserEntity): string {
     const host = process.env.HOST;
     if (_user.avatar == '') {

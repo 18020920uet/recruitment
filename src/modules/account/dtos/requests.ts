@@ -13,10 +13,9 @@ export class RegisterRequest {
   @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
-  @Matches(
-    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
-    { message: 'password must contain at least 1 special character' }
-  )
+  @Matches(/.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/, {
+    message: 'password must contain at least 1 special character',
+  })
   @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   readonly password: string;
@@ -44,10 +43,9 @@ export class LoginRequest {
   @Matches(/.*\d.*/, { message: 'password must contain at least 1 number' })
   @Matches(/.*[A-Z].*/, { message: 'password must contain at least 1 uppercase character' })
   @Matches(/.*[a-z].*/, { message: 'password must contain at least 1 lowercase character' })
-  @Matches(
-    /.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/,
-    { message: 'password must contain at least 1 special character' }
-  )
+  @Matches(/.*[\*\.\!\@\#\$\%\^\&\(\)\{\}\[\]\:\"\;\'\<\>\,\.\?\/\~\`\_\+\-\=\|\\\\].*/, {
+    message: 'password must contain at least 1 special character',
+  })
   @NotContains(' ', { message: 'password must not contain white space' })
   @ApiProperty()
   password: string;

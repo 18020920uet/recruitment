@@ -30,7 +30,7 @@ export class CurriculumVitae {
   gender: Gender;
 
   @AutoMap()
-  @ApiProperty({ description: 'string "MM/DD/YYYY"'})
+  @ApiProperty({ description: 'string "MM/DD/YYYY"' })
   dateOfBirth: string;
 
   @AutoMap()

@@ -1,9 +1,7 @@
-import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-// import { Company } from '@Shared/responses/company';
 import { User } from '@Shared/responses/user';
-import { Role } from '@Shared/enums/role';
 
 export class Review {
   @AutoMap()
@@ -16,7 +14,7 @@ export class Review {
 
   @AutoMap()
   @ApiProperty()
-  reviewee: User;
+  revieweeId: string;
 
   @AutoMap()
   @ApiProperty()

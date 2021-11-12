@@ -27,6 +27,9 @@ export class CurriculumVitaeEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
+  @Column({ name: 'user_id' })
+  userId: string;
+
   @AutoMap()
   @Column({ type: 'enum', enum: Gender, default: Gender.UNDEFINED })
   gender: Gender;

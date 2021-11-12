@@ -1,8 +1,13 @@
-import { PrimaryGeneratedColumn, Column, Entity,
-  JoinColumn, OneToOne, CreateDateColumn, UpdateDateColumn
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
-
 
 import { UserEntity } from '@Entities/user.entity';
 
@@ -17,13 +22,19 @@ export class ReviewEntity {
   @JoinColumn({ name: 'reviewer_id' })
   reviewer: UserEntity;
 
-  @AutoMap()
+  @Column({ name: 'reviewer_id' })
+  reviewerId: string;
+
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'reviewee_id' })
   reviewee: UserEntity;
 
   @AutoMap()
-  @Column('varchar', { length: 500 })
+  @Column({ name: 'reviewee_id' })
+  revieweeId: string;
+
+  @AutoMap()
+  @Column('varchar', { length: 200 })
   comment: string;
 
   @AutoMap()

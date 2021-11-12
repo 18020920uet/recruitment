@@ -37,5 +37,5 @@ export class ChangeAvatarResponse {
 
 export class UpdateCertificationsResponse {
   @ApiProperty({ type: [String] })
-  certifications: string[]
+  certifications: string[];
 }
