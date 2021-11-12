@@ -169,5 +169,5 @@ ormconfig.json
 
 /public
 /data
-
+/src/migrations/*
 code.sh
