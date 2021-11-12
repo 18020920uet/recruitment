@@ -22,9 +22,11 @@ export class ReviewEntity {
   @JoinColumn({ name: 'reviewer_id' })
   reviewer: UserEntity;
 
+  @AutoMap()
   @Column({ name: 'reviewer_id' })
   reviewerId: string;
 
+  @AutoMap()
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'reviewee_id' })
   reviewee: UserEntity;

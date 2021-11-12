@@ -11,6 +11,8 @@ import { UserEntity } from '@Entities/user.entity';
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { Review } from '@Shared/responses/review';
+import { ReviewByUser } from '@Shared/responses/review-by-user';
+
 import { User } from '@Shared/responses/user';
 
 import { FileService } from '@Shared/services/file.service';
@@ -79,6 +81,7 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           }),
         );
       mapper.createMap(ReviewEntity, Review);
+      mapper.createMap(ReviewEntity, ReviewByUser);
     };
   }
 }

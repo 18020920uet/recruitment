@@ -42,17 +42,14 @@ import { ApplicationApiOkResponse, ApplicationArrayApiOkResponse } from '@Common
 import { UserEntity } from '@Entities/user.entity';
 
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
-
 import {
   UpdateCurriculumnVitaeRequest,
   UpdateCertificationsRequest,
   ChangePasswordRequest,
   ChangeAvatarRequest,
-  GetReviewsQuery,
 } from './dtos/requests';
 
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
-import { Review } from '@Shared/responses/review';
 
 import { UserService } from './user.service';
 
@@ -94,16 +91,6 @@ export class UserController {
     return await this.userService.updateAvatar(_currentUser, file);
   }
 
-  @Get('cv')
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthenticationGuard)
-  @ApplicationApiOkResponse(CurriculumVitae)
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getCurriculumnVitae(@CurrentUser() _currentUser: UserEntity): Promise<CurriculumVitae> {
-    return await this.userService.getCurriculumnVitae(_currentUser);
-  }
-
   @Put('cv')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
@@ -116,20 +103,6 @@ export class UserController {
     @Body() updateCurriculumnVitaeRequest: UpdateCurriculumnVitaeRequest,
   ): Promise<CurriculumVitae> {
     return await this.userService.updateCurriculumnVitae(_currentUser, updateCurriculumnVitaeRequest);
-  }
-
-  @Get('reviews')
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthenticationGuard)
-  @ApplicationArrayApiOkResponse(Review)
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getReviews(
-    @CurrentUser() _currentUser: UserEntity,
-    @Query() getReviewsQuery: GetReviewsQuery,
-  ): Promise<Review[]> {
-    return await this.userService.getReviews(_currentUser, getReviewsQuery.page);
   }
 
   @Put('certifications')

@@ -130,13 +130,6 @@ export class UpdateCurriculumnVitaeRequest {
   experiences: UpdateCurriculumnVitaeExperienceRequest[];
 }
 
-export class GetReviewsQuery {
-  @Min(0)
-  @Type(() => Number)
-  @ApiProperty({ type: 'number' })
-  page: number;
-}
-
 export class ChangeAvatarRequest {
   @ApiProperty({ type: 'string', format: 'binary' })
   file: any;

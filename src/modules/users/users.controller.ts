@@ -29,6 +29,7 @@ import {
 import { UserEntity } from '@Entities/user.entity';
 
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
 import {
@@ -63,6 +64,18 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviews(@Param('userId') userId: string, @Query() getReviewsQuery: GetReviewsQuery): Promise<Review[]> {
     return await this.usersService.getReviews(userId, getReviewsQuery.page);
+  }
+
+  @Get(':userId/reviewsByUser')
+  @ApplicationArrayApiOkResponse(ReviewByUser)
+  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getReviewsByUser(
+    @Param('userId') userId: string,
+    @Query() getReviewsQuery: GetReviewsQuery
+  ): Promise<ReviewByUser[]> {
+    return await this.usersService.getReviewsByUser(userId, getReviewsQuery.page);
   }
 
   @Post(':userId/review')

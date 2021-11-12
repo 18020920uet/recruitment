@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 export class GetReviewsQuery {
   @Type(() => Number)
-  @Min(0)
+  @Min(1)
   @ApiProperty({ type: 'number' })
   page: number;
 }
@@ -21,7 +21,7 @@ export class UpdateReviewParams {
   userId: string;
 
   @Type(() => Number)
-  @Min(0)
+  @Min(1)
   @ApiProperty({ type: 'number' })
   reviewId: number;
 }

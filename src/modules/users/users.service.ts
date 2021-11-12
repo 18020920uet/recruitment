@@ -12,7 +12,9 @@ import { ReviewRepository } from '@Repositories/review.repository';
 import { UserRepository } from '@Repositories/user.repository';
 
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
+
 
 import { FileService } from '@Shared/services/file.service';
 
@@ -49,10 +51,21 @@ export class UsersService {
       where: { revieweeId: userId },
       relations: ['reviewer'],
       order: { createdAt: 'ASC' },
-      skip: page * 10,
+      skip: page > 0 ? (page - 1) : 0 * 10,
       take: 10,
     });
     return _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
+  }
+
+  async getReviewsByUser(userId: string, page: number): Promise<ReviewByUser[]> {
+    const _reviews = await this.reviewRepository.find({
+      where: { reviewerId: userId },
+      relations: ['reviewee'],
+      order: { createdAt: 'ASC' },
+      skip: page > 0 ? (page - 1) : 0 * 10,
+      take: 10,
+    });
+    return _reviews.map((_review) => this.mapper.map(_review, ReviewByUser, ReviewEntity));
   }
 
   async createReview(
