@@ -11,7 +11,6 @@ import {
   IsPositive,
   NotContains,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';

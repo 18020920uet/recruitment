@@ -11,6 +11,6 @@ export class CountryEntity {
   @Column({ name: 'total_cities' })
   totalCities: number;
 
-  @Column({ name: 'total_states'})
+  @Column({ name: 'total_states' })
   totalStates: number;
 }

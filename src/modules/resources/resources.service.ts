@@ -25,7 +25,7 @@ export class ResourcesService {
     return await getRepository(StateEntity).find({ countryId: countryId });
   }
 
-  async getCities(countryId: number|null, stateId: number|null):  Promise<CityEntity[]> {
+  async getCities(countryId: number | null, stateId: number | null): Promise<CityEntity[]> {
     console.log(stateId);
     if (stateId == null) {
       return await getRepository(CityEntity).find({ countryId: countryId });

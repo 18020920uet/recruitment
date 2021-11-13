@@ -1,7 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AutoMap } from '@automapper/classes';
-
-import { User } from '@Shared/responses/user';
 
 export class ChangePasswordResponse {
   @ApiProperty()

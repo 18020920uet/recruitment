@@ -15,7 +15,6 @@ import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
-
 import { FileService } from '@Shared/services/file.service';
 
 import {
@@ -51,7 +50,7 @@ export class UsersService {
       where: { revieweeId: userId },
       relations: ['reviewer'],
       order: { createdAt: 'ASC' },
-      skip: page > 0 ? (page - 1) : 0 * 10,
+      skip: page > 0 ? page - 1 : 0 * 10,
       take: 10,
     });
     return _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
@@ -62,7 +61,7 @@ export class UsersService {
       where: { reviewerId: userId },
       relations: ['reviewee'],
       order: { createdAt: 'ASC' },
-      skip: page > 0 ? (page - 1) : 0 * 10,
+      skip: page > 0 ? page - 1 : 0 * 10,
       take: 10,
     });
     return _reviews.map((_review) => this.mapper.map(_review, ReviewByUser, ReviewEntity));

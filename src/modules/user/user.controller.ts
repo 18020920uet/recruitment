@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Put,
-  Body,
-  UploadedFile,
-  UseInterceptors,
-  Query,
-  UploadedFiles,
-} from '@nestjs/common';
+import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import {
@@ -37,7 +27,7 @@ import {
 import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
 
 import { CurrentUser } from '@Common/decorators/current-user.decorator';
-import { ApplicationApiOkResponse, ApplicationArrayApiOkResponse } from '@Common/decorators/swagger.decorator';
+import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 

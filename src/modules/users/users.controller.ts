@@ -73,7 +73,7 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviewsByUser(
     @Param('userId') userId: string,
-    @Query() getReviewsQuery: GetReviewsQuery
+    @Query() getReviewsQuery: GetReviewsQuery,
   ): Promise<ReviewByUser[]> {
     return await this.usersService.getReviewsByUser(userId, getReviewsQuery.page);
   }
