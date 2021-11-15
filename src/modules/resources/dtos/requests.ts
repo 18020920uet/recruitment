@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class GetStatesQuery {
@@ -11,9 +11,10 @@ export class GetStatesQuery {
 export class GetCitiesQuery {
   @IsNotEmpty()
   @Type(() => Number)
-  @ApiProperty({ required: true })
+  @ApiProperty()
   countryId: number | null;
 
+  @IsOptional()
   @Type(() => Number)
   @ApiProperty({ required: false })
   stateId: number | null;

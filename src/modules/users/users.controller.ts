@@ -17,14 +17,15 @@ import {
   NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 
-import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
-
-import { CurrentUser } from '@Common/decorators/current-user.decorator';
 import {
   ApplicationApiOkResponse,
   ApplicationApiCreateResponse,
   ApplicationArrayApiOkResponse,
 } from '@Common/decorators/swagger.decorator';
+
+import { CurrentUser } from '@Common/decorators/current-user.decorator';
+
+import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
 
 import { UserEntity } from '@Entities/user.entity';
 
