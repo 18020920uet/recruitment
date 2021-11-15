@@ -83,8 +83,4 @@ export class CurriculumVitaeEntity {
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
   @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae)
   experiences: CurriculumVitaeExperienceEntity[];
-
-  @AutoMap()
-  @Column({ default: 0, name: 'minimal_hourly_rate' })
-  minimalHourlyRate: number;
 }

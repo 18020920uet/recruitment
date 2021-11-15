@@ -89,12 +89,6 @@ export class UpdateCurriculumnVitaeRequest {
   phoneNumber: string | null;
 
   @IsPositive()
-  @Min(5)
-  @Max(150)
-  @ApiProperty({ minimum: 5, maximum: 150 })
-  minimalHourlyRate: number;
-
-  @IsPositive()
   @ApiProperty()
   nationality: number | null;
 

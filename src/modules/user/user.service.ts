@@ -82,7 +82,6 @@ export class UserService {
 
       _cv.phoneNumber = updateCurriculumnVitaeRequest.phoneNumber;
       _cv.dateOfBirth = new Date(updateCurriculumnVitaeRequest.dateOfBirth);
-      _cv.minimalHourlyRate = updateCurriculumnVitaeRequest.minimalHourlyRate;
       _cv.gender = updateCurriculumnVitaeRequest.gender;
       _cv.nationality = updateCurriculumnVitaeRequest.nationality;
       _cv.educations = updateCurriculumnVitaeRequest.educations;

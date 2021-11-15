@@ -50,10 +50,6 @@ export class CurriculumVitae {
   educations: string;
 
   @AutoMap()
-  @ApiProperty({ minimum: 5, maximum: 150 })
-  minimalHourlyRate: number;
-
-  @AutoMap()
   @ApiProperty()
   introduce: string;
 
