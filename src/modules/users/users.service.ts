@@ -15,8 +15,6 @@ import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
-import { FileService } from '@Shared/services/file.service';
-
 import {
   CreateReviewRequest,
   UpdateReviewRequest,
@@ -34,7 +32,6 @@ export class UsersService {
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
-    private fileService: FileService,
   ) {}
 
   async getCurriculumnVitae(userId: string): Promise<CurriculumVitae> {

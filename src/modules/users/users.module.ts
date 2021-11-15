@@ -11,8 +11,6 @@ import { AuthenticationModule } from '@Modules/authentication/authentication.mod
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
-import { FileService } from '@Shared/services/file.service';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([CurriculumVitaeRepository, ReviewRepository, UserRepository]),
@@ -20,6 +18,6 @@ import { FileService } from '@Shared/services/file.service';
     ConfigModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, FileService],
+  providers: [UsersService],
 })
 export class UsersModule {}
