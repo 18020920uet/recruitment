@@ -86,9 +86,9 @@ export class UserService {
       _cv.nationality = updateCurriculumnVitaeRequest.nationality;
       _cv.educations = updateCurriculumnVitaeRequest.educations;
       _cv.introduce = updateCurriculumnVitaeRequest.introduce;
-      _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join(',');
-      _cv.skills = updateCurriculumnVitaeRequest.skills.join(',');
-      _cv.languages = updateCurriculumnVitaeRequest.languages.join(',');
+      _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join('|');
+      _cv.skills = updateCurriculumnVitaeRequest.skills.join('|');
+      _cv.languages = updateCurriculumnVitaeRequest.languages.join('|');
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
       if (updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
@@ -137,7 +137,7 @@ export class UserService {
     files: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
     const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
-    const _certifications = _cv.certifications.split(',');
+    const _certifications = _cv.certifications.split('|');
 
     /// Remove old file
     for (const _certification of _certifications) {
@@ -148,10 +148,10 @@ export class UserService {
     }
 
     const certifications = files.map((file) => file.filename);
-    _cv.certifications = certifications.join(',');
+    _cv.certifications = certifications.join('|');
     await this.curriculumnVitaeRepository.save(_cv);
     return {
-      certifications: _cv.certifications.split(',').map((_c) => this.fileService.getCertification(_c)),
+      certifications: _cv.certifications.split('|').map((_c) => this.fileService.getCertification(_c)),
     };
   }
 }

@@ -3,17 +3,23 @@ import { InjectMapper, AutomapperProfile } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { mapFrom } from '@automapper/core';
 
-import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
+import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
+import { CompanyInformationEntity } from '@Entities/company-information.entity';
+import { CountryEntity } from '@Entities/country.entity';
+import { CompanyEntity } from '@Entities/company.entity';
 import { ReviewEntity } from '@Entities/review.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
-import { Review } from '@Shared/responses/review';
 import { ReviewByUser } from '@Shared/responses/review-by-user';
-
+import { Company } from '@Shared/responses/company';
+import { Review } from '@Shared/responses/review';
 import { User } from '@Shared/responses/user';
+
+import { CompanyInformation, GetCompanyDetail } from '@Modules/companies/dtos/responses';
+
 
 import { FileService } from '@Shared/services/file.service';
 
@@ -56,22 +62,22 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           (curriculumVitae) => curriculumVitae.certifications,
           mapFrom((_curriculumVitae) => {
             return _curriculumVitae.certifications
-              .split(',')
+              .split('|')
               .filter((certification) => certification)
               .map((certification) => this.fileService.getCertification(certification));
           }),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.skills,
-          mapFrom((_curriculumVitae) => _curriculumVitae.skills.split(',').filter((skill) => skill)),
+          mapFrom((_curriculumVitae) => _curriculumVitae.skills.split('|').filter((skill) => skill)),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.hobbies,
-          mapFrom((_curriculumVitae) => _curriculumVitae.hobbies.split(',').filter((hobby) => hobby)),
+          mapFrom((_curriculumVitae) => _curriculumVitae.hobbies.split('|').filter((hobby) => hobby)),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.languages,
-          mapFrom((_curriculumVitae) => _curriculumVitae.languages.split(',').filter((language) => language)),
+          mapFrom((_curriculumVitae) => _curriculumVitae.languages.split('|').filter((language) => language)),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.dateOfBirth,
@@ -82,6 +88,31 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         );
       mapper.createMap(ReviewEntity, Review);
       mapper.createMap(ReviewEntity, ReviewByUser);
+      mapper.createMap(CompanyEntity, Company);
+      mapper.createMap(CountryEntity, CountryEntity);
+      mapper.createMap(CompanyInformationEntity, CompanyInformation)
+        .forMember(
+          (information) => information.photos,
+          mapFrom((_companyInformation) => {
+            return _companyInformation.photos
+              .split('|')
+              .filter((photo) => photo)
+              .map((photo) => this.fileService.getAvatar(photo));
+          }),
+        )
+        .forMember(
+          (information) => information.addresses,
+          mapFrom(_companyInformation => _companyInformation.addresses.split('|').filter((address) => address)),
+        )
+        .forMember(
+          (information) => information.socialNetworks,
+          mapFrom(_companyInformation => _companyInformation.socialNetworks)
+        );
+      mapper.createMap(CompanyEntity, GetCompanyDetail)
+        .forMember(
+          (detail) => detail.businessFields,
+          mapFrom(_company => _company.businessFields.split('|').filter((bf) => bf)),
+        );
     };
   }
 }
