@@ -14,8 +14,4 @@ export class StateEntity {
   @ApiProperty()
   @Column()
   name: string;
-
-  @ApiProperty()
-  @Column({ name: 'total_cities' })
-  totalCities: number;
 }
