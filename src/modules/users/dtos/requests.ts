@@ -15,6 +15,18 @@ export class CreateReviewParam {
   userId: string;
 }
 
+export class GetReviewsParam {
+  @IsString()
+  @ApiProperty()
+  userId: string;
+}
+
+export class GetCvParam {
+  @IsString()
+  @ApiProperty()
+  userId: string;
+}
+
 export class UpdateReviewParams {
   @IsString()
   @ApiProperty()

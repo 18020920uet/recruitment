@@ -33,12 +33,14 @@ import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
 import {
-  GetReviewsQuery,
   CreateReviewRequest,
   UpdateReviewRequest,
-  CreateReviewParam,
-  UpdateReviewParams,
   DeleteReviewParams,
+  UpdateReviewParams,
+  CreateReviewParam,
+  GetReviewsParam,
+  GetReviewsQuery,
+  GetCvParam,
 } from './dtos/requests';
 import { DeleteReviewResponse } from './dtos/responses';
 
@@ -53,8 +55,10 @@ export class UsersController {
   @ApplicationApiOkResponse(CurriculumVitae)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getCurriculumnVitae(@Param('userId') userId: string): Promise<CurriculumVitae> {
-    return await this.usersService.getCurriculumnVitae(userId);
+  async getCurriculumnVitae(
+    @Param() getCvParam: GetCvParam,
+  ): Promise<CurriculumVitae> {
+    return await this.usersService.getCurriculumnVitae(getCvParam.userId);
   }
 
   @Get(':userId/reviews')
@@ -62,8 +66,11 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getReviews(@Param('userId') userId: string, @Query() getReviewsQuery: GetReviewsQuery): Promise<Review[]> {
-    return await this.usersService.getReviews(userId, getReviewsQuery.page);
+  async getReviews(
+    @Param() getReviewsParam: GetReviewsParam,
+    @Query() getReviewsQuery: GetReviewsQuery
+  ): Promise<Review[]> {
+    return await this.usersService.getReviews(getReviewsParam.userId, getReviewsQuery.page);
   }
 
   @Get(':userId/reviewsByUser')
@@ -72,10 +79,10 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviewsByUser(
-    @Param('userId') userId: string,
-    @Query() getReviewsQuery: GetReviewsQuery,
+    @Param() getReviewsParam: GetReviewsParam,
+    @Query() getReviewsQuery: GetReviewsQuery
   ): Promise<ReviewByUser[]> {
-    return await this.usersService.getReviewsByUser(userId, getReviewsQuery.page);
+    return await this.usersService.getReviewsByUser(getReviewsParam.userId, getReviewsQuery.page);
   }
 
   @Post(':userId/review')
