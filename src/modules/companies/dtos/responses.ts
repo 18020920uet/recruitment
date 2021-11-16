@@ -38,6 +38,14 @@ export class CompanyInformation {
   socialNetworks: object;
 }
 
+class BusinessField {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
+}
+
 export class GetCompanyDetail {
   @AutoMap()
   @ApiProperty()
@@ -67,14 +75,6 @@ export class GetCompanyDetail {
   @ApiProperty()
   information: CompanyInformation;
 
-  @ApiProperty()
+  @ApiProperty({ type: [BusinessField] })
   businessFields: BusinessField[];
-}
-
-class BusinessField {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  name: string;
 }
