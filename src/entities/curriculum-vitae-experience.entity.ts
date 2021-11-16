@@ -5,7 +5,7 @@ import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-ex
 
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 
-@Entity('curriculum-vitaes-experiences')
+@Entity('curriculum_vitaes_experiences')
 export class CurriculumVitaeExperienceEntity {
   @AutoMap()
   @PrimaryGeneratedColumn()

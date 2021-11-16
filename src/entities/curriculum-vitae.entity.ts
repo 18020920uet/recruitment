@@ -16,7 +16,7 @@ import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-expe
 
 import { UserEntity } from '@Entities/user.entity';
 
-@Entity('curriculum-vitaes')
+@Entity('curriculum_vitaes')
 export class CurriculumVitaeEntity {
   @AutoMap()
   @PrimaryGeneratedColumn()
