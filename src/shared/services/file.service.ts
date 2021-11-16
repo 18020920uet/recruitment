@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { UserEntity } from '@Entities/user.entity';
 
+import { CompanyEntity } from '@Entities/company.entity';
 @Injectable()
 export class FileService {
   getAvatar(_user: UserEntity): string {
@@ -12,8 +13,21 @@ export class FileService {
     return `${host}/public/avatars/${_user.avatar}`;
   }
 
-  getCertification(certificationID: string) {
+  getCertification(certificationId: string) {
     const host = process.env.HOST;
-    return `${host}/public/certifications/${certificationID}`;
+    return `${host}/public/certifications/${certificationId}`;
+  }
+
+  getLogo(_company: CompanyEntity) {
+    const host = process.env.HOST;
+    if (_company.logo == '') {
+      return `${host}/resource/images/company-logo.png`;
+    }
+    return `${host}/public/photos/${_company.logo}`;
+  }
+
+  getPhoto(photoId: string) {
+    const host = process.env.HOST;
+    return `${host}/public/photos/${photoId}`;
   }
 }

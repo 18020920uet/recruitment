@@ -88,17 +88,15 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         );
       mapper.createMap(ReviewEntity, Review);
       mapper.createMap(ReviewEntity, ReviewByUser);
-      mapper.createMap(CompanyEntity, Company);
+      mapper.createMap(CompanyEntity, Company)
+        .forMember((company) => company.logo, mapFrom(_company => this.fileService.getLogo(_company)));
       mapper.createMap(CountryEntity, CountryEntity);
       mapper.createMap(CompanyInformationEntity, CompanyInformation)
         .forMember(
           (information) => information.photos,
-          mapFrom((_companyInformation) => {
-            return _companyInformation.photos
-              .split('|')
-              .filter((photo) => photo)
-              .map((photo) => this.fileService.getAvatar(photo));
-          }),
+          mapFrom((_companyInformation) => _companyInformation.photos.split('|').filter((photo) => photo)
+              .map((photo) => this.fileService.getPhoto(photo))
+          )
         )
         .forMember(
           (information) => information.addresses,
@@ -109,12 +107,13 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           mapFrom(_companyInformation => _companyInformation.socialNetworks)
         );
       mapper.createMap(CompanyEntity, GetCompanyDetail)
+        .forMember((detail) => detail.logo, mapFrom(_company => this.fileService.getLogo(_company)))
         .forMember(
           (detail) => detail.businessFields,
           mapFrom(_company =>
             _company.businessFields.map(_businessField => ({ id: _businessField.id, name: _businessField.name }))
           )
-        )
+        );
     };
   }
 }

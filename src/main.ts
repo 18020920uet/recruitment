@@ -16,6 +16,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use('/public', express.static(join(__dirname, '..', 'public')));
+  app.use('/resources', express.static(join(__dirname, '..', 'resources')));
 
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new TransformInterceptor());

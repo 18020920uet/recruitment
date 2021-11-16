@@ -27,7 +27,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
       dest: 'public',
     }),
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: process.env.NODE_ENV == 'development' ? `.env.${process.env.NODE_ENV}` : '.env',
       load: [configuration],
       isGlobal: true,
     }),
