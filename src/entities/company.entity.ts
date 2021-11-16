@@ -28,6 +28,9 @@ export class CompanyEntity {
   @Column({ type: 'real' })
   stars: number;
 
+  @Column({ default: '' })
+  email: string;
+
   @AutoMap()
   @Column()
   isVerified: boolean;
@@ -42,11 +45,15 @@ export class CompanyEntity {
   country: CountryEntity;
 
   @AutoMap({ typeFn: () => CompanyInformationEntity })
-  @OneToOne(() => CompanyInformationEntity)
+  @OneToOne(() => CompanyInformationEntity, { cascade: true } )
   @JoinColumn({ name: 'company_information_id' })
   information: CompanyInformationEntity;
 
-  @ManyToMany(() => BusinessFieldEntity)
-  @JoinTable({ name: 'companies_business_fields'})
+  @ManyToMany(() => BusinessFieldEntity , { cascade: true })
+  @JoinTable({
+    name: 'companies_business_fields',
+    joinColumn: { name: "company_id", referencedColumnName: "id" },
+    inverseJoinColumn: { name: "business_field_id" }
+  })
   businessFields: BusinessFieldEntity[]
 }

@@ -23,7 +23,7 @@ export class CompanyInformationEntity {
   paxNumber: string;
 
   @AutoMap()
-  @Column({ type: 'varchar', length: 700, default: '' })
+  @Column({ type: 'varchar', default: '' })
   description: string;
 
   // Photos: photo-code-1|photo-code-2|photo-code-3
@@ -38,7 +38,7 @@ export class CompanyInformationEntity {
 
   // { facebook: '', linkedin: '', website: '', .... }
   @AutoMap()
-  @Column('jsonb', { nullable: true })
+  @Column({ type: 'jsonb', nullable: true, name: 'social_networks' })
   socialNetworks: object;
 
   @OneToOne(() => CompanyEntity)
@@ -47,4 +47,7 @@ export class CompanyInformationEntity {
 
   @Column({ name: 'company_id' })
   companyId: string;
+
+  @Column({ name: 'date_of_establishment' })
+  dateOfEstablishment: string;
 }
