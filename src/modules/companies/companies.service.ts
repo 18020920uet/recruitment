@@ -30,19 +30,18 @@ export class CompaniesService {
          :
         { name : Not(IsNull()) },
       relations: [ 'country' ],
-      skip: page > 0 ? page - 1 : 0 * 6,
-      take: 6,
+      skip: page > 0 ? page - 1 : 0 * (character != undefined ? 6 : 10),
+      take: (character != undefined ? 6 : 10),
       order: { name: 'ASC' }
     });
     return _companies.map((_company) => this.mapper.map(_company, Company, CompanyEntity));
   }
 
   async getCompanyDetail(companyId: string): Promise<GetCompanyDetail> {
-    const _companies = await this.companyRepository.findOne({
+    const _company = await this.companyRepository.findOne({
       where: { id: companyId },
-      relations: [ 'country', 'information' ],
+      relations: [ 'country', 'information', 'businessFields' ],
     });
-
-    return this.mapper.map(_companies, GetCompanyDetail, CompanyEntity);
+    return this.mapper.map(_company, GetCompanyDetail, CompanyEntity);
   }
 }

@@ -32,7 +32,7 @@ export class CompaniesController {
   constructor(private companiesService: CompaniesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get 6 companies by first charater in name or all' })
+  @ApiOperation({ summary: 'Get 6 companies by first charater in name or 10 companies' })
   @ApplicationArrayApiOkResponse(Company)
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })

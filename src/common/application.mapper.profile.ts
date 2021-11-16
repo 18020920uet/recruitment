@@ -111,8 +111,10 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(CompanyEntity, GetCompanyDetail)
         .forMember(
           (detail) => detail.businessFields,
-          mapFrom(_company => _company.businessFields.split('|').filter((bf) => bf)),
-        );
+          mapFrom(_company =>
+            _company.businessFields.map(_businessField => ({ id: _businessField.id, name: _businessField.name }))
+          )
+        )
     };
   }
 }

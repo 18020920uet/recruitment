@@ -1,7 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
+import {
+  Entity, PrimaryGeneratedColumn, Column,
+  JoinColumn, OneToOne, ManyToOne,
+  ManyToMany, JoinTable
+} from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { CompanyInformationEntity } from './company-information.entity';
+import { BusinessFieldEntity } from './business-field.entity';
 import { CountryEntity } from './country.entity';
 import { UserEntity } from './user.entity';
 
@@ -32,7 +37,7 @@ export class CompanyEntity {
   owner: UserEntity;
 
   @AutoMap({ typeFn: () => CountryEntity })
-  @OneToOne(() => CountryEntity)
+  @ManyToOne(() => CountryEntity)
   @JoinColumn({ name: 'country_id' })
   country: CountryEntity;
 
@@ -41,8 +46,7 @@ export class CompanyEntity {
   @JoinColumn({ name: 'company_information_id' })
   information: CompanyInformationEntity;
 
-  @AutoMap()
-  // Business Fields: PR|HR|IT|HS|....
-  @Column({ default: '', name: 'business_fields' })
-  businessFields: string;
+  @ManyToMany(() => BusinessFieldEntity)
+  @JoinTable({ name: 'companies_business_fields'})
+  businessFields: BusinessFieldEntity[]
 }

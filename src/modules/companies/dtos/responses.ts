@@ -68,5 +68,13 @@ export class GetCompanyDetail {
   information: CompanyInformation;
 
   @ApiProperty()
-  businessFields: string[];
+  businessFields: BusinessField[];
+}
+
+class BusinessField {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
 }
