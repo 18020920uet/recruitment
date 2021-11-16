@@ -2,30 +2,4 @@ version: '3.9'
 
 services:
   application:
-    image: node:14-alpine3.12
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    container_name: application
-    working_dir: /home/recruitment
-    volumes:
-      - ./src:/home/recruitment/src
-      - ./public:/home/recruitment/public
-      - ./logs:/home/recruitment/logs
-      - ./package.json:/home/recruitment/package.json
-      - ./tsconfig.json:/home/recruitment/tsconfig.json
-      - ./tsconfig.build.json:/home/recruitment/tsconfig.build.json
-      - ./nest-cli.json:/home/recruitment/nest-cli.json
-      - ./.env.development:/home/recruitment/.env.development
-      - ./.env.product:/home/recruitment/.env.product
-    environment:
-      TZ: '${TIMEZONE}'
-    ports:
-      - '${PORT}:${PORT}'
     command: sh -c "yarn build && yarn start:dev"
-    restart: unless-stopped
-    depends_on:
-      - database
-      - adminer
-    networks:
-      - recruitment_networks

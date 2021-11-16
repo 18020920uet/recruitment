@@ -1,2 +1,2 @@
 #!/bin/sh
-docker-compose -f docker-compose.yml -f docker-compose.product.yml up
+docker-compose --env-file ./.env.development -f docker-compose.yml up application
