@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 
-import { UserEntity } from './user.entity';
+import { SkillEntity } from './skill.entity';
 
 @Entity('business_fields')
 export class BusinessFieldEntity {
@@ -12,4 +12,12 @@ export class BusinessFieldEntity {
 
   @Column()
   description: string;
+
+  @ManyToMany(() => SkillEntity)
+  @JoinTable({
+    name: 'skills_business_fields',
+    joinColumn: { name: 'business_field_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id' }
+  })
+  skill: SkillEntity[];
 }

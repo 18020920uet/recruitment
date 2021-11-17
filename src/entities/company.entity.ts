@@ -1,7 +1,7 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
   JoinColumn, OneToOne, ManyToOne,
-  ManyToMany, JoinTable
+  ManyToMany, JoinTable, OneToMany
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
@@ -10,6 +10,7 @@ import { BusinessFieldEntity } from './business-field.entity';
 import { CountryEntity } from './country.entity';
 import { AreaEntity } from './area.entity';
 import { UserEntity } from './user.entity';
+import { JobEntity } from './job.entity';
 
 @Entity('companies')
 export class CompanyEntity {
@@ -47,7 +48,7 @@ export class CompanyEntity {
 
   @AutoMap({ typeFn: () => AreaEntity })
   @ManyToOne(() => AreaEntity)
-  @JoinColumn({ name: 'city_id' })
+  @JoinColumn({ name: 'area_id' })
   area: AreaEntity;
 
   @AutoMap({ typeFn: () => CompanyInformationEntity })
@@ -61,5 +62,8 @@ export class CompanyEntity {
     joinColumn: { name: "company_id", referencedColumnName: "id" },
     inverseJoinColumn: { name: "business_field_id" }
   })
-  businessFields: BusinessFieldEntity[]
+  businessFields: BusinessFieldEntity[];
+
+  @OneToMany(() => JobEntity, job => job.company, { cascade: true })
+  jobs: JobEntity[];
 }
