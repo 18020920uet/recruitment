@@ -1,8 +1,10 @@
 import { Controller, Get, Body } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiUnauthorizedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiInternalServerErrorResponse,
+  ApiUnauthorizedResponse, ApiOperation, ApiTags, ApiBearerAuth
+} from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
-
 import { InternalServerErrorResponse, UnauthorizedResponse } from '@Decorators/swagger.error-responses.decorator';
 
 import { AuthenticationService } from './authentication.service';
@@ -17,6 +19,7 @@ export class AuthenticationController {
 
   @Get('refresh-access-token')
   @ApiOperation({ summary: 'Get new access token' })
+  @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(RefreshAccessTokenResponse)
   @ApiUnauthorizedResponse({ description: 'Refresh token expired', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })

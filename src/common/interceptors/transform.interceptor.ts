@@ -7,13 +7,14 @@ import { Response } from '@Shared/responses/default';
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-    return next.handle().pipe(
-      map((data) => ({
+    const mapResponse = (data) => {
+      return {
         statusCode: context.switchToHttp().getResponse().statusCode,
-        status: 1,
         message: 'Success',
+        status: 1,
         data: data,
-      })),
-    );
+      };
+    }
+    return next.handle().pipe(map((data) => mapResponse(data)));
   }
 }

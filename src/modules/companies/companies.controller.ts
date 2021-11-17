@@ -9,7 +9,6 @@ import {
 } from '@nestjs/swagger';
 
 import { ApplicationArrayApiOkResponse, ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
-
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,

@@ -18,11 +18,13 @@ import { UserRepository } from '@Repositories/user.repository';
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { Review } from '@Shared/responses/review';
+import { User } from '@Shared/responses/user';
+
+import { FileService } from '@Shared/services/file.service';
 
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import { UpdateCurriculumnVitaeRequest, ChangePasswordRequest } from './dtos/requests';
 
-import { FileService } from '@Shared/services/file.service';
 
 @Injectable()
 export class UserService {
@@ -34,6 +36,10 @@ export class UserService {
     private configService: ConfigService,
     private fileService: FileService,
   ) {}
+
+  getCurrentUser(_currentUser: UserEntity): User {
+    return this.mapper.map(_currentUser, User, UserEntity);
+  }
 
   async changePassword(
     _currentUser: UserEntity,
@@ -89,6 +95,7 @@ export class UserService {
       _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join('|');
       _cv.skills = updateCurriculumnVitaeRequest.skills.join('|');
       _cv.languages = updateCurriculumnVitaeRequest.languages.join('|');
+      _cv.address = updateCurriculumnVitaeRequest.address;
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
       if (updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
@@ -111,25 +118,6 @@ export class UserService {
       await transactionalEntityManager.insert(CurriculumVitaeExperienceEntity, _experiences);
     });
     return await this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
-  }
-
-  async getCurriculumnVitae(_currentUser: UserEntity): Promise<CurriculumVitae> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({
-      where: { user: _currentUser },
-      relations: ['experiences', 'user'],
-    });
-    return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
-  }
-
-  async getReviews(_currentUser: UserEntity, page: number): Promise<Review[]> {
-    const _reviews = await this.reviewRepository.find({
-      where: { reviewee: _currentUser },
-      relations: ['reviewer'],
-      order: { createdAt: 'ASC' },
-      skip: page * 10,
-      take: 10,
-    });
-    return _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
   }
 
   async updateCertifications(

@@ -13,7 +13,6 @@ import {
 } from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse, ApplicationApiCreateResponse } from '@Decorators/swagger.decorator';
-
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,
@@ -27,7 +26,6 @@ import {
 import { AccountService } from './account.service';
 
 import { RegisterRequest, LoginRequest, ActivateRequest, UnlockRequest } from './dtos/requests';
-
 import { RequestResetPasswordResponse, AccountResponse } from './dtos/responses';
 
 @ApiTags('account')

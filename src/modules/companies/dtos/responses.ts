@@ -3,6 +3,8 @@ import { AutoMap } from '@automapper/classes';
 
 import { CountryEntity } from '@Entities/country.entity';
 
+import { Company } from '@Shared/responses/company';
+
 export class CompanyInformation {
   @AutoMap()
   @ApiProperty()

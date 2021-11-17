@@ -1,8 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiTags } from '@nestjs/swagger';
-import { InternalServerErrorResponse } from '@Decorators/swagger.error-responses.decorator';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { ApiInternalServerErrorResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ApplicationArrayApiOkResponse } from '@Common/decorators/swagger.decorator';
+import { InternalServerErrorResponse } from '@Decorators/swagger.error-responses.decorator';
 
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
@@ -19,6 +19,7 @@ export class ResourcesController {
   constructor(private resourcesService: ResourcesService) {}
 
   @Get('languages')
+  @ApiOperation({ summary: 'Get system languages' })
   @ApplicationArrayApiOkResponse(LanguageEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getLanguages(): Promise<LanguageEntity[]> {
@@ -26,6 +27,7 @@ export class ResourcesController {
   }
 
   @Get('nationnalities')
+  @ApiOperation({ summary: 'Get system nationalities' })
   @ApplicationArrayApiOkResponse(NationalityEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getNationnalities(): Promise<NationalityEntity[]> {
@@ -33,6 +35,7 @@ export class ResourcesController {
   }
 
   @Get('countries')
+  @ApiOperation({ summary: 'Get system countries' })
   @ApplicationArrayApiOkResponse(CountryEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getCountries(): Promise<CountryEntity[]> {
@@ -40,6 +43,7 @@ export class ResourcesController {
   }
 
   @Get('areas')
+  @ApiOperation({ summary: 'Get system areas' })
   @ApplicationArrayApiOkResponse(AreaEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getAreasByCountry(@Query() getAreasQuery: GetAreasQuery): Promise<AreaEntity[]> {

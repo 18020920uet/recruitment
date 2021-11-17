@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles, Get } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import {
@@ -8,12 +8,15 @@ import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
   ApiBearerAuth,
+  ApiOperation,
   ApiConsumes,
   ApiTags,
 } from '@nestjs/swagger';
 
 import { saveAvatarStorage } from '@Common/storages/images.storage';
 import { saveCertificationsStorage } from '@Common/storages/certifications.storage';
+
+import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
 
 import {
   UnsupportedMediaTypeResponse,
@@ -23,11 +26,8 @@ import {
   BadRequestResponse,
   ForbiddenResponse,
 } from '@Decorators/swagger.error-responses.decorator';
-
-import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
-
-import { CurrentUser } from '@Common/decorators/current-user.decorator';
 import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
+import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 
@@ -40,6 +40,7 @@ import {
 } from './dtos/requests';
 
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { User } from '@Shared/responses/user';
 
 import { UserService } from './user.service';
 
@@ -48,14 +49,26 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get()
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(User)
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  getCurrentUser(@CurrentUser() _currentUser: UserEntity): User {
+    return this.userService.getCurrentUser(_currentUser);
+  }
+
   @Put('change-password')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Change password' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(ChangePasswordResponse)
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiForbiddenResponse({ description: 'Wrong password', type: ForbiddenResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  @UseGuards(JwtAuthenticationGuard)
   async changePassword(
     @CurrentUser() _currentUser: UserEntity,
     @Body() changePasswordRequest: ChangePasswordRequest,
@@ -64,9 +77,10 @@ export class UserController {
   }
 
   @Put('avatar')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
   @UseInterceptors(FileInterceptor('file', saveAvatarStorage))
+  @ApiOperation({ summary: 'Change avatar' })
+  @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
   @ApplicationApiOkResponse(ChangeAvatarResponse)
   @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
@@ -82,8 +96,9 @@ export class UserController {
   }
 
   @Put('cv')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Update cv' })
+  @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(CurriculumVitae)
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
@@ -96,9 +111,10 @@ export class UserController {
   }
 
   @Put('certifications')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
   @UseInterceptors(FilesInterceptor('files', 3, saveCertificationsStorage))
+  @ApiOperation({ summary: 'Update/Replace certifications' })
+  @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
   @ApplicationApiOkResponse(UpdateCertificationsResponse)
   @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })

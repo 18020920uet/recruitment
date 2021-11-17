@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body, UseInterceptors } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,
@@ -7,8 +7,12 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiBearerAuth,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
+
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,
@@ -16,16 +20,12 @@ import {
   ForbiddenResponse,
   NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
-
 import {
   ApplicationApiOkResponse,
   ApplicationApiCreateResponse,
   ApplicationArrayApiOkResponse,
 } from '@Common/decorators/swagger.decorator';
-
 import { CurrentUser } from '@Common/decorators/current-user.decorator';
-
-import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
 
 import { UserEntity } from '@Entities/user.entity';
 
@@ -53,6 +53,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get(':userId/cv')
+  @ApiOperation({ summary: 'Get user cv'})
   @ApplicationApiOkResponse(CurriculumVitae)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -63,6 +64,7 @@ export class UsersController {
   }
 
   @Get(':userId/reviews')
+  @ApiOperation({ summary: 'Get user reviews'})
   @ApplicationArrayApiOkResponse(Review)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
@@ -75,6 +77,7 @@ export class UsersController {
   }
 
   @Get(':userId/reviewsByUser')
+  @ApiOperation({ summary: 'Get reviews write by user'})
   @ApplicationArrayApiOkResponse(ReviewByUser)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
@@ -87,8 +90,9 @@ export class UsersController {
   }
 
   @Post(':userId/review')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Post a review'})
+  @ApiBearerAuth('access-token')
   @ApplicationApiCreateResponse(Review)
   @ApiNotFoundResponse({ description: 'Cannot find user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
@@ -103,8 +107,9 @@ export class UsersController {
   }
 
   @Put(':userId/reviews/:reviewId')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Update review'})
+  @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(Review)
   @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
@@ -120,8 +125,9 @@ export class UsersController {
   }
 
   @Delete(':userId/reviews/:reviewId')
-  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Detete review'})
+  @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(DeleteReviewResponse)
   @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
   @ApiNotFoundResponse({ description: 'Cannot find user or review', type: NotFoundResponse })
