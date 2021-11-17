@@ -1,16 +1,17 @@
 import { PrimaryColumn, Column, Entity } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('cities')
-export class CityEntity {
+@Entity('areas')
+export class AreaEntity {
+  @ApiProperty()
   @PrimaryColumn()
   id: number;
 
+  @ApiProperty()
   @Column({ name: 'country_id' })
   countryId: number;
 
-  @Column({ name: 'state_id' })
-  stateId: number;
-
+  @ApiProperty()
   @Column()
   name: string;
 }

@@ -8,6 +8,7 @@ import { AutoMap } from '@automapper/classes';
 import { CompanyInformationEntity } from './company-information.entity';
 import { BusinessFieldEntity } from './business-field.entity';
 import { CountryEntity } from './country.entity';
+import { AreaEntity } from './area.entity';
 import { UserEntity } from './user.entity';
 
 @Entity('companies')
@@ -43,6 +44,11 @@ export class CompanyEntity {
   @ManyToOne(() => CountryEntity)
   @JoinColumn({ name: 'country_id' })
   country: CountryEntity;
+
+  @AutoMap({ typeFn: () => AreaEntity })
+  @ManyToOne(() => AreaEntity)
+  @JoinColumn({ name: 'city_id' })
+  area: AreaEntity;
 
   @AutoMap({ typeFn: () => CompanyInformationEntity })
   @OneToOne(() => CompanyInformationEntity, { cascade: true } )
