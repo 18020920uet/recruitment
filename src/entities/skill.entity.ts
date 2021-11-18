@@ -11,12 +11,12 @@ export class SkillEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: '' })
   description: string;
 
   @ManyToMany(() => BusinessFieldEntity)
   @JoinTable({
-    name: 'skills_business_fields',
+    name: 'business_fields_skills',
     joinColumn: { name: 'skill_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'business_field_id' }
   })

@@ -1,5 +1,5 @@
 import {
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   ManyToMany,
   JoinColumn,
   ManyToOne,
@@ -20,10 +20,10 @@ import { JobStatus } from '@Shared/enums/job-status';
 
 @Entity('jobs')
 export class JobEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'company_id' })
   companyId: string;
 
   @ManyToOne(() => CompanyEntity)
@@ -48,15 +48,15 @@ export class JobEntity {
   @Column({ type: 'enum', enum: JobStatus, default: JobStatus.AWAIT })
   status: JobStatus;
 
-  @Column({ type: 'enum', enum: JobExperience, default: null, nullable: true, name: 'require_experience' })
-  requireExperience: JobExperience;
+  @Column({ type: 'enum', enum: JobExperience, default: null, nullable: true, name: 'experience' })
+  experience: JobExperience;
 
   @Column({ type: 'enum', enum: JobWorkMode, default: JobWorkMode.HYBRID, name: 'work_mode' })
   workMode: JobWorkMode;
 
   @ManyToMany(() => SkillEntity)
   @JoinTable({
-      name: 'skills_and_jobs',
+      name: 'jobs_skills',
       joinColumn: { name: 'job_id', referencedColumnName: 'id' },
       inverseJoinColumn: { name: 'skill_id' }
   })
@@ -74,11 +74,11 @@ export class JobEntity {
   @JoinColumn({ name: 'area_id' })
   area: AreaEntity;
 
-  @Column({ name: 'start_date' })
-  startDate: string;
+  @Column({ type: 'timestamp' })
+  startDate: Date;
 
-  @Column({ name: 'end_date' })
-  endDate: string;
+  @Column({ type: 'timestamp' })
+  endDate: Date;
 
   @Column({ type: 'timestamp',name: 'created_at' })
   createdAt: Date;

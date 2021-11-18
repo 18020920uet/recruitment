@@ -24,7 +24,7 @@ export class Job {
   title: string;
 
   @ApiProperty({ enum: JobExperience, enumName: 'JobExperience' })
-  requireExperience: JobExperience;
+  experience: JobExperience;
 
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
   status: JobStatus;

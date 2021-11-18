@@ -20,7 +20,7 @@ services:
       - ./logs:/home/recruitment/logs
       - ./src:/home/recruitment/src
     environment:
-      TZ: '${TIMEZONE}'
+      TZ: '${TZ}'
     ports:
       - '${PORT}:${PORT}'
     command: sh -c "yarn build && yarn start"
@@ -38,8 +38,8 @@ services:
       POSTGRES_USER: '${DATABASE_USER}'
       POSTGRES_PASSWORD: '${DATABASE_PASSWORD}'
       POSTGRES_DB: '${DATABASE_NAME}'
-      TZ: '${TIMEZONE}'
-      PGTZ: '${TIMEZONE}'
+      TZ: '${TZ}'
+      PGTZ: '${TZ}'
     expose:
       - '${DATABASE_PORT}'
     volumes:

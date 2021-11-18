@@ -1,0 +1,378 @@
+[
+  {
+    "id": 1,
+    "name": "React.js"
+  },
+  {
+    "id": 2,
+    "name": "Angular"
+  },
+  {
+    "id": 3,
+    "name": "Vue.js"
+  },
+  {
+    "id": 4,
+    "name": "jQuery"
+  },
+  {
+    "id": 5,
+    "name": "Express.js"
+  },
+  {
+    "id": 6,
+    "name": "Node.js"
+  },
+  {
+    "id": 7,
+    "name": "Core Data"
+  },
+  {
+    "id": 8,
+    "name": "Laravel"
+  },
+  {
+    "id": 9,
+    "name": "Phalcon"
+  },
+  {
+    "id": 10,
+    "name": "CakePHP"
+  },
+  {
+    "id": 11,
+    "name": "Symfony"
+  },
+  {
+    "id": 12,
+    "name": "Zend"
+  },
+  {
+    "id": 13,
+    "name": "React Native"
+  },
+  {
+    "id": 14,
+    "name": "AngularJS"
+  },
+  {
+    "id": 15,
+    "name": "Mojito"
+  },
+  {
+    "id": 16,
+    "name": "Meteor"
+  },
+  {
+    "id": 17,
+    "name": "Bootstrap"
+  },
+  {
+    "id": 18,
+    "name": "Django"
+  },
+  {
+    "id": 19,
+    "name": "Ruby on Rails"
+  },
+  {
+    "id": 20,
+    "name": "ASP.NET"
+  },
+  {
+    "id": 21,
+    "name": "Spring"
+  },
+  {
+    "id": 22,
+    "name": "Ember"
+  },
+  {
+    "id": 23,
+    "name": "Flask"
+  },
+  {
+    "id": 24,
+    "name": "Gatsby"
+  },
+  {
+    "id": 25,
+    "name": "Sinatra"
+  },
+  {
+    "id": 26,
+    "name": "PhoneGap"
+  },
+  {
+    "id": 27,
+    "name": "Corona"
+  },
+  {
+    "id": 28,
+    "name": "jQuery Mobile"
+  },
+  {
+    "id": 29,
+    "name": "Flutter"
+  },
+  {
+    "id": 30,
+    "name": "Mobile Angular UI"
+  },
+  {
+    "id": 31,
+    "name": "Appcelerator Titanium"
+  },
+  {
+    "id": 32,
+    "name": "PyTorch"
+  },
+  {
+    "id": 33,
+    "name": "Neural Network Libraries"
+  },
+  {
+    "id": 34,
+    "name": "ML.NET"
+  },
+  {
+    "id": 35,
+    "name": "Robot Framework"
+  },
+  {
+    "id": 36,
+    "name": "Pytest"
+  },
+  {
+    "id": 37,
+    "name": "Mocha"
+  },
+  {
+    "id": 38,
+    "name": "Nightwatch"
+  },
+  {
+    "id": 39,
+    "name": "Cypress"
+  },
+  {
+    "id": 40,
+    "name": "Scrapy"
+  },
+  {
+    "id": 41,
+    "name": "Truffle"
+  },
+  {
+    "id": 42,
+    "name": "Embark"
+  },
+  {
+    "id": 43,
+    "name": "C"
+  },
+  {
+    "id": 44,
+    "name": "Java"
+  },
+  {
+    "id": 45,
+    "name": "Python"
+  },
+  {
+    "id": 46,
+    "name": "C++"
+  },
+  {
+    "id": 47,
+    "name": "C#"
+  },
+  {
+    "id": 48,
+    "name": "Visual Basic"
+  },
+  {
+    "id": 49,
+    "name": "JavaScript"
+  },
+  {
+    "id": 50,
+    "name": "PHP"
+  },
+  {
+    "id": 51,
+    "name": "SQL"
+  },
+  {
+    "id": 52,
+    "name": "Assembly language"
+  },
+  {
+    "id": 53,
+    "name": "R"
+  },
+  {
+    "id": 54,
+    "name": "Groovy"
+  },
+  {
+    "id": 55,
+    "name": "Kotlin"
+  },
+  {
+    "id": 56,
+    "name": "Swift"
+  },
+  {
+    "id": 57,
+    "name": "Ruby"
+  },
+  {
+    "id": 58,
+    "name": "HTML"
+  },
+  {
+    "id": 59,
+    "name": "CSS"
+  },
+  {
+    "id": 60,
+    "name": "Rust"
+  },
+  {
+    "id": 61,
+    "name": "Go"
+  },
+  {
+    "id": 62,
+    "name": "Perl"
+  },
+  {
+    "id": 63,
+    "name": "Lua"
+  },
+  {
+    "id": 64,
+    "name": "Hasket"
+  },
+  {
+    "id": 65,
+    "name": "Scala"
+  },
+  {
+    "id": 66,
+    "name": "Typescript"
+  },
+  {
+    "id": 67,
+    "name": "Matlab"
+  },
+  {
+    "id": 68,
+    "name": "MySQL"
+  },
+  {
+    "id": 69,
+    "name": "PostgreSQL"
+  },
+  {
+    "id": 70,
+    "name": "MongoDB"
+  },
+  {
+    "id": 71,
+    "name": "MariaDB"
+  },
+  {
+    "id": 72,
+    "name": "DB2"
+  },
+  {
+    "id": 73,
+    "name": "Oracle"
+  },
+  {
+    "id": 74,
+    "name": "Microsoft SQL Server"
+  },
+  {
+    "id": 75,
+    "name": "CouchDB"
+  },
+  {
+    "id": 76,
+    "name": "redis"
+  },
+  {
+    "id": 77,
+    "name": "Neo4j"
+  },
+  {
+    "id": 78,
+    "name": "Docker"
+  },
+  {
+    "id": 79,
+    "name": "Version Control"
+  },
+  {
+    "id": 80,
+    "name": "QuerySurge"
+  },
+  {
+    "id": 81,
+    "name": "Basis Technologies"
+  },
+  {
+    "id": 82,
+    "name": "GitHub"
+  },
+  {
+    "id": 83,
+    "name": "Selenium"
+  },
+  {
+    "id": 84,
+    "name": "Appium"
+  },
+  {
+    "id": 85,
+    "name": "TestComplete"
+  },
+  {
+    "id": 86,
+    "name": "Watir"
+  },
+  {
+    "id": 87,
+    "name": "Cucumber"
+  },
+  {
+    "id": 88,
+    "name": "Katalon Studio"
+  },
+  {
+    "id": 89,
+    "name": "Cybersecurity"
+  },
+  {
+    "id": 90,
+    "name": "Cloud computing"
+  },
+  {
+    "id": 91,
+    "name": "Data analytics and data science"
+  },
+  {
+    "id": 92,
+    "name": "AI and machine learning"
+  },
+  {
+    "id": 93,
+    "name": "Software development"
+  },
+  {
+    "id": 94,
+    "name": "Networking and wireless"
+  }
+]
