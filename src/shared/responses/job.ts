@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AutoMap } from '@automapper/classes';
 
 import { AreaEntity } from '@Entities/area.entity';
 
@@ -11,45 +12,59 @@ import { Company } from './company';
 import { Skill } from './skill';
 
 export class Job {
+  @AutoMap()
   @ApiProperty()
   id: number;
 
-  @ApiProperty({ type: Company })
-  company: Company;
-
+  @AutoMap()
   @ApiProperty()
   salary: number;
 
+  @AutoMap()
   @ApiProperty()
   title: string;
 
+  @AutoMap()
   @ApiProperty({ enum: JobExperience, enumName: 'JobExperience' })
   experience: JobExperience;
 
+  @AutoMap()
   @ApiProperty({ enum: JobStatus, enumName: 'JobStatus' })
   status: JobStatus;
 
-  @ApiProperty({ enum: JobWorkMode, enumName: 'JobWorkMode' })
-  workMode: JobWorkMode;
-
-  @ApiProperty({ type: [Skill] })
-  skills: Skill[];
-
-  @ApiProperty({ type: [BusinessField] })
-  businessFields: BusinessField[];
-
-  @ApiProperty({ type: AreaEntity })
-  area: AreaEntity;
-
+  @AutoMap()
   @ApiProperty()
-  startDate: Date;
+  startDate: string;
 
+  @AutoMap()
   @ApiProperty()
-  endDate: Date;
+  endDate: string;
 
+  @AutoMap()
   @ApiProperty()
   createdAt: Date;
 
+  @AutoMap()
   @ApiProperty()
   updatedAt: Date;
+
+  @AutoMap()
+  @ApiProperty({ enum: JobWorkMode, enumName: 'JobWorkMode' })
+  workMode: JobWorkMode;
+
+  @AutoMap({ typeFn: () => Company })
+  @ApiProperty({ type: Company })
+  company: Company;
+
+  @AutoMap({ typeFn: () => Skill })
+  @ApiProperty({ type: [Skill] })
+  skills: Skill[];
+
+  @AutoMap({ typeFn: () => BusinessField })
+  @ApiProperty({ type: [BusinessField] })
+  businessFields: BusinessField[];
+
+  @AutoMap({ typeFn: () => AreaEntity })
+  @ApiProperty({ type: AreaEntity })
+  area: AreaEntity;
 }

@@ -4,22 +4,29 @@ import type { Mapper } from '@automapper/types';
 import { mapFrom } from '@automapper/core';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
-import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { CompanyInformationEntity } from '@Entities/company-information.entity';
+import { BusinessFieldEntity } from '@Entities/business-field.entity';
+import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { CountryEntity } from '@Entities/country.entity';
 import { CompanyEntity } from '@Entities/company.entity';
 import { ReviewEntity } from '@Entities/review.entity';
+import { SkillEntity } from '@Entities/skill.entity';
 import { UserEntity } from '@Entities/user.entity';
+import { AreaEntity } from '@Entities/area.entity';
+import { JobEntity } from '@Entities/job.entity';
 
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
+import { BusinessField } from '@Shared/responses/business-field';
 import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Company } from '@Shared/responses/company';
 import { Review } from '@Shared/responses/review';
+import { Skill } from '@Shared/responses/skill';
 import { User } from '@Shared/responses/user';
+import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse } from '@Modules/companies/dtos/responses';
-
+import { JobDetail } from '@Modules/jobs/dtos/responses';
 
 import { FileService } from '@Shared/services/file.service';
 
@@ -91,6 +98,7 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(CompanyEntity, Company)
         .forMember((company) => company.logo, mapFrom(_company => this.fileService.getLogo(_company)));
       mapper.createMap(CountryEntity, CountryEntity);
+      mapper.createMap(AreaEntity, AreaEntity);
       mapper.createMap(CompanyInformationEntity, CompanyInformation)
         .forMember(
           (information) => information.photos,
@@ -114,6 +122,10 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             _company.businessFields.map(_businessField => ({ id: _businessField.id, name: _businessField.name }))
           )
         );
+      mapper.createMap(SkillEntity, Skill);
+      mapper.createMap(JobEntity, Job);
+      mapper.createMap(JobEntity, JobDetail);
+      mapper.createMap(BusinessFieldEntity, BusinessField);
     };
   }
 }

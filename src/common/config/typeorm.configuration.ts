@@ -12,7 +12,7 @@ export default class TypeOrmConfig {
       username: configService.get('database.username'),
       password: configService.get('database.password'),
       migrationsTableName: 'migrations',
-      entities: ['dist/**/*.entity{.ts,.js}'],
+      entities: ['dist/**/*{.entity,.relation}{.ts,.js}'],
       migrations: ['dist/migrations/*.js'],
       subscribers: ['dist/subscribers/*.js'],
       cli: {
