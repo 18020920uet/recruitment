@@ -8,7 +8,7 @@ import { CompanyRepository } from '@Repositories/company.repository';
 import { CompanyEntity } from '@Entities/company.entity';
 
 import { GetCompaniesFilterWithTheFirstCharacterInNameQuery } from './dtos/requests';
-import { GetCompanyDetail } from './dtos/responses';
+import { GetCompanyDetailResponse } from './dtos/responses';
 import { Company } from '@Shared/responses/company';
 
 @Injectable()
@@ -37,11 +37,11 @@ export class CompaniesService {
     return _companies.map((_company) => this.mapper.map(_company, Company, CompanyEntity));
   }
 
-  async getCompanyDetail(companyId: string): Promise<GetCompanyDetail> {
+  async getCompanyDetail(companyId: string): Promise<GetCompanyDetailResponse> {
     const _company = await this.companyRepository.findOne({
       where: { id: companyId },
       relations: [ 'country', 'information', 'businessFields' ],
     });
-    return this.mapper.map(_company, GetCompanyDetail, CompanyEntity);
+    return this.mapper.map(_company, GetCompanyDetailResponse, CompanyEntity);
   }
 }

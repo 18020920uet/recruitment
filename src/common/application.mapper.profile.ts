@@ -18,7 +18,7 @@ import { Company } from '@Shared/responses/company';
 import { Review } from '@Shared/responses/review';
 import { User } from '@Shared/responses/user';
 
-import { CompanyInformation, GetCompanyDetail } from '@Modules/companies/dtos/responses';
+import { CompanyInformation, GetCompanyDetailResponse } from '@Modules/companies/dtos/responses';
 
 
 import { FileService } from '@Shared/services/file.service';
@@ -106,7 +106,7 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           (information) => information.socialNetworks,
           mapFrom(_companyInformation => _companyInformation.socialNetworks)
         );
-      mapper.createMap(CompanyEntity, GetCompanyDetail)
+      mapper.createMap(CompanyEntity, GetCompanyDetailResponse)
         .forMember((detail) => detail.logo, mapFrom(_company => this.fileService.getLogo(_company)))
         .forMember(
           (detail) => detail.businessFields,

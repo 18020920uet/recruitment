@@ -48,7 +48,7 @@ class BusinessField {
   name: string;
 }
 
-export class GetCompanyDetail {
+export class GetCompanyDetailResponse {
   @AutoMap()
   @ApiProperty()
   id: string;

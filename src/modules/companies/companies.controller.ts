@@ -18,12 +18,8 @@ import {
 import { CompaniesService } from './companies.service';
 
 import { Company } from '@Shared/responses/company';
-import { GetCompanyDetail } from './dtos/responses';
-import {
-  GetCompaniesFilterWithTheFirstCharacterInNameQuery,
-  GetCompanyDetailParam,
-} from './dtos/requests';
-
+import { GetCompanyDetailResponse } from './dtos/responses';
+import { GetCompaniesFilterWithTheFirstCharacterInNameQuery, GetCompanyDetailParam } from './dtos/requests';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -43,10 +39,10 @@ export class CompaniesController {
 
   @Get(':companyId/detail')
   @ApiOperation({ summary: 'Get a company detail' })
-  @ApplicationApiOkResponse(GetCompanyDetail)
+  @ApplicationApiOkResponse(GetCompanyDetailResponse)
   @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getCompanyDetail(@Param() getCompanyDetailParam: GetCompanyDetailParam): Promise<GetCompanyDetail> {
+  async getCompanyDetail(@Param() getCompanyDetailParam: GetCompanyDetailParam): Promise<GetCompanyDetailResponse> {
     return await this.companiesService.getCompanyDetail(getCompanyDetailParam.companyId);
   }
 }
