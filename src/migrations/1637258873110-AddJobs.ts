@@ -44,8 +44,8 @@ export class AddJobs1637258873110 implements MigrationInterface {
         job.salary = rawJob.salary;
         job.createdAt = new Date(rawJob.createdAt);
         job.updatedAt = new Date(rawJob.updatedAt);
-        job.startDate = new Date(rawJob.startDate);
-        job.endDate = new Date(rawJob.endDate);
+        job.startDate = new Date(rawJob.startDate).toISOString().slice(0,10);
+        job.endDate = new Date(rawJob.endDate).toISOString().slice(0,10);
 
         job.area = areas[Math.floor(Math.random() * areas.length)];
         job.businessFields = [businessFields[Math.floor(Math.random() * businessFields.length)], itBusinessField]

@@ -74,11 +74,11 @@ export class JobEntity {
   @JoinColumn({ name: 'area_id' })
   area: AreaEntity;
 
-  @Column({ type: 'timestamp' })
-  startDate: Date;
+  @Column({ type: 'date' })
+  startDate: string;
 
-  @Column({ type: 'timestamp' })
-  endDate: Date;
+  @Column({ type: 'date' })
+  endDate: string;
 
   @Column({ type: 'timestamp',name: 'created_at' })
   createdAt: Date;
