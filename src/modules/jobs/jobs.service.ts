@@ -60,8 +60,8 @@ export class JobsService {
         },
       },
       relations: ['area', 'skills', 'businessFields', 'company'],
-      skip: getJobsQuery.page > 0 ? getJobsQuery.page - 1 : 0 * 10,
-      take: 10,
+      skip: getJobsQuery.page > 0 ? getJobsQuery.page - 1 : 0 * getJobsQuery.records,
+      take: getJobsQuery.records,
       order: { createdAt: 'DESC' },
     });
 

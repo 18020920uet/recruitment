@@ -41,11 +41,8 @@ export class GetJobsQuery {
   @Type(() => Number)
   @IsOptional()
   @Transform(({ value }) => {
-    if (Array.isArray(value)) {
-      return value;
-    } else {
-      return [value];
-    }
+    if (Array.isArray(value)) return value;
+    return [value];
   })
   @ApiProperty({ type: 'array', items: { type: 'number' }, required: false })
   skillIds: number[] | null;
@@ -53,11 +50,8 @@ export class GetJobsQuery {
   @Type(() => Number)
   @IsOptional()
   @Transform(({ value }) => {
-    if (Array.isArray(value)) {
-      return value;
-    } else {
-      return [value];
-    }
+    if (Array.isArray(value)) return value;
+    return [value];
   })
   @ApiProperty({ type: 'array', items: { type: 'number' }, required: false })
   businessFieldIds: number[] | null;
@@ -66,6 +60,11 @@ export class GetJobsQuery {
   @Min(1)
   @ApiProperty({ type: 'number' })
   page: number;
+
+  @Type(() => Number)
+  @Min(1)
+  @ApiProperty({ type: 'number' })
+  records: number;
 }
 
 export class GetJobDetailParam {
