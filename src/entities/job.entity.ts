@@ -1,12 +1,4 @@
-import {
-  PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinColumn,
-  ManyToOne,
-  JoinTable,
-  Column,
-  Entity,
-} from 'typeorm';
+import { PrimaryGeneratedColumn, ManyToMany, JoinColumn, ManyToOne, JoinTable, Column, Entity } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -66,11 +58,11 @@ export class JobEntity {
   workMode: JobWorkMode;
 
   @AutoMap({ typeFn: () => SkillEntity })
-  @ManyToMany(() => SkillEntity,{ cascade: true })
+  @ManyToMany(() => SkillEntity, { cascade: true })
   @JoinTable({
-      name: 'jobs_skills',
-      joinColumn: { name: 'job_id', referencedColumnName: 'id' },
-      inverseJoinColumn: { name: 'skill_id' }
+    name: 'jobs_skills',
+    joinColumn: { name: 'job_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id' },
   })
   skills: SkillEntity[];
 
@@ -79,7 +71,7 @@ export class JobEntity {
   @JoinTable({
     name: 'jobs_business_fields',
     joinColumn: { name: 'job_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'business_field_id' }
+    inverseJoinColumn: { name: 'business_field_id' },
   })
   businessFields: BusinessFieldEntity[];
 
@@ -97,7 +89,7 @@ export class JobEntity {
   endDate: string;
 
   @AutoMap()
-  @Column({ type: 'timestamp',name: 'created_at' })
+  @Column({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
 
   @AutoMap()

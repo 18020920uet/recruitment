@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { UserEntity } from '@Entities/user.entity';
-
 import { CompanyEntity } from '@Entities/company.entity';
+
 @Injectable()
 export class FileService {
   getAvatar(_user: UserEntity): string {

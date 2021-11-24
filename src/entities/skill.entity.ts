@@ -22,7 +22,7 @@ export class SkillEntity {
   @JoinTable({
     name: 'business_fields_skills',
     joinColumn: { name: 'skill_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'business_field_id' }
+    inverseJoinColumn: { name: 'business_field_id' },
   })
   businessFields: BusinessFieldEntity[];
 
@@ -30,7 +30,7 @@ export class SkillEntity {
   @JoinTable({
     name: 'jobs_skills',
     joinColumn: { name: 'skill_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'job_id' }
+    inverseJoinColumn: { name: 'job_id' },
   })
   jobs: JobEntity[];
 }

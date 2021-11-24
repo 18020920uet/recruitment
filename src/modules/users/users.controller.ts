@@ -53,45 +53,43 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get(':userId/cv')
-  @ApiOperation({ summary: 'Get user cv'})
+  @ApiOperation({ summary: 'Get user cv' })
   @ApplicationApiOkResponse(CurriculumVitae)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getCurriculumnVitae(
-    @Param() getCvParam: GetCvParam,
-  ): Promise<CurriculumVitae> {
+  async getCurriculumnVitae(@Param() getCvParam: GetCvParam): Promise<CurriculumVitae> {
     return await this.usersService.getCurriculumnVitae(getCvParam.userId);
   }
 
   @Get(':userId/reviews')
-  @ApiOperation({ summary: 'Get user reviews'})
+  @ApiOperation({ summary: 'Get user reviews' })
   @ApplicationArrayApiOkResponse(Review)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviews(
     @Param() getReviewsParam: GetReviewsParam,
-    @Query() getReviewsQuery: GetReviewsQuery
+    @Query() getReviewsQuery: GetReviewsQuery,
   ): Promise<Review[]> {
     return await this.usersService.getReviews(getReviewsParam.userId, getReviewsQuery.page);
   }
 
   @Get(':userId/reviewsByUser')
-  @ApiOperation({ summary: 'Get reviews write by user'})
+  @ApiOperation({ summary: 'Get reviews write by user' })
   @ApplicationArrayApiOkResponse(ReviewByUser)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getReviewsByUser(
     @Param() getReviewsParam: GetReviewsParam,
-    @Query() getReviewsQuery: GetReviewsQuery
+    @Query() getReviewsQuery: GetReviewsQuery,
   ): Promise<ReviewByUser[]> {
     return await this.usersService.getReviewsByUser(getReviewsParam.userId, getReviewsQuery.page);
   }
 
   @Post(':userId/review')
   @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Post a review'})
+  @ApiOperation({ summary: 'Post a review' })
   @ApiBearerAuth('access-token')
   @ApplicationApiCreateResponse(Review)
   @ApiNotFoundResponse({ description: 'Cannot find user', type: NotFoundResponse })
@@ -108,7 +106,7 @@ export class UsersController {
 
   @Put(':userId/reviews/:reviewId')
   @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Update review'})
+  @ApiOperation({ summary: 'Update review' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(Review)
   @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
@@ -126,7 +124,7 @@ export class UsersController {
 
   @Delete(':userId/reviews/:reviewId')
   @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Detete review'})
+  @ApiOperation({ summary: 'Detete review' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(DeleteReviewResponse)
   @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })

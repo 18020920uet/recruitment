@@ -4,14 +4,14 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOperation,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 
 import { ApplicationArrayApiOkResponse, ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,
-  NotFoundResponse
+  NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 
 import { JobsService } from './jobs.service';

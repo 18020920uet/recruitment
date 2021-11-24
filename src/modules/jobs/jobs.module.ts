@@ -18,6 +18,6 @@ import { AuthenticationModule } from '@Modules/authentication/authentication.mod
     ConfigModule,
   ],
   providers: [JobsService],
-  controllers: [JobsController]
+  controllers: [JobsController],
 })
 export class JobsModule {}

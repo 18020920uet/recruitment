@@ -36,7 +36,7 @@ export class CompanyInformation {
   @AutoMap()
   @ApiProperty({
     description: 'Social network by field Example: { facebook: "fb", linkedin: "linkedin", ... }',
-    type: 'object'
+    type: 'object',
   })
   socialNetworks: object;
 }

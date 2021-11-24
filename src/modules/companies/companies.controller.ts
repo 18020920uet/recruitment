@@ -5,14 +5,14 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOperation,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 
 import { ApplicationArrayApiOkResponse, ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,
-  NotFoundResponse
+  NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 
 import { CompaniesService } from './companies.service';
@@ -32,7 +32,7 @@ export class CompaniesController {
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getCompanies(
-    @Query() getCompaniesFilterWithTheFirstCharacterInNameQuery: GetCompaniesFilterWithTheFirstCharacterInNameQuery
+    @Query() getCompaniesFilterWithTheFirstCharacterInNameQuery: GetCompaniesFilterWithTheFirstCharacterInNameQuery,
   ): Promise<Company[]> {
     return await this.companiesService.getCompanies(getCompaniesFilterWithTheFirstCharacterInNameQuery);
   }

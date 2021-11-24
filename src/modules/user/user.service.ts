@@ -25,7 +25,6 @@ import { FileService } from '@Shared/services/file.service';
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import { UpdateCurriculumnVitaeRequest, ChangePasswordRequest } from './dtos/requests';
 
-
 @Injectable()
 export class UserService {
   constructor(

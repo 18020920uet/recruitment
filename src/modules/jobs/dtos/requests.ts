@@ -9,13 +9,13 @@ import { JobStatus } from '@Shared/enums/job-status';
 export class GetJobsQuery {
   @Type(() => Number)
   @IsOptional()
-  @ApiProperty({ type: 'number', required: false  })
+  @ApiProperty({ type: 'number', required: false })
   areaId: number | null;
 
   @Type(() => Number)
   @Min(1)
   @IsOptional()
-  @ApiProperty({ type: 'number', required: false  })
+  @ApiProperty({ type: 'number', required: false })
   salary: number | null;
 
   @IsOptional()
@@ -40,7 +40,7 @@ export class GetJobsQuery {
 
   @Type(() => Number)
   @IsOptional()
-  @Transform(({ value }) =>  {
+  @Transform(({ value }) => {
     if (Array.isArray(value)) {
       return value;
     } else {
@@ -52,7 +52,7 @@ export class GetJobsQuery {
 
   @Type(() => Number)
   @IsOptional()
-  @Transform(({ value }) =>  {
+  @Transform(({ value }) => {
     if (Array.isArray(value)) {
       return value;
     } else {
