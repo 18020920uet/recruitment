@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
 import { CountryEntity } from '@Entities/country.entity';
+import { AreaEntity } from '@Entities/area.entity';
 
 import { Company } from '@Shared/responses/company';
 
@@ -48,35 +49,15 @@ class BusinessField {
   name: string;
 }
 
-export class GetCompanyDetailResponse {
-  @AutoMap()
-  @ApiProperty()
-  id: string;
-
-  @AutoMap()
-  @ApiProperty()
-  name: string;
-
-  @AutoMap()
-  @ApiProperty()
-  stars: number;
-
-  @AutoMap({ typeFn: () => CountryEntity })
-  @ApiProperty()
-  country: CountryEntity;
-
-  @AutoMap()
-  @ApiProperty()
-  logo: string;
-
-  @AutoMap()
-  @ApiProperty()
-  isVerified: boolean;
-
+export class GetCompanyDetailResponse extends Company {
   @AutoMap()
   @ApiProperty()
   information: CompanyInformation;
 
   @ApiProperty({ type: [BusinessField] })
   businessFields: BusinessField[];
+
+  @AutoMap()
+  @ApiProperty({ type: AreaEntity })
+  area: AreaEntity;
 }

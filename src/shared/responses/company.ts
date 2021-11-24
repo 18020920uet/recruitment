@@ -17,7 +17,7 @@ export class Company {
   stars: number;
 
   @AutoMap({ typeFn: () => CountryEntity })
-  @ApiProperty()
+  @ApiProperty({ type: CountryEntity })
   country: CountryEntity;
 
   @AutoMap()

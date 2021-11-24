@@ -29,7 +29,7 @@ export class CompaniesService {
         [ { name: Like(`${character.toLowerCase()}%`) }, { name: Like(`${character.toUpperCase()}%`) }]
          :
         { name : Not(IsNull()) },
-      relations: [ 'country' ],
+      relations: [ 'country', 'area' ],
       skip: page > 0 ? page - 1 : 0 * (character != undefined ? 6 : 10),
       take: (character != undefined ? 6 : 10),
       order: { name: 'ASC' }
@@ -40,7 +40,7 @@ export class CompaniesService {
   async getCompanyDetail(companyId: string): Promise<GetCompanyDetailResponse> {
     const _company = await this.companyRepository.findOne({
       where: { id: companyId },
-      relations: [ 'country', 'information', 'businessFields' ],
+      relations: [ 'country', 'information', 'businessFields', 'area' ],
     });
     return this.mapper.map(_company, GetCompanyDetailResponse, CompanyEntity);
   }
