@@ -7,6 +7,10 @@ import { JobWorkMode } from '@Shared/enums/job-work-mode';
 import { JobStatus } from '@Shared/enums/job-status';
 
 export class GetJobsQuery {
+  @IsOptional()
+  @ApiProperty({ type: 'string', required: false })
+  title: string | null;
+
   @Type(() => Number)
   @IsOptional()
   @ApiProperty({ type: 'number', required: false })
@@ -58,12 +62,13 @@ export class GetJobsQuery {
 
   @Type(() => Number)
   @Min(1)
-  @ApiProperty({ type: 'number' })
+  @ApiProperty({ type: 'number', minimum: 1, description: 'page > 1' })
   page: number;
 
   @Type(() => Number)
   @Min(1)
-  @ApiProperty({ type: 'number' })
+  @IsOptional()
+  @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
   records: number;
 }
 

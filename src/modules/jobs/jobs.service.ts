@@ -1,7 +1,7 @@
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { Injectable } from '@nestjs/common';
-import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, createQueryBuilder } from 'typeorm';
+import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, createQueryBuilder, Like } from 'typeorm';
 
 import { JobRepository } from '@Repositories/job.repository';
 
@@ -26,25 +26,36 @@ export class JobsService {
   constructor(@InjectMapper() private readonly mapper: Mapper, private jobRepository: JobRepository) {}
 
   async getJobs(getJobsQuery: GetJobsQuery): Promise<GetJobsResponse> {
-    const entityManager = getManager();
     let jobIds: number[] = [];
 
     if (getJobsQuery.skillIds != undefined && getJobsQuery.skillIds.length != 0) {
       const skillIds = getJobsQuery.skillIds;
-      const params = skillIds.map((id, index) => `$${index + 1}`).join(',');
-      const query = `SELECT * FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
-      jobIds = (await entityManager.query(query, getJobsQuery.skillIds)).map((r) => r['job_id']);
+      const params = skillIds.map((id) => `${id}`).join(',');
+      const queryString = `SELECT * FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
+      jobIds = (await getManager().query(queryString)).map(r => r['job_id']);
     }
 
     if (getJobsQuery.businessFieldIds != undefined && getJobsQuery.businessFieldIds.length != 0) {
       const businessFieldIds = getJobsQuery.businessFieldIds;
-      const params = businessFieldIds.map((id, index) => `$${index + 1}`).join(',');
-      const params2 = jobIds.map((id, index) => `$${businessFieldIds.length + index + 1}`).join(',');
-      const query =
+      const params = businessFieldIds.map(id => `$${id}`).join(',');
+      const params2 = jobIds.map(id => `$${id}`).join(',');
+      const queryString =
         `SELECT * FROM "jobs_business_fields" WHERE business_field_id IN (${params})` +
         `AND job_id IN (${params2}) GROUP BY job_id, business_field_id`;
-      jobIds = (await entityManager.query(query, getJobsQuery.businessFieldIds.concat(jobIds))).map((r) => r['job_id']);
+      jobIds = (await getManager().query(queryString)).map((r) => r['job_id']);
     }
+
+    if (getJobsQuery.title != undefined) {
+      const title = getJobsQuery.title;
+      if (!title.includes("\'\)") && !title.includes("\"\)")) {
+        const params = jobIds.map(id => `${id}`).join(',')
+        jobIds = (await getRepository(JobEntity).createQueryBuilder('job')
+          .where((jobIds.length != 0 ? `id IN (${params}) AND ` : '') + `title @@ to_tsquery('${title}')`)
+          .select('job.id').getMany()).map(_job => _job.id);
+      }
+    }
+
+    const records = getJobsQuery.records != undefined ? getJobsQuery.records : 10;
 
     const [_jobs, totalRecods] = await this.jobRepository.findAndCount({
       where: {
@@ -55,13 +66,14 @@ export class JobsService {
         status: getJobsQuery.status != undefined ? getJobsQuery.status : Not(IsNull()),
         startDate: getJobsQuery.startDate != undefined ? getJobsQuery.startDate : Not(IsNull()),
         endDate: getJobsQuery.endDate != undefined ? getJobsQuery.endDate : Not(IsNull()),
+        title: getJobsQuery.title != undefined  ? Like(`%${getJobsQuery.title}%`) : Not(IsNull()),
         area: {
           id: getJobsQuery.areaId != undefined ? getJobsQuery.areaId : Not(IsNull()),
         },
       },
       relations: ['area', 'skills', 'businessFields', 'company'],
-      skip: getJobsQuery.page > 0 ? getJobsQuery.page - 1 : 0 * getJobsQuery.records,
-      take: getJobsQuery.records,
+      skip: getJobsQuery.page > 0 ? getJobsQuery.page - 1 : 0 * records,
+      take: records,
       order: { createdAt: 'DESC' },
     });
 
@@ -81,7 +93,6 @@ export class JobsService {
     response.jobDetail = this.mapper.map(_job, JobDetail, JobEntity);
 
     let _relatedJobs: JobEntity[] = [];
-    const entityManager = getManager();
 
     const relatedJobsFilters = Object.values(RelatedJobFilter);
     const relatedJobsFilter = relatedJobsFilters[Math.floor(Math.random() * relatedJobsFilters.length)];
@@ -103,7 +114,7 @@ export class JobsService {
         const query =
           `SELECT * FROM "jobs_business_fields" WHERE business_field_id IN (${params})` +
           'GROUP BY job_id, business_field_id';
-        const jobIds = (await entityManager.query(query, businessFieldIds)).map(r => r['job_id']);
+        const jobIds = (await getManager().query(query, businessFieldIds)).map(r => r['job_id']);
         if (jobIds.length != 0) {
           _relatedJobs = (await this.jobRepository.find({
             where: { id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()) },
@@ -117,7 +128,7 @@ export class JobsService {
         const skillIds = _job.skills.map((skill) => skill.id);
         const params = skillIds.map((id, index) => `$${index + 1}`).join(',');
         const query = `SELECT * FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
-        const jobIds = (await entityManager.query(query, skillIds)).map(r => r['job_id']);
+        const jobIds = (await getManager().query(query, skillIds)).map(r => r['job_id']);
         _relatedJobs = (await this.jobRepository.find({
           where: { id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()) },
           relations: ['area', 'skills', 'businessFields', 'company'],

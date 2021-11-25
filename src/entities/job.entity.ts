@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, ManyToMany, JoinColumn, ManyToOne, JoinTable, Column, Entity } from 'typeorm';
+import { PrimaryGeneratedColumn, ManyToMany, JoinColumn, ManyToOne, JoinTable, Column, Entity, Index } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -26,6 +26,7 @@ export class JobEntity {
   company: CompanyEntity;
 
   @AutoMap()
+  @Index({ fulltext: true })
   @Column({ type: 'varchar', length: 100 })
   title: string;
 
