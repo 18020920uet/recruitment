@@ -36,14 +36,16 @@ import { Review } from '@Shared/responses/review';
 import {
   CreateReviewRequest,
   UpdateReviewRequest,
+  GetUserDetailParams,
   DeleteReviewParams,
   UpdateReviewParams,
   CreateReviewParam,
   GetReviewsParam,
   GetReviewsQuery,
+  GetUsersQuery,
   GetCvParam,
 } from './dtos/requests';
-import { DeleteReviewResponse } from './dtos/responses';
+import { DeleteReviewResponse, GetUsersResponse, GetUserProfileResponse } from './dtos/responses';
 
 import { UsersService } from './users.service';
 
@@ -51,6 +53,25 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get users by filter' })
+  @ApplicationApiOkResponse(GetUsersResponse)
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getUsers(@Query() getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
+    return await this.usersService.getUsers(getUsersQuery);
+  }
+
+  @Get(':userId/profile')
+  @ApiOperation({ summary: 'Get user detail' })
+  @ApplicationApiOkResponse(GetUserProfileResponse)
+  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getUserDetail(@Param() getUserDetailParams: GetUserDetailParams): Promise<GetUserProfileResponse> {
+    // return await this.usersService.getUserDetail(getUserDetailParams);
+    return null
+  }
 
   @Get(':userId/cv')
   @ApiOperation({ summary: 'Get user cv' })

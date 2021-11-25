@@ -18,11 +18,13 @@ import { Review } from '@Shared/responses/review';
 import {
   CreateReviewRequest,
   UpdateReviewRequest,
-  CreateReviewParam,
+  GetUserDetailParams,
   UpdateReviewParams,
   DeleteReviewParams,
+  CreateReviewParam,
+  GetUsersQuery,
 } from './dtos/requests';
-import { DeleteReviewResponse } from './dtos/responses';
+import { DeleteReviewResponse, GetUsersResponse, GetUserProfileResponse } from './dtos/responses';
 
 @Injectable()
 export class UsersService {
@@ -34,11 +36,20 @@ export class UsersService {
     private configService: ConfigService,
   ) {}
 
+  async getUsers(getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
+    return null;
+  }
+
+  async getUserProfile(getUserDetailParams: GetUserDetailParams): Promise<GetUserProfileResponse> {
+    return null;
+  }
+
   async getCurriculumnVitae(userId: string): Promise<CurriculumVitae> {
     const _cv = await this.curriculumnVitaeRepository.findOne({
       where: { userId: userId },
-      relations: ['experiences', 'user', 'skills', 'languages', 'nationality'],
+      relations: ['experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality'],
     });
+
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }
 
