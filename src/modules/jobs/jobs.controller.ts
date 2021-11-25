@@ -25,7 +25,7 @@ export class JobsController {
   constructor(private jobsService: JobsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get 10 jobs by filter' })
+  @ApiOperation({ summary: 'Get jobs by filter' })
   @ApplicationApiOkResponse(GetJobsResponse)
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })

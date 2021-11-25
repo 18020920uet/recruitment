@@ -16,10 +16,13 @@ import { AutoMap } from '@automapper/classes';
 import { Gender } from '@Shared/enums/gender';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
+import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
 import { SkillEntity } from '@Entities/skill.entity';
 import { UserEntity } from '@Entities/user.entity';
+
+import { JobExperience } from '@Shared/enums/job-experience';
 
 @Entity('curriculum_vitaes')
 export class CurriculumVitaeEntity {
@@ -58,14 +61,9 @@ export class CurriculumVitaeEntity {
   @Column({ default: '' })
   address: string;
 
-  @AutoMap({ typeFn: () => SkillEntity })
-  @ManyToMany(() => SkillEntity, { cascade: true })
-  @JoinTable({
-    name: 'curriculum_vitaes_skills',
-    joinColumn: { name: 'cv_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'skill_id' },
-  })
-  skills: SkillEntity[];
+  @OneToMany(() => CurriculumVitaeSkillRelation, curriculumnVitaeSkill => curriculumnVitaeSkill.cv, { cascade: true })
+  @JoinTable({ name: 'curriculum_vitaes_skills' })
+  skillRelations: CurriculumVitaeSkillRelation[];
 
   @AutoMap()
   @Column({ default: '' })
@@ -94,6 +92,9 @@ export class CurriculumVitaeEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column({ name: 'brief_introduce', type: 'varchar', length: 35, default: '' })
+  briefIntroduce: string;
+
   @AutoMap()
   @Column({ type: 'varchar', length: 500, default: '' })
   introduce: string;
@@ -101,4 +102,13 @@ export class CurriculumVitaeEntity {
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
   @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae)
   experiences: CurriculumVitaeExperienceEntity[];
+
+  @Column({ default: 0 })
+  star: number;
+
+  @Column({ type: 'enum', enum: JobExperience, default: null, nullable: true, name: 'experience' })
+  experience: JobExperience;
+
+  @Column({ name: 'uncounted_star', default: 0 })
+  uncountedStar: number;
 }

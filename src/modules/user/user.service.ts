@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import fs from 'fs';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
+import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
@@ -76,7 +77,7 @@ export class UserService {
   ): Promise<CurriculumVitae> {
     const _cv = await this.curriculumnVitaeRepository.findOne({
       where: { user: _currentUser },
-      relations: ['experiences', 'user'],
+      relations: ['experiences', 'user', 'skillRelations', 'languages', ],
     });
 
     await getManager().transaction(async (transactionalEntityManager) => {
@@ -99,12 +100,29 @@ export class UserService {
       _cv.nationalityId = updateCurriculumnVitaeRequest.nationalityId;
 
       _cv.nationality = await getRepository(NationalityEntity).findOne(
-        { id: updateCurriculumnVitaeRequest. nationalityId }
+        { id: updateCurriculumnVitaeRequest.nationalityId }
       );
 
-      _cv.skills = await getRepository(SkillEntity).find(
-        { where: { id: In(updateCurriculumnVitaeRequest.skillIds) }}
+      const _skills = await getRepository(SkillEntity).find(
+        { id: In(updateCurriculumnVitaeRequest.skills.map((s) => s.skillId)) }
       );
+
+      await getRepository(CurriculumVitaeSkillRelation).remove(_cv.skillRelations);
+
+      _cv.skillRelations = [];
+
+      for (const updateSkill of updateCurriculumnVitaeRequest.skills) {
+        const _skill = _skills.find(_skill => _skill.id == updateSkill.skillId)
+        if (_skill != null) {
+          const skillRelation = new CurriculumVitaeSkillRelation();
+          skillRelation.experience = updateSkill.experience;
+          skillRelation.skill = _skill;
+          skillRelation.cv = _cv;
+          skillRelation.cvId = _cv.id;
+          skillRelation.skillId = _skill.id;
+          _cv.skillRelations.push(skillRelation);
+        }
+      }
 
       _cv.languages = await getRepository(LanguageEntity).find(
         { where: { id: In(updateCurriculumnVitaeRequest.languageIds) }}

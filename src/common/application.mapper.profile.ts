@@ -92,7 +92,15 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             const dateOfBirth = _curriculumVitae.dateOfBirth ? _curriculumVitae.dateOfBirth : new Date();
             return dateOfBirth.toLocaleDateString('en-Us');
           }),
-        );
+        )
+        .forMember(
+          (curriculumVitae) => curriculumVitae.skills,
+          mapFrom((_curriculumVitae) => {
+            return _curriculumVitae.skillRelations.map(skillRelation =>
+              ({ id: skillRelation.skill.id, name: skillRelation.skill.name, experience: skillRelation.experience })
+            )
+          }),
+        )
       mapper.createMap(ReviewEntity, Review);
       mapper.createMap(ReviewEntity, ReviewByUser);
       mapper.createMap(CompanyEntity, Company).forMember(

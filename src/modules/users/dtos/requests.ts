@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, MaxLength, Min, Max, IsOptional } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+
+import { JobExperience } from '@Shared/enums/job-experience';
 
 export class GetReviewsQuery {
   @Type(() => Number)
@@ -73,4 +75,53 @@ export class UpdateReviewRequest {
   @MaxLength(200)
   @ApiProperty({ type: 'string', maxLength: 200 })
   comment: string;
+}
+
+export class GetUsersQuery {
+  @IsOptional()
+  @ApiProperty({ type: 'string', required: false })
+  name: string | null;
+
+  @Type(() => Number)
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    return [value];
+  })
+  @ApiProperty({ type: 'array', items: { type: 'number' }, required: false })
+  skillIds: number[] | null;
+
+  @IsOptional()
+  @ApiProperty({ enum: JobExperience, enumName: 'JobExperience', required: false })
+  experience: JobExperience | null;
+
+  @Type(() => Number)
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    return [value];
+  })
+  @ApiProperty({ type: 'array', items: { type: 'number' }, required: false })
+  languageIds: number[] | null;
+
+  @Type(() => Number)
+  @Min(0)
+  @ApiProperty({ type: 'number', minimum: 0, description: 'rate > 0 ' })
+  rate: number;
+
+  @Type(() => Number)
+  @Min(1)
+  @ApiProperty({ type: 'number', minimum: 1, description: 'page > 1' })
+  page: number;
+
+  @Type(() => Number)
+  @Min(1)
+  @IsOptional()
+  @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
+  records: number;
+}
+
+export class GetUserDetailParams {
+  @ApiProperty()
+  userId: string;
 }
