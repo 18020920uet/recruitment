@@ -3,6 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
 import { CurriculumVitaeExperience } from './curriculum-vitae-experience';
+import { Skill } from './skill';
+
+import { NationalityEntity } from '@Entities/nationality.entity';
+import { LanguageEntity } from '@Entities/language.entity';
 
 export class CurriculumVitae {
   @AutoMap()
@@ -37,9 +41,8 @@ export class CurriculumVitae {
   @ApiProperty()
   phoneNumber: string;
 
-  @AutoMap()
-  @ApiProperty()
-  nationality: number;
+  @ApiProperty({ type: NationalityEntity })
+  nationality: NationalityEntity | null;
 
   @AutoMap()
   @ApiProperty()
@@ -57,17 +60,16 @@ export class CurriculumVitae {
   @ApiProperty({ type: [String] })
   certifications: string[];
 
-  @AutoMap()
-  @ApiProperty({ type: [String] })
-  languages: string[];
+  @ApiProperty({ type: [LanguageEntity] })
+  languages: LanguageEntity[];
 
   @AutoMap()
   @ApiProperty({ type: [String] })
   hobbies: string[];
 
-  @AutoMap()
-  @ApiProperty({ type: [String] })
-  skills: string;
+  @AutoMap({ typeFn: () => Skill })
+  @ApiProperty({ type: [Skill] })
+  skills: Skill[];
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperience })
   @ApiProperty({ type: [CurriculumVitaeExperience] })

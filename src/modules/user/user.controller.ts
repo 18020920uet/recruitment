@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles, Get } from '@nestjs/common';
+import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles, Get, Delete } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import {
@@ -34,7 +34,9 @@ import { UserEntity } from '@Entities/user.entity';
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import {
   UpdateCurriculumnVitaeRequest,
+  RemoveCertificationsRequest,
   UpdateCertificationsRequest,
+  UpdateCertificationRequest,
   ChangePasswordRequest,
   ChangeAvatarRequest,
 } from './dtos/requests';
@@ -123,9 +125,45 @@ export class UserController {
   @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
   async updateCertifications(
     @CurrentUser() _currentUser: UserEntity,
-    @Body() addCertificationRequest: UpdateCertificationsRequest,
+    @Body() updateCertificationsRequest: UpdateCertificationsRequest,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
     return await this.userService.updateCertifications(_currentUser, files);
+  }
+
+  @Put('certification')
+  @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(FileInterceptor('file', saveCertificationsStorage))
+  @ApiOperation({ summary: 'Add certification' })
+  @ApiBearerAuth('access-token')
+  @ApiConsumes('multipart/form-data')
+  @ApplicationApiOkResponse(UpdateCertificationsResponse)
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiForbiddenResponse({ description: 'Total certifications > 3', type: ForbiddenResponse })
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
+  async updateCertification(
+    @CurrentUser() _currentUser: UserEntity,
+    @Body() updateCertificationRequest: UpdateCertificationRequest,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UpdateCertificationsResponse> {
+    return await this.userService.updateCertification(_currentUser, file);
+  }
+
+  @Delete('certifications')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Remove certifications' })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(UpdateCertificationsResponse)
+  @ApiBadRequestResponse({ description: 'Bad request', type: BadRequestResponse })
+  @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
+  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async removeCertification(
+    @CurrentUser() _currentUser: UserEntity,
+    @Body() removeCertificationsRequest: RemoveCertificationsRequest,
+  ): Promise<UpdateCertificationsResponse> {
+    return await this.userService.removeCertifications(_currentUser, removeCertificationsRequest);
   }
 }

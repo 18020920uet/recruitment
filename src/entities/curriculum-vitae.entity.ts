@@ -1,19 +1,24 @@
 import {
-  Entity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
-  JoinColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
+  JoinTable,
   OneToOne,
+  Entity,
+  Column
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { Gender } from '@Shared/enums/gender';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
-
+import { NationalityEntity } from '@Entities/nationality.entity';
+import { LanguageEntity } from '@Entities/language.entity';
+import { SkillEntity } from '@Entities/skill.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 @Entity('curriculum_vitaes')
@@ -42,17 +47,25 @@ export class CurriculumVitaeEntity {
   @Column({ nullable: true, name: 'phone_number' })
   phoneNumber: string;
 
-  @AutoMap()
-  @Column({ default: null, nullable: true })
-  nationality: number;
+  @Column({ name: 'nationality_id', nullable: true })
+  nationalityId: number | null;
+
+  @ManyToOne(() => NationalityEntity, { nullable: true })
+  @JoinColumn({ name: 'nationality_id' })
+  nationality: NationalityEntity;
 
   @AutoMap()
   @Column({ default: '' })
   address: string;
 
-  @AutoMap()
-  @Column({ default: '' })
-  skills: string;
+  @AutoMap({ typeFn: () => SkillEntity })
+  @ManyToMany(() => SkillEntity, { cascade: true })
+  @JoinTable({
+    name: 'curriculum_vitaes_skills',
+    joinColumn: { name: 'cv_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'skill_id' },
+  })
+  skills: SkillEntity[];
 
   @AutoMap()
   @Column({ default: '' })
@@ -62,9 +75,14 @@ export class CurriculumVitaeEntity {
   @Column({ default: '' })
   certifications: string;
 
-  @AutoMap()
-  @Column({ default: '' })
-  languages: string;
+  @AutoMap({ typeFn: () => LanguageEntity })
+  @ManyToMany(() => LanguageEntity, { cascade: true })
+  @JoinTable({
+    name: 'curriculum_vitaes_languages',
+    joinColumn: { name: 'cv_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'language_id' },
+  })
+  languages: LanguageEntity[];
 
   @AutoMap()
   @Column({ default: '' })

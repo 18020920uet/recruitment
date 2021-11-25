@@ -90,7 +90,7 @@ export class UpdateCurriculumnVitaeRequest {
 
   @IsPositive()
   @ApiProperty()
-  nationality: number | null;
+  nationalityId: number | null;
 
   @ApiProperty({ description: 'month/date/year. new Date("MM/DD/YYYY").toLocaleDateString("en-Us")' })
   dateOfBirth: string;
@@ -110,11 +110,11 @@ export class UpdateCurriculumnVitaeRequest {
   @ApiProperty()
   introduce: string;
 
-  @ApiProperty({ type: [String] })
-  skills: string[];
+  @ApiProperty({ type: [Number] })
+  skillIds: number[];
 
   @ApiProperty({ type: [String] })
-  languages: string[];
+  languageIds: string[];
 
   @ApiProperty({ type: [String] })
   hobbies: string[];
@@ -128,7 +128,17 @@ export class ChangeAvatarRequest {
   file: any;
 }
 
+export class UpdateCertificationRequest {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
+}
+
 export class UpdateCertificationsRequest {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   files: any[];
+}
+
+export class RemoveCertificationsRequest {
+  @ApiProperty({ type: [String] })
+  certifications: string[];
 }

@@ -44,7 +44,7 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       );
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper
-        .createMap(CurriculumVitaeEntity, CurriculumVitae, { useUndefined: true })
+        .createMap(CurriculumVitaeEntity, CurriculumVitae)
         .forMember(
           (curriculumVitae) => curriculumVitae.email,
           mapFrom((_curriculumVitae) => _curriculumVitae.user.email),
@@ -75,16 +75,16 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           }),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.skills,
-          mapFrom((_curriculumVitae) => _curriculumVitae.skills.split('|').filter((skill) => skill)),
+          (curriculumVitae) => curriculumVitae.languages,
+          mapFrom((_curriculumVitae) => _curriculumVitae.languages),
+        )
+        .forMember(
+          (curriculumVitae) => curriculumVitae.nationality,
+          mapFrom((_curriculumVitae) => _curriculumVitae.nationality),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.hobbies,
           mapFrom((_curriculumVitae) => _curriculumVitae.hobbies.split('|').filter((hobby) => hobby)),
-        )
-        .forMember(
-          (curriculumVitae) => curriculumVitae.languages,
-          mapFrom((_curriculumVitae) => _curriculumVitae.languages.split('|').filter((language) => language)),
         )
         .forMember(
           (curriculumVitae) => curriculumVitae.dateOfBirth,

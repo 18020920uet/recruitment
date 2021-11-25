@@ -37,7 +37,7 @@ export class UsersService {
   async getCurriculumnVitae(userId: string): Promise<CurriculumVitae> {
     const _cv = await this.curriculumnVitaeRepository.findOne({
       where: { userId: userId },
-      relations: ['experiences', 'user'],
+      relations: ['experiences', 'user', 'skills', 'languages', 'nationality'],
     });
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }

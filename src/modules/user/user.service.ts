@@ -2,13 +2,16 @@ import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
-import { getManager } from 'typeorm';
+import { getManager, getRepository, In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import fs from 'fs';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
+import { NationalityEntity } from '@Entities/nationality.entity';
+import { LanguageEntity } from '@Entities/language.entity';
 import { ReviewEntity } from '@Entities/review.entity';
+import { SkillEntity } from '@Entities/skill.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
@@ -22,8 +25,8 @@ import { User } from '@Shared/responses/user';
 
 import { FileService } from '@Shared/services/file.service';
 
+import { UpdateCurriculumnVitaeRequest, ChangePasswordRequest, RemoveCertificationsRequest } from './dtos/requests';
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
-import { UpdateCurriculumnVitaeRequest, ChangePasswordRequest } from './dtos/requests';
 
 @Injectable()
 export class UserService {
@@ -59,6 +62,7 @@ export class UserService {
   }
 
   async updateAvatar(_currentUser: UserEntity, file: Express.Multer.File): Promise<ChangeAvatarResponse> {
+    fs.unlinkSync(`./public/certifications/${_currentUser.avatar}`);
     _currentUser.avatar = file.filename;
     await this.userRepository.save(_currentUser);
     return {
@@ -88,13 +92,23 @@ export class UserService {
       _cv.phoneNumber = updateCurriculumnVitaeRequest.phoneNumber;
       _cv.dateOfBirth = new Date(updateCurriculumnVitaeRequest.dateOfBirth);
       _cv.gender = updateCurriculumnVitaeRequest.gender;
-      _cv.nationality = updateCurriculumnVitaeRequest.nationality;
       _cv.educations = updateCurriculumnVitaeRequest.educations;
       _cv.introduce = updateCurriculumnVitaeRequest.introduce;
       _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join('|');
-      _cv.skills = updateCurriculumnVitaeRequest.skills.join('|');
-      _cv.languages = updateCurriculumnVitaeRequest.languages.join('|');
       _cv.address = updateCurriculumnVitaeRequest.address;
+      _cv.nationalityId = updateCurriculumnVitaeRequest.nationalityId;
+
+      _cv.nationality = await getRepository(NationalityEntity).findOne(
+        { id: updateCurriculumnVitaeRequest. nationalityId }
+      );
+
+      _cv.skills = await getRepository(SkillEntity).find(
+        { where: { id: In(updateCurriculumnVitaeRequest.skillIds) }}
+      );
+
+      _cv.languages = await getRepository(LanguageEntity).find(
+        { where: { id: In(updateCurriculumnVitaeRequest.languageIds) }}
+      );
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
       if (updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
@@ -124,7 +138,7 @@ export class UserService {
     files: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
     const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
-    const _certifications = _cv.certifications.split('|');
+    const _certifications = _cv.certifications.split('|').filter(_certification => _certification);
 
     /// Remove old file
     for (const _certification of _certifications) {
@@ -134,11 +148,61 @@ export class UserService {
       }
     }
 
-    const certifications = files.map((file) => file.filename);
+    const certifications = files.map(file => file.filename);
     _cv.certifications = certifications.join('|');
     await this.curriculumnVitaeRepository.save(_cv);
     return {
-      certifications: _cv.certifications.split('|').map((_c) => this.fileService.getCertification(_c)),
+      certifications: certifications.map(_c => this.fileService.getCertification(_c)),
     };
+  }
+
+  async updateCertification(
+    _currentUser: UserEntity,
+    file: Express.Multer.File,
+  ): Promise<UpdateCertificationsResponse> {
+    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _certifications = _cv.certifications.split('|').filter(_certification => _certification);
+
+    if (_certifications.length >= 3) {
+      fs.unlinkSync(`./public/certifications/${file.filename}`);
+      throw new ForbiddenException('Total certifications greater than 3');
+    } else {
+      _certifications.push(file.filename);
+      _cv.certifications = _certifications.join('|');
+      await this.curriculumnVitaeRepository.save(_cv);
+      return {
+        certifications: _certifications.map(_c => this.fileService.getCertification(_c)),
+      };
+    }
+  }
+
+  async removeCertifications(
+    _currentUser: UserEntity, removeCertificationsRequest: RemoveCertificationsRequest
+  ): Promise<UpdateCertificationsResponse>  {
+    const certifications = removeCertificationsRequest.certifications;
+    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _certifications = _cv.certifications.split('|').filter(_certification => _certification);
+
+    if (certifications.length != 0) {
+      return {
+        certifications: _certifications.map(_c => this.fileService.getCertification(_c)),
+      };
+    } else {
+      if (!certifications.every(certification => _certifications.includes(certification)))
+        throw new ForbiddenException('No permission to delete');
+
+      for (const certification of certifications.filter(certification=> certification)) {
+        const path = `./public/certifications/${certification}`;
+        fs.unlinkSync(path);
+      }
+
+      const _newCertifications = _certifications.filter(_c => certifications.indexOf(_c) == -1);
+      _cv.certifications = _newCertifications.join('|')
+      await this.curriculumnVitaeRepository.save(_cv);
+
+      return {
+        certifications: _newCertifications.map(_c => this.fileService.getCertification(_c)),
+      };
+    }
   }
 }
