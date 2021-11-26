@@ -3,8 +3,8 @@ import { MigrationInterface, QueryRunner, Not } from 'typeorm';
 import { BusinessFieldEntity } from '@Entities/business-field.entity';
 import { CompanyEntity } from '@Entities/company.entity';
 import { SkillEntity } from '@Entities/skill.entity';
-import { JobEntity } from '@Entities/job.entity';
 import { AreaEntity } from '@Entities/area.entity';
+import { JobEntity } from '@Entities/job.entity';
 
 import { JobExperience } from '@Shared/enums/job-experience';
 import { JobWorkMode } from '@Shared/enums/job-work-mode';
@@ -24,6 +24,7 @@ export class AddJobs1637258873110 implements MigrationInterface {
       .createQueryBuilder('businessField')
       .where("businessField.name != 'Information Technology'")
       .getMany();
+
     const itBusinessField = await businessFieldRepository.findOne({ name: 'Information Technology' });
 
     const areas = await areaRepository.find({ countryId: 240 });

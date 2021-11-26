@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { LanguageEntity } from '@Entities/language.entity';
+
 import rawLanguages from './data/raw_languages.json';
 
 export class AddLanguages1636951384409 implements MigrationInterface {

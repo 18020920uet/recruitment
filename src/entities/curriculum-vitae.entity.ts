@@ -99,11 +99,11 @@ export class CurriculumVitaeEntity {
   briefIntroduce: string;
 
   @AutoMap()
-  @Column({ type: 'varchar', length: 500, default: '' })
+  @Column({ type: 'varchar', length: 10000, default: '' })
   introduce: string;
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
-  @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae)
+  @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae, { cascade: true })
   experiences: CurriculumVitaeExperienceEntity[];
 
   @AutoMap()

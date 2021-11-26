@@ -65,12 +65,12 @@ export class JobsService {
       where: {
         id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()),
         experience: getJobsQuery.experience != undefined ? getJobsQuery.experience : Not(IsNull()),
+        title: getJobsQuery.title != undefined ? Like(`%${getJobsQuery.title}%`) : Not(IsNull()),
+        startDate: getJobsQuery.startDate != undefined ? getJobsQuery.startDate : Not(IsNull()),
         workMode: getJobsQuery.workMode != undefined ? getJobsQuery.workMode : Not(IsNull()),
         salary: getJobsQuery.salary != undefined ? getJobsQuery.salary : MoreThanOrEqual(0),
-        status: getJobsQuery.status != undefined ? getJobsQuery.status : Not(IsNull()),
-        startDate: getJobsQuery.startDate != undefined ? getJobsQuery.startDate : Not(IsNull()),
         endDate: getJobsQuery.endDate != undefined ? getJobsQuery.endDate : Not(IsNull()),
-        title: getJobsQuery.title != undefined ? Like(`%${getJobsQuery.title}%`) : Not(IsNull()),
+        status: getJobsQuery.status != undefined ? getJobsQuery.status : Not(IsNull()),
         area: {
           id: getJobsQuery.areaId != undefined ? getJobsQuery.areaId : Not(IsNull()),
         },

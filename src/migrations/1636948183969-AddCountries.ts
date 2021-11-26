@@ -1,8 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-import rawCountries from './data/raw_countries.json';
-
 import { CountryEntity } from '@Entities/country.entity';
+
+import rawCountries from './data/raw_countries.json';
 
 export class AddCountries1636948183969 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

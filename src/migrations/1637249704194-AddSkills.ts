@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner, Not } from 'typeorm';
 
-import rawSkills from './data/raw_skills.json';
-
-import { SkillEntity } from '@Entities/skill.entity';
 import { BusinessFieldEntity } from '@Entities/business-field.entity';
+import { SkillEntity } from '@Entities/skill.entity';
+
+import rawSkills from './data/raw_skills.json';
 
 export class AddSkills1637249704194 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
