@@ -7,6 +7,7 @@ import { CurriculumVitaeSkill } from './curriculum-vitae-skill';
 
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
+import { AreaEntity } from '@Entities/area.entity';
 
 export class CurriculumVitae {
   @AutoMap()
@@ -51,6 +52,14 @@ export class CurriculumVitae {
   @AutoMap()
   @ApiProperty()
   educations: string;
+
+  @AutoMap()
+  @ApiProperty()
+  briefIntroduce: string;
+
+  @AutoMap()
+  @ApiProperty()
+  area: AreaEntity;
 
   @AutoMap()
   @ApiProperty()

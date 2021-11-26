@@ -26,6 +26,7 @@ import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse } from '@Modules/companies/dtos/responses';
+import { FreeLancer } from '@Modules/users/dtos/responses';
 import { JobDetail } from '@Modules/jobs/dtos/responses';
 
 import { FileService } from '@Shared/services/file.service';
@@ -96,11 +97,13 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         .forMember(
           (curriculumVitae) => curriculumVitae.skills,
           mapFrom((_curriculumVitae) => {
-            return _curriculumVitae.skillRelations.map(skillRelation =>
-              ({ id: skillRelation.skill.id, name: skillRelation.skill.name, experience: skillRelation.experience })
-            )
+            return _curriculumVitae.skillRelations.map((skillRelation) => ({
+              id: skillRelation.skill.id,
+              name: skillRelation.skill.name,
+              experience: skillRelation.experience,
+            }));
           }),
-        )
+        );
       mapper.createMap(ReviewEntity, Review);
       mapper.createMap(ReviewEntity, ReviewByUser);
       mapper.createMap(CompanyEntity, Company).forMember(
@@ -144,6 +147,42 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(JobEntity, Job);
       mapper.createMap(JobEntity, JobDetail);
       mapper.createMap(BusinessFieldEntity, BusinessField);
+      mapper
+        .createMap(CurriculumVitaeEntity, FreeLancer)
+        .forMember(
+          (freelancer) => freelancer.email,
+          mapFrom((_curriculumVitae) => _curriculumVitae.user.email),
+        )
+        .forMember(
+          (freelancer) => freelancer.firstName,
+          mapFrom((_curriculumVitae) => _curriculumVitae.user.firstName),
+        )
+        .forMember(
+          (freelancer) => freelancer.lastName,
+          mapFrom((_curriculumVitae) => _curriculumVitae.user.lastName),
+        )
+        .forMember(
+          (freelancer) => freelancer.id,
+          mapFrom((_curriculumVitae) => _curriculumVitae.user.id),
+        )
+        .forMember(
+          (freelancer) => freelancer.role,
+          mapFrom((_curriculumVitae) => _curriculumVitae.user.role),
+        )
+        .forMember(
+          (freelancer) => freelancer.avatar,
+          mapFrom((_curriculumVitae) => this.fileService.getAvatar(_curriculumVitae.user)),
+        )
+        .forMember(
+          (freelancer) => freelancer.skills,
+          mapFrom((_curriculumVitae) => {
+            return _curriculumVitae.skillRelations.map((skillRelation) => ({
+              id: skillRelation.skill.id,
+              name: skillRelation.skill.name,
+              experience: skillRelation.experience,
+            }));
+          }),
+        );
     };
   }
 }

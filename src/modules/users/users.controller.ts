@@ -34,9 +34,9 @@ import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
 import {
+  GetUserProfileParams,
   CreateReviewRequest,
   UpdateReviewRequest,
-  GetUserDetailParams,
   DeleteReviewParams,
   UpdateReviewParams,
   CreateReviewParam,
@@ -68,9 +68,8 @@ export class UsersController {
   @ApplicationApiOkResponse(GetUserProfileResponse)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getUserDetail(@Param() getUserDetailParams: GetUserDetailParams): Promise<GetUserProfileResponse> {
-    // return await this.usersService.getUserDetail(getUserDetailParams);
-    return null
+  async getUserProfile(@Param() getUserProfileParams: GetUserProfileParams): Promise<GetUserProfileResponse> {
+    return await this.usersService.getUserProfile(getUserProfileParams);
   }
 
   @Get(':userId/cv')
@@ -78,8 +77,8 @@ export class UsersController {
   @ApplicationApiOkResponse(CurriculumVitae)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getCurriculumnVitae(@Param() getCvParam: GetCvParam): Promise<CurriculumVitae> {
-    return await this.usersService.getCurriculumnVitae(getCvParam.userId);
+  async getCurriculumVitae(@Param() getCvParam: GetCvParam): Promise<CurriculumVitae> {
+    return await this.usersService.getCurriculumVitae(getCvParam.userId);
   }
 
   @Get(':userId/reviews')

@@ -1,4 +1,14 @@
-import { Controller, UseGuards, Put, Body, UploadedFile, UseInterceptors, UploadedFiles, Get, Delete } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Put,
+  Body,
+  UploadedFile,
+  UseInterceptors,
+  UploadedFiles,
+  Get,
+  Delete,
+} from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import {

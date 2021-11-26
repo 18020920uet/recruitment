@@ -30,7 +30,7 @@ import { UserModule } from '@Modules/user/user.module';
       load: [configuration],
       isGlobal: true,
     }),
-    AutomapperModule.forRoot({ options: [{ name: 'classMapper',pluginInitializer: classes }], singular: true }),
+    AutomapperModule.forRoot({ options: [{ name: 'classMapper', pluginInitializer: classes }], singular: true }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
     AccountModule,
     AuthenticationModule,

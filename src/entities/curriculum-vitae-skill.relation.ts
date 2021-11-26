@@ -1,11 +1,4 @@
-import {
-  PrimaryGeneratedColumn,
-  PrimaryColumn,
-  JoinColumn,
-  ManyToOne,
-  Entity,
-  Column
-} from 'typeorm';
+import { PrimaryGeneratedColumn, PrimaryColumn, JoinColumn, ManyToOne, Entity, Column } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';

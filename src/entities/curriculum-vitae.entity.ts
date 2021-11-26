@@ -9,7 +9,7 @@ import {
   JoinTable,
   OneToOne,
   Entity,
-  Column
+  Column,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
@@ -19,7 +19,9 @@ import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-expe
 import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
+import { CountryEntity } from '@Entities/country.entity';
 import { SkillEntity } from '@Entities/skill.entity';
+import { AreaEntity } from '@Entities/area.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 import { JobExperience } from '@Shared/enums/job-experience';
@@ -61,7 +63,7 @@ export class CurriculumVitaeEntity {
   @Column({ default: '' })
   address: string;
 
-  @OneToMany(() => CurriculumVitaeSkillRelation, curriculumnVitaeSkill => curriculumnVitaeSkill.cv, { cascade: true })
+  @OneToMany(() => CurriculumVitaeSkillRelation, (curriculumnVitaeSkill) => curriculumnVitaeSkill.cv, { cascade: true })
   @JoinTable({ name: 'curriculum_vitaes_skills' })
   skillRelations: CurriculumVitaeSkillRelation[];
 
@@ -92,6 +94,7 @@ export class CurriculumVitaeEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @AutoMap()
   @Column({ name: 'brief_introduce', type: 'varchar', length: 35, default: '' })
   briefIntroduce: string;
 
@@ -103,12 +106,26 @@ export class CurriculumVitaeEntity {
   @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae)
   experiences: CurriculumVitaeExperienceEntity[];
 
-  @Column({ default: 0 })
-  star: number;
+  @AutoMap()
+  @Column({ default: 0, type: 'real' })
+  rate: number;
 
-  @Column({ type: 'enum', enum: JobExperience, default: null, nullable: true, name: 'experience' })
-  experience: JobExperience;
-
-  @Column({ name: 'uncounted_star', default: 0 })
+  @Column({ name: 'uncounted_star', default: 0, type: 'real' })
   uncountedStar: number;
+
+  @Column({ name: 'area_id', nullable: true })
+  areaId: number;
+
+  @AutoMap({ typeFn: () => AreaEntity })
+  @ManyToOne(() => AreaEntity)
+  @JoinColumn({ name: 'area_id' })
+  area: AreaEntity;
+
+  @Column({ name: 'country_id', nullable: true })
+  countryId: number;
+
+  @AutoMap({ typeFn: () => CountryEntity })
+  @ManyToOne(() => CountryEntity)
+  @JoinColumn({ name: 'country_id' })
+  country: CountryEntity;
 }

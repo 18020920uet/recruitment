@@ -3,6 +3,7 @@ import { IsNotEmpty, IsString, MaxLength, Min, Max, IsOptional } from 'class-val
 import { Type, Transform } from 'class-transformer';
 
 import { JobExperience } from '@Shared/enums/job-experience';
+import { Role } from '@Shared/enums/role';
 
 export class GetReviewsQuery {
   @Type(() => Number)
@@ -79,6 +80,10 @@ export class UpdateReviewRequest {
 
 export class GetUsersQuery {
   @IsOptional()
+  @ApiProperty({ type: 'number', required: false, description: '0 = ADMIN, 1 = COMPANY, 2 = FREELANCE' })
+  role: Role | null;
+
+  @IsOptional()
   @ApiProperty({ type: 'string', required: false })
   name: string | null;
 
@@ -97,17 +102,23 @@ export class GetUsersQuery {
 
   @Type(() => Number)
   @IsOptional()
+  @Min(0)
+  @ApiProperty({ type: 'number', description: 'areaId', required: false })
+  areaId: number;
+
+  @Type(() => String)
+  @IsOptional()
   @Transform(({ value }) => {
     if (Array.isArray(value)) return value;
     return [value];
   })
-  @ApiProperty({ type: 'array', items: { type: 'number' }, required: false })
-  languageIds: number[] | null;
+  @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
+  languageIds: string[] | null;
 
   @Type(() => Number)
-  @Min(0)
-  @ApiProperty({ type: 'number', minimum: 0, description: 'rate > 0 ' })
-  rate: number;
+  @IsOptional()
+  @ApiProperty({ type: 'number', description: 'rate > 0 && rate < 5', required: false })
+  rate: number | null;
 
   @Type(() => Number)
   @Min(1)
@@ -121,7 +132,7 @@ export class GetUsersQuery {
   records: number;
 }
 
-export class GetUserDetailParams {
+export class GetUserProfileParams {
   @ApiProperty()
   userId: string;
 }

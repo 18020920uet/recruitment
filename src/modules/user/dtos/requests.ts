@@ -16,7 +16,6 @@ import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
 import { JobExperience } from '@Shared/enums/job-experience';
 
-
 export class ChangePasswordRequest {
   @IsNotEmpty()
   @IsString()
@@ -79,7 +78,7 @@ export class UpdateSkill {
   skillId: number;
 
   @ApiProperty({ enum: JobExperience, enumName: 'JobExperience' })
-  experience: JobExperience
+  experience: JobExperience;
 }
 
 export class UpdateCurriculumnVitaeRequest {
@@ -119,6 +118,10 @@ export class UpdateCurriculumnVitaeRequest {
   @IsString()
   @ApiProperty()
   introduce: string;
+
+  @IsString()
+  @ApiProperty()
+  briefIntroduce: string;
 
   @ApiProperty({ type: [UpdateSkill] })
   skills: UpdateSkill[];
