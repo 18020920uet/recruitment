@@ -1,6 +1,5 @@
-import { PrimaryColumn, Column, Entity, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { PrimaryColumn, Column, Entity, ManyToMany, JoinTable } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
-import { ApiProperty } from '@nestjs/swagger';
 
 import { BusinessFieldEntity } from './business-field.entity';
 import { JobEntity } from './job.entity';

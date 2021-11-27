@@ -2,17 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
-import {
-  IsNull,
-  Not,
-  MoreThanOrEqual,
-  In,
-  getManager,
-  getRepository,
-  createQueryBuilder,
-  Like,
-  Between,
-} from 'typeorm';
+import { IsNull, Not, In, getManager, getRepository, Like, Between } from 'typeorm';
 
 import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
@@ -103,7 +93,7 @@ export class UsersService {
         id: forceQuery ? In(_cvIds) : Not(IsNull()),
         user: {
           firstName: getUsersQuery.name != undefined ? Like(`%${getUsersQuery.name}%`) : Not(IsNull()),
-          lastName: getUsersQuery.name != undefined ? Like(`%${getUsersQuery.name}%`) : Not(IsNull()),
+          // lastName: getUsersQuery.name != undefined ? Like(`%${getUsersQuery.name}%`) : Not(IsNull()),
           role: getUsersQuery.role != undefined ? getUsersQuery.role : 2,
         },
         areaId: getUsersQuery.areaId != undefined ? getUsersQuery.areaId : Not(IsNull()),
@@ -112,7 +102,8 @@ export class UsersService {
             ? Between(Math.floor(getUsersQuery.rate), Math.floor(getUsersQuery.rate) + 1)
             : Not(IsNull()),
       },
-      skip: getUsersQuery.page > 0 ? getUsersQuery.page - 1 : 0 * records,
+      order: { createdAt: 'DESC' },
+      skip: (getUsersQuery.page > 0 ? getUsersQuery.page - 1 : 0) * records,
       take: records,
     });
 

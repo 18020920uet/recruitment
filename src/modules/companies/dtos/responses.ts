@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-import { CountryEntity } from '@Entities/country.entity';
 import { AreaEntity } from '@Entities/area.entity';
 
 import { Company } from '@Shared/responses/company';
@@ -38,7 +37,7 @@ export class CompanyInformation {
     description: 'Social network by field Example: { facebook: "fb", linkedin: "linkedin", ... }',
     type: 'object',
   })
-  socialNetworks: object;
+  socialNetworks: Record<string, unknown>;
 }
 
 class BusinessField {

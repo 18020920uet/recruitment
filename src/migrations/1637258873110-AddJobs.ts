@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Not } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { BusinessFieldEntity } from '@Entities/business-field.entity';
 import { CompanyEntity } from '@Entities/company.entity';

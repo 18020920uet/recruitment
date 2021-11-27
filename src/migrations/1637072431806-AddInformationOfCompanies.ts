@@ -34,5 +34,8 @@ export class AddInformationOfCompanies1637072431806 implements MigrationInterfac
     }
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
+    await companyRepository.clear();
+  }
 }

@@ -7,7 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { ApplicationArrayApiOkResponse, ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
+import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,

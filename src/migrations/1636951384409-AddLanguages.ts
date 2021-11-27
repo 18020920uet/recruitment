@@ -10,5 +10,8 @@ export class AddLanguages1636951384409 implements MigrationInterface {
     await languageRespository.insert(rawLanguages.map((raw) => ({ id: raw.id, name: raw.name })));
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const languageRespository = queryRunner.connection.getRepository(LanguageEntity);
+    await languageRespository.clear();
+  }
 }

@@ -6,8 +6,6 @@ import {
   IsString,
   IsNumberString,
   Matches,
-  Min,
-  Max,
   IsPositive,
   NotContains,
 } from 'class-validator';
@@ -131,6 +129,12 @@ export class UpdateCurriculumnVitaeRequest {
 
   @ApiProperty({ type: [String] })
   hobbies: string[];
+
+  @ApiProperty()
+  countryId: number;
+
+  @ApiProperty()
+  areaId: number;
 
   @ApiProperty({ type: [UpdateCurriculumnVitaeExperienceRequest] })
   experiences: UpdateCurriculumnVitaeExperienceRequest[];

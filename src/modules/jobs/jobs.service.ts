@@ -1,19 +1,11 @@
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { Injectable } from '@nestjs/common';
-import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, createQueryBuilder, Like } from 'typeorm';
+import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like } from 'typeorm';
 
 import { JobRepository } from '@Repositories/job.repository';
 
-import { BusinessFieldEntity } from '@Entities/business-field.entity';
-import { CompanyEntity } from '@Entities/company.entity';
-import { SkillEntity } from '@Entities/skill.entity';
-import { AreaEntity } from '@Entities/area.entity';
 import { JobEntity } from '@Entities/job.entity';
-
-import { JobExperience } from '@Shared/enums/job-experience';
-import { JobWorkMode } from '@Shared/enums/job-work-mode';
-import { JobStatus } from '@Shared/enums/job-status';
 
 import { GetJobsQuery, GetJobDetailParam } from './dtos/requests';
 import { GetJobsResponse, GetJobDetailResponse, JobDetail } from './dtos/responses';

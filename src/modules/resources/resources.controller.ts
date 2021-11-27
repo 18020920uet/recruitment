@@ -1,5 +1,5 @@
-import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiInternalServerErrorResponse, ApiOperation, ApiTags, ApiOkResponse } from '@nestjs/swagger';
 
 import { ApplicationArrayApiOkResponse } from '@Common/decorators/swagger.decorator';
 import { InternalServerErrorResponse } from '@Decorators/swagger.error-responses.decorator';
@@ -7,6 +7,7 @@ import { InternalServerErrorResponse } from '@Decorators/swagger.error-responses
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
 import { CountryEntity } from '@Entities/country.entity';
+import { SkillEntity } from '@Entities/skill.entity';
 import { AreaEntity } from '@Entities/area.entity';
 
 import { ResourcesService } from './resources.service';
@@ -48,5 +49,35 @@ export class ResourcesController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getAreasByCountry(@Query() getAreasQuery: GetAreasQuery): Promise<AreaEntity[]> {
     return await this.resourcesService.getAreas(getAreasQuery);
+  }
+
+  @Get('skills')
+  @ApiOperation({ summary: 'Get system skills' })
+  @ApplicationArrayApiOkResponse(SkillEntity)
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getSkills(): Promise<SkillEntity[]> {
+    return await this.resourcesService.getSkills();
+  }
+
+  @Get('skill-experiences')
+  @ApiOperation({ summary: 'Get system skill experiences' })
+  @ApiOkResponse({
+    description: 'Success',
+    content: {
+      'application-json': {
+        schema: {
+          properties: {
+            code: { type: 'number', default: 1 },
+            statusCode: { type: 'number', default: 200 },
+            message: { type: 'string' },
+            data: { type: 'array', items: { type: 'string' } },
+          },
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  getSkillExperiences(): string[] {
+    return this.resourcesService.getSkillExperiences();
   }
 }

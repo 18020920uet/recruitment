@@ -10,5 +10,8 @@ export class AddNationalities1636951392811 implements MigrationInterface {
     await nationalityRepository.insert(rawNationalities.map((raw) => ({ id: raw.id, name: raw.name })));
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const nationalityRepository = queryRunner.connection.getRepository(NationalityEntity);
+    await nationalityRepository.clear();
+  }
 }

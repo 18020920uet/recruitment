@@ -1,6 +1,5 @@
 import { PrimaryGeneratedColumn, ManyToMany, JoinColumn, ManyToOne, JoinTable, Column, Entity, Index } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
-import { ApiProperty } from '@nestjs/swagger';
 
 import { BusinessFieldEntity } from './business-field.entity';
 import { CompanyEntity } from './company.entity';

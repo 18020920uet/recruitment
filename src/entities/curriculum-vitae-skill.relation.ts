@@ -1,5 +1,4 @@
-import { PrimaryGeneratedColumn, PrimaryColumn, JoinColumn, ManyToOne, Entity, Column } from 'typeorm';
-import { AutoMap } from '@automapper/classes';
+import { PrimaryColumn, JoinColumn, ManyToOne, Entity, Column } from 'typeorm';
 
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
 import { SkillEntity } from '@Entities/skill.entity';

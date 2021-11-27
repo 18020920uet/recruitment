@@ -9,9 +9,7 @@ import fs from 'fs';
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
-import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
-import { ReviewEntity } from '@Entities/review.entity';
 import { SkillEntity } from '@Entities/skill.entity';
 import { UserEntity } from '@Entities/user.entity';
 
@@ -21,7 +19,6 @@ import { UserRepository } from '@Repositories/user.repository';
 
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
-import { Review } from '@Shared/responses/review';
 import { User } from '@Shared/responses/user';
 
 import { FileService } from '@Shared/services/file.service';
@@ -87,34 +84,29 @@ export class UserService {
         await transactionalEntityManager.delete(CurriculumVitaeExperienceEntity, _cv.experiences);
       }
 
-      _cv.experiences = [];
-
       _currentUser.firstName = updateCurriculumnVitaeRequest.firstName;
       _currentUser.lastName = updateCurriculumnVitaeRequest.lastName;
       await transactionalEntityManager.save(_currentUser);
 
       _cv.dateOfBirth = new Date(updateCurriculumnVitaeRequest.dateOfBirth);
+      _cv.briefIntroduce = updateCurriculumnVitaeRequest.briefIntroduce;
       _cv.nationalityId = updateCurriculumnVitaeRequest.nationalityId;
       _cv.hobbies = updateCurriculumnVitaeRequest.hobbies.join('|');
       _cv.phoneNumber = updateCurriculumnVitaeRequest.phoneNumber;
-      _cv.briefIntroduce = updateCurriculumnVitaeRequest.briefIntroduce;
       _cv.educations = updateCurriculumnVitaeRequest.educations;
       _cv.introduce = updateCurriculumnVitaeRequest.introduce;
       _cv.address = updateCurriculumnVitaeRequest.address;
       _cv.gender = updateCurriculumnVitaeRequest.gender;
 
-      _cv.nationality = await getRepository(NationalityEntity).findOne({
-        id: updateCurriculumnVitaeRequest.nationalityId,
-      });
+      _cv.nationalityId = updateCurriculumnVitaeRequest.nationalityId;
+      _cv.countryId = updateCurriculumnVitaeRequest.countryId;
+      _cv.areaId = updateCurriculumnVitaeRequest.areaId;
 
       const _skills = await getRepository(SkillEntity).find({
         id: In(updateCurriculumnVitaeRequest.skills.map((s) => s.skillId)),
       });
-
       await getRepository(CurriculumVitaeSkillRelation).remove(_cv.skillRelations);
-
       _cv.skillRelations = [];
-
       for (const updateSkill of updateCurriculumnVitaeRequest.skills) {
         const _skill = _skills.find((_skill) => _skill.id == updateSkill.skillId);
         if (_skill != null) {
@@ -149,6 +141,7 @@ export class UserService {
         });
       }
       _cv.experiences = _experiences;
+
       await transactionalEntityManager.save(_cv);
       await transactionalEntityManager.insert(CurriculumVitaeExperienceEntity, _experiences);
     });

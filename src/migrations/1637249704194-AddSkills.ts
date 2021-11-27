@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Not } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { BusinessFieldEntity } from '@Entities/business-field.entity';
 import { SkillEntity } from '@Entities/skill.entity';
@@ -23,5 +23,8 @@ export class AddSkills1637249704194 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const skillRepository = await queryRunner.connection.getRepository(SkillEntity);
+    await skillRepository.clear();
+  }
 }

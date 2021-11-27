@@ -12,5 +12,8 @@ export class AddAreas1636721488030 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const areaRepository = queryRunner.connection.getRepository(AreaEntity);
+    await areaRepository.clear();
+  }
 }

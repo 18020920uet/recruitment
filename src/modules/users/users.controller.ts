@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,

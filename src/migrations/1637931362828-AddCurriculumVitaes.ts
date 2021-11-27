@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
@@ -98,6 +98,7 @@ export class AddCurriculumVitaes1637931362828 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    await userRepository.delete({ password: '' });
   }
-
 }

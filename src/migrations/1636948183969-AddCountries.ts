@@ -16,5 +16,8 @@ export class AddCountries1636948183969 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    const countryRepository = queryRunner.connection.getRepository(CountryEntity);
+    await countryRepository.clear();
+  }
 }

@@ -39,7 +39,7 @@ export class CompanyInformationEntity {
   // { facebook: '', linkedin: '', website: '', .... }
   @AutoMap()
   @Column({ type: 'jsonb', nullable: true, name: 'social_networks' })
-  socialNetworks: object;
+  socialNetworks: Record<string, unknown>;
 
   @OneToOne(() => CompanyEntity)
   @JoinColumn({ name: 'company_id' })

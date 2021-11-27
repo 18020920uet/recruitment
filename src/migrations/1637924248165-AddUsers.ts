@@ -1,4 +1,4 @@
-import {MigrationInterface, QueryRunner} from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { UserEntity } from '@Entities/user.entity';
 
@@ -30,6 +30,7 @@ export class AddUsers1637924248165 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    await userRepository.delete({ password: '' });
   }
-
 }

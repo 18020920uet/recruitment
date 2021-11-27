@@ -20,11 +20,8 @@ import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.r
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';
 import { CountryEntity } from '@Entities/country.entity';
-import { SkillEntity } from '@Entities/skill.entity';
 import { AreaEntity } from '@Entities/area.entity';
 import { UserEntity } from '@Entities/user.entity';
-
-import { JobExperience } from '@Shared/enums/job-experience';
 
 @Entity('curriculum_vitaes')
 export class CurriculumVitaeEntity {
