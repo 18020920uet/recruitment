@@ -206,7 +206,7 @@ export class UserService {
     const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
-    if (certifications.length != 0) {
+    if (certifications.length == 0) {
       return {
         certifications: _certifications.map((_c) => this.fileService.getCertification(_c)),
       };
