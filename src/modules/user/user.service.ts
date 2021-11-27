@@ -63,7 +63,9 @@ export class UserService {
   }
 
   async updateAvatar(_currentUser: UserEntity, file: Express.Multer.File): Promise<ChangeAvatarResponse> {
-    fs.unlinkSync(`./public/certifications/${_currentUser.avatar}`);
+    if (_currentUser.avatar != '') {
+      fs.unlinkSync(`./public/avatars/${_currentUser.avatar}`);
+    }
     _currentUser.avatar = file.filename;
     await this.userRepository.save(_currentUser);
     return {
