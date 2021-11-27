@@ -144,7 +144,7 @@ export class UsersController {
 
   @Delete(':userId/reviews/:reviewId')
   @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Detete review' })
+  @ApiOperation({ summary: 'Delete review' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(DeleteReviewResponse)
   @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
