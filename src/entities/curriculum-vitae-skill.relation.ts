@@ -14,11 +14,20 @@ export class CurriculumVitaeSkillRelation {
   cvId: number;
 
   @ManyToOne(() => SkillEntity)
-  @JoinColumn({ name: 'skill_id' })
+  @JoinColumn([{ name: 'skill_id', referencedColumnName: 'id' }])
   skill: SkillEntity | null;
 
-  @ManyToOne(() => CurriculumVitaeEntity)
-  @JoinColumn({ name: 'cv_id' })
+  @ManyToOne(
+    () => CurriculumVitaeEntity,
+    (curriculumnVitae) => curriculumnVitae.skillRelations,
+    {
+      primary: true,
+      onDelete: "CASCADE",
+      onUpdate: "RESTRICT",
+      orphanedRowAction: 'delete'
+    }
+  )
+  @JoinColumn([{ name: 'cv_id', referencedColumnName: 'id' }])
   cv: CurriculumVitaeEntity | null;
 
   @Column({ type: 'enum', enum: JobExperience, default: null, nullable: true, name: 'experience' })

@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Column, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, Column, JoinColumn, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
@@ -11,11 +11,20 @@ export class CurriculumVitaeExperienceEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => CurriculumVitaeEntity, (curriculumnVitae) => curriculumnVitae.experiences)
-  @JoinColumn({ name: 'cv_id' })
+  @ManyToOne(
+    () => CurriculumVitaeEntity,
+    (curriculumnVitae) => curriculumnVitae.experiences,
+    {
+      primary: true,
+      onDelete: "CASCADE",
+      onUpdate: "RESTRICT",
+      orphanedRowAction: 'delete'
+    }
+  )
+  @JoinColumn([{ name: 'cv_id', referencedColumnName: 'id' }])
   curriculumnVitae: CurriculumVitaeEntity;
 
-  @Column({ name: 'cv_id' })
+  @PrimaryColumn({ name: 'cv_id' })
   cvId: number;
 
   @AutoMap()

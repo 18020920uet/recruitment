@@ -23,14 +23,19 @@ import { User } from '@Shared/responses/user';
 
 import { FileService } from '@Shared/services/file.service';
 
-import { UpdateCurriculumnVitaeRequest, ChangePasswordRequest, RemoveCertificationsRequest } from './dtos/requests';
+import {
+  UpdateCurriculumnVitaeExperienceRequest,
+  UpdateCurriculumnVitaeRequest,
+  RemoveCertificationsRequest,
+  ChangePasswordRequest,
+} from './dtos/requests';
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    private curriculumnVitaeRepository: CurriculumVitaeRepository,
+    private curriculumVitaeRepository: CurriculumVitaeRepository,
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
@@ -39,6 +44,14 @@ export class UserService {
 
   getCurrentUser(_currentUser: UserEntity): User {
     return this.mapper.map(_currentUser, User, UserEntity);
+  }
+
+  async getCurriculumVitae(userId: string): Promise<CurriculumVitaeEntity> {
+    const _cv = await this.curriculumVitaeRepository.findOne({
+      where: { userId: userId },
+      relations: ['experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area'],
+    });
+    return _cv;
   }
 
   async changePassword(
@@ -74,16 +87,12 @@ export class UserService {
     _currentUser: UserEntity,
     updateCurriculumnVitaeRequest: UpdateCurriculumnVitaeRequest,
   ): Promise<CurriculumVitae> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({
+    const _cv = await this.curriculumVitaeRepository.findOne({
       where: { user: _currentUser },
       relations: ['experiences', 'user', 'skillRelations', 'languages'],
     });
 
     await getManager().transaction(async (transactionalEntityManager) => {
-      if (_cv.experiences.length != 0) {
-        await transactionalEntityManager.delete(CurriculumVitaeExperienceEntity, _cv.experiences);
-      }
-
       _currentUser.firstName = updateCurriculumnVitaeRequest.firstName;
       _currentUser.lastName = updateCurriculumnVitaeRequest.lastName;
       await transactionalEntityManager.save(_currentUser);
@@ -105,7 +114,6 @@ export class UserService {
       const _skills = await getRepository(SkillEntity).find({
         id: In(updateCurriculumnVitaeRequest.skills.map((s) => s.skillId)),
       });
-      await getRepository(CurriculumVitaeSkillRelation).remove(_cv.skillRelations);
       _cv.skillRelations = [];
       for (const updateSkill of updateCurriculumnVitaeRequest.skills) {
         const _skill = _skills.find((_skill) => _skill.id == updateSkill.skillId);
@@ -126,7 +134,8 @@ export class UserService {
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
       if (updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
-        updateCurriculumnVitaeRequest.experiences.forEach((experience: CurriculumVitaeExperience, index: number) => {
+        for (let index = 0; index < updateCurriculumnVitaeRequest.experiences.length; index++) {
+          const experience: UpdateCurriculumnVitaeExperienceRequest = updateCurriculumnVitaeRequest.experiences[index];
           const _experience = new CurriculumVitaeExperienceEntity();
           _experience.companyEmail = experience.companyEmail;
           _experience.companyName = experience.companyName;
@@ -137,22 +146,22 @@ export class UserService {
           _experience.type = experience.type;
           _experience.index = index;
           _experience.cvId = _cv.id;
+          _experience.curriculumnVitae = _cv;
           _experiences.push(_experience);
-        });
+        }
       }
       _cv.experiences = _experiences;
-
       await transactionalEntityManager.save(_cv);
-      await transactionalEntityManager.insert(CurriculumVitaeExperienceEntity, _experiences);
     });
-    return await this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
+
+    return this.mapper.map(await this.getCurriculumVitae(_currentUser.id), CurriculumVitae, CurriculumVitaeEntity);
   }
 
   async updateCertifications(
     _currentUser: UserEntity,
     files: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
     /// Remove old file
@@ -165,7 +174,7 @@ export class UserService {
 
     const certifications = files.map((file) => file.filename);
     _cv.certifications = certifications.join('|');
-    await this.curriculumnVitaeRepository.save(_cv);
+    await this.curriculumVitaeRepository.save(_cv);
     return {
       certifications: certifications.map((_c) => this.fileService.getCertification(_c)),
     };
@@ -175,7 +184,7 @@ export class UserService {
     _currentUser: UserEntity,
     file: Express.Multer.File,
   ): Promise<UpdateCertificationsResponse> {
-    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
     if (_certifications.length >= 3) {
@@ -184,7 +193,7 @@ export class UserService {
     } else {
       _certifications.push(file.filename);
       _cv.certifications = _certifications.join('|');
-      await this.curriculumnVitaeRepository.save(_cv);
+      await this.curriculumVitaeRepository.save(_cv);
       return {
         certifications: _certifications.map((_c) => this.fileService.getCertification(_c)),
       };
@@ -196,7 +205,7 @@ export class UserService {
     removeCertificationsRequest: RemoveCertificationsRequest,
   ): Promise<UpdateCertificationsResponse> {
     const certifications = removeCertificationsRequest.certifications;
-    const _cv = await this.curriculumnVitaeRepository.findOne({ where: { user: _currentUser } });
+    const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
     if (certifications.length == 0) {
@@ -214,7 +223,7 @@ export class UserService {
 
       const _newCertifications = _certifications.filter((_c) => certifications.indexOf(_c) == -1);
       _cv.certifications = _newCertifications.join('|');
-      await this.curriculumnVitaeRepository.save(_cv);
+      await this.curriculumVitaeRepository.save(_cv);
 
       return {
         certifications: _newCertifications.map((_c) => this.fileService.getCertification(_c)),

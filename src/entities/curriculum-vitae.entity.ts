@@ -100,7 +100,11 @@ export class CurriculumVitaeEntity {
   introduce: string;
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
-  @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae, { cascade: true })
+  @OneToMany(
+    () => CurriculumVitaeExperienceEntity,
+    (experience) => experience.curriculumnVitae,
+    { cascade: true }
+  )
   experiences: CurriculumVitaeExperienceEntity[];
 
   @AutoMap()
