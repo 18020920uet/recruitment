@@ -20,8 +20,8 @@ export class JobEntity {
   companyId: string;
 
   @AutoMap({ typeFn: () => CompanyEntity })
-  @ManyToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'company_id' })
+  @ManyToOne(() => CompanyEntity, (company) => company.jobs, { onDelete: 'CASCADE' })
+  @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   company: CompanyEntity;
 
   @AutoMap()

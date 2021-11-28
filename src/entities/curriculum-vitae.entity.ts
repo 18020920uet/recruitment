@@ -30,8 +30,8 @@ export class CurriculumVitaeEntity {
   id: number;
 
   @AutoMap()
-  @OneToOne(() => UserEntity)
-  @JoinColumn({ name: 'user_id' })
+  @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: UserEntity;
 
   @Column({ name: 'user_id' })
@@ -100,11 +100,7 @@ export class CurriculumVitaeEntity {
   introduce: string;
 
   @AutoMap({ typeFn: () => CurriculumVitaeExperienceEntity })
-  @OneToMany(
-    () => CurriculumVitaeExperienceEntity,
-    (experience) => experience.curriculumnVitae,
-    { cascade: true }
-  )
+  @OneToMany(() => CurriculumVitaeExperienceEntity, (experience) => experience.curriculumnVitae, { cascade: true })
   experiences: CurriculumVitaeExperienceEntity[];
 
   @AutoMap()

@@ -41,8 +41,8 @@ export class CompanyInformationEntity {
   @Column({ type: 'jsonb', nullable: true, name: 'social_networks' })
   socialNetworks: Record<string, unknown>;
 
-  @OneToOne(() => CompanyEntity)
-  @JoinColumn({ name: 'company_id' })
+  @OneToOne(() => CompanyEntity, (company) => company.information, { onDelete: 'CASCADE' })
+  @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   company: CompanyEntity;
 
   @Column({ name: 'company_id' })

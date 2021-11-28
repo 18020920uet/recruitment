@@ -11,16 +11,12 @@ export class CurriculumVitaeExperienceEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(
-    () => CurriculumVitaeEntity,
-    (curriculumnVitae) => curriculumnVitae.experiences,
-    {
-      primary: true,
-      onDelete: "CASCADE",
-      onUpdate: "RESTRICT",
-      orphanedRowAction: 'delete'
-    }
-  )
+  @ManyToOne(() => CurriculumVitaeEntity, (curriculumnVitae) => curriculumnVitae.experiences, {
+    primary: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
+    orphanedRowAction: 'delete',
+  })
   @JoinColumn([{ name: 'cv_id', referencedColumnName: 'id' }])
   curriculumnVitae: CurriculumVitaeEntity;
 

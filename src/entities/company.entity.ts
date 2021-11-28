@@ -12,6 +12,7 @@ import {
 import { AutoMap } from '@automapper/classes';
 
 import { CompanyInformationEntity } from './company-information.entity';
+import { CompanyEmployeeEntity } from './company-employee.entity';
 import { BusinessFieldEntity } from './business-field.entity';
 import { CountryEntity } from './country.entity';
 import { AreaEntity } from './area.entity';
@@ -72,4 +73,7 @@ export class CompanyEntity {
 
   @OneToMany(() => JobEntity, (job) => job.company, { cascade: true })
   jobs: JobEntity[];
+
+  @OneToMany(() => CompanyEmployeeEntity, (employee) => employee.company, { cascade: true })
+  employees: CompanyEmployeeEntity[];
 }
