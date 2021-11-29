@@ -1,10 +1,24 @@
-import { PrimaryGeneratedColumn, ManyToMany, JoinColumn, ManyToOne, JoinTable, Column, Entity, Index } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  ManyToMany,
+  JoinColumn,
+  ManyToOne,
+  JoinTable,
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+} from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
+import { JobEmployeeRelation } from './job-employee.relation';
+import { JobCandidateRelation } from './job-candidate.relation';
 import { BusinessFieldEntity } from './business-field.entity';
 import { CompanyEntity } from './company.entity';
 import { SkillEntity } from './skill.entity';
 import { AreaEntity } from './area.entity';
+import { UserEntity } from './user.entity';
 
 import { JobExperience } from '@Shared/enums/job-experience';
 import { JobWorkMode } from '@Shared/enums/job-work-mode';
@@ -75,6 +89,23 @@ export class JobEntity {
   })
   businessFields: BusinessFieldEntity[];
 
+  @Column({ name: 'creator_id', nullable: true })
+  creatorId: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'creator_id' })
+  creator: UserEntity;
+
+  @Column({ name: 'last_updater_id', nullable: true })
+  updaterId: string;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'last_updater_id' })
+  lastUpdater: UserEntity;
+
+  @Column({ name: 'area_id' })
+  areaId: number;
+
   @AutoMap()
   @ManyToOne(() => AreaEntity)
   @JoinColumn({ name: 'area_id' })
@@ -89,10 +120,29 @@ export class JobEntity {
   endDate: string;
 
   @AutoMap()
-  @Column({ type: 'timestamp', name: 'created_at' })
+  @Column({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
   @AutoMap()
   @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @OneToMany(() => JobEmployeeRelation, (jobEmployeeRelation) => jobEmployeeRelation.job, {
+    primary: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
+    orphanedRowAction: 'delete',
+  })
+  employeeRelations: JobEmployeeRelation[];
+
+  @OneToMany(() => JobCandidateRelation, (jobCandidateRelation) => jobCandidateRelation.job, {
+    primary: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
+    orphanedRowAction: 'delete',
+  })
+  candidateRelations: JobCandidateRelation[];
 }

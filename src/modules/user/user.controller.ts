@@ -26,7 +26,7 @@ import {
 import { saveAvatarStorage } from '@Common/storages/images.storage';
 import { saveCertificationsStorage } from '@Common/storages/certifications.storage';
 
-import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
+import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
 
 import {
   UnsupportedMediaTypeResponse,

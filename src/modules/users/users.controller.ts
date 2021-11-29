@@ -11,7 +11,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { JwtAuthenticationGuard } from '@Modules/authentication/jwt-authentication.guard';
+import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
 
 import {
   InternalServerErrorResponse,
@@ -21,9 +21,9 @@ import {
   NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
 import {
-  ApplicationApiOkResponse,
-  ApplicationApiCreateResponse,
   ApplicationArrayApiOkResponse,
+  ApplicationApiCreateResponse,
+  ApplicationApiOkResponse,
 } from '@Common/decorators/swagger.decorator';
 import { CurrentUser } from '@Common/decorators/current-user.decorator';
 

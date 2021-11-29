@@ -1,74 +1,117 @@
+import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like, Between } from 'typeorm';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
-import { Injectable } from '@nestjs/common';
-import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like } from 'typeorm';
 
+import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { JobRepository } from '@Repositories/job.repository';
 
+import { JobCandidateRelation } from '@Entities/job-candidate.relation';
+import { BusinessFieldEntity } from '@Entities/business-field.entity';
+import { JobEmployeeRelation } from '@Entities/job-employee.relation';
+import { CompanyEntity } from '@Entities/company.entity';
+import { SkillEntity } from '@Entities/skill.entity';
+import { AreaEntity } from '@Entities/area.entity';
+import { UserEntity } from '@Entities/user.entity';
 import { JobEntity } from '@Entities/job.entity';
 
-import { GetJobsQuery, GetJobDetailParam } from './dtos/requests';
-import { GetJobsResponse, GetJobDetailResponse, JobDetail } from './dtos/responses';
+import {
+  RemoveEmployeeFromJobParams,
+  GetCandidatesOfJobParams,
+  GetEmployeesOfJobParams,
+  GetJobDetailParams,
+  UpdateJobRequest,
+  CreateJobRequest,
+  ApplyJobRequest,
+  UpdateJobParams,
+  DeleteJobParams,
+  GetJobsQueries,
+  ApplyJobParams,
+  GetCandidatesOfJobQuerires,
+  ChangeJobApplyStatusParams,
+  ChangeJobApplyStatusRequest,
+  GetEmployeesOfJobQuerires,
+} from './dtos/requests';
+import {
+  GetJobsResponse,
+  GetJobDetailResponse,
+  JobDetail,
+  DeleteJobResponse,
+  CandidateOfJob,
+  GetCandidatesOfJobResponse,
+  EmployeeOfJob,
+  GetEmployeesOfJobResponse,
+} from './dtos/responses';
 import { Job } from '@Shared/responses/job';
 
 import { RelatedJobFilter } from '@Shared/enums/related-job-filter';
+import { JobStatus } from '@Shared/enums/job-status';
+
+import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 
 @Injectable()
 export class JobsService {
-  constructor(@InjectMapper() private readonly mapper: Mapper, private jobRepository: JobRepository) {}
+  constructor(
+    @InjectMapper() private readonly mapper: Mapper,
+    private jobEmployeeRepositoty: JobEmployeeRepositoty,
+    private jobCandidateRepositoty: JobCandidateRepositoty,
+    private jobRepository: JobRepository,
+  ) {}
 
-  async getJobs(getJobsQuery: GetJobsQuery): Promise<GetJobsResponse> {
+  async getJobs(getJobsQueries: GetJobsQueries): Promise<GetJobsResponse> {
     let jobIds: number[] = [];
 
-    if (getJobsQuery.skillIds != undefined && getJobsQuery.skillIds.length != 0) {
-      const skillIds = getJobsQuery.skillIds;
+    if (getJobsQueries.skillIds != undefined && getJobsQueries.skillIds.length != 0) {
+      const skillIds = getJobsQueries.skillIds;
       const params = skillIds.map((skillId) => `${skillId}`).join(',');
-      const queryString = `SELECT * FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
-      jobIds = (await getManager().query(queryString)).map((r) => r['job_id']);
+      const queryString = `SELECT job_id FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
+      jobIds = (await getManager().query(queryString)).map((r: { job_id: number }) => r.job_id);
     }
 
-    if (getJobsQuery.businessFieldIds != undefined && getJobsQuery.businessFieldIds.length != 0) {
-      const businessFieldIds = getJobsQuery.businessFieldIds;
+    if (getJobsQueries.businessFieldIds != undefined && getJobsQueries.businessFieldIds.length != 0) {
+      const businessFieldIds = getJobsQueries.businessFieldIds;
       const params = businessFieldIds.map((businessFieldId) => `${businessFieldId}`).join(',');
       const params2 = jobIds.map((jobId) => `${jobId}`).join(',');
       const queryString =
-        `SELECT * FROM "jobs_business_fields" WHERE business_field_id IN (${params})` +
+        `SELECT job_id FROM "jobs_business_fields" WHERE business_field_id IN (${params}) ` +
         `AND job_id IN (${params2}) GROUP BY job_id, business_field_id`;
-      jobIds = (await getManager().query(queryString)).map((r) => r['job_id']);
+      jobIds = (await getManager().query(queryString)).map((r: { job_id: number }) => r.job_id);
     }
 
-    if (getJobsQuery.title != undefined) {
-      const title = getJobsQuery.title;
+    if (getJobsQueries.title != undefined) {
+      const title = getJobsQueries.title;
       if (!title.includes("')") && !title.includes('")')) {
         const params = jobIds.map((jobId) => `${jobId}`).join(',');
         jobIds = (
           await getRepository(JobEntity)
             .createQueryBuilder('job')
-            .where((jobIds.length != 0 ? `id IN (${params}) AND ` : '') + `title @@ to_tsquery('${title}')`)
+            .where((jobIds.length != 0 ? `id IN (${params}) AND` : '') + ` title @@ to_tsquery('${title}')`)
             .select('job.id')
             .getMany()
         ).map((_job) => _job.id);
       }
     }
 
-    const records = getJobsQuery.records != undefined ? getJobsQuery.records : 10;
+    const records = getJobsQueries.records != undefined ? getJobsQueries.records : 10;
 
     const [_jobs, totalRecods] = await this.jobRepository.findAndCount({
       where: {
         id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()),
-        experience: getJobsQuery.experience != undefined ? getJobsQuery.experience : Not(IsNull()),
-        title: getJobsQuery.title != undefined ? Like(`%${getJobsQuery.title}%`) : Not(IsNull()),
-        startDate: getJobsQuery.startDate != undefined ? getJobsQuery.startDate : Not(IsNull()),
-        workMode: getJobsQuery.workMode != undefined ? getJobsQuery.workMode : Not(IsNull()),
-        salary: getJobsQuery.salary != undefined ? getJobsQuery.salary : MoreThanOrEqual(0),
-        endDate: getJobsQuery.endDate != undefined ? getJobsQuery.endDate : Not(IsNull()),
-        status: getJobsQuery.status != undefined ? getJobsQuery.status : Not(IsNull()),
+        experience: getJobsQueries.experience != undefined ? getJobsQueries.experience : Not(IsNull()),
+        title: getJobsQueries.title != undefined ? Like(`%${getJobsQueries.title}%`) : Not(IsNull()),
+        startDate: getJobsQueries.startDate != undefined ? getJobsQueries.startDate : Not(IsNull()),
+        workMode: getJobsQueries.workMode != undefined ? getJobsQueries.workMode : Not(IsNull()),
+        salary: getJobsQueries.salary != undefined ? getJobsQueries.salary : MoreThanOrEqual(0),
+        endDate: getJobsQueries.endDate != undefined ? getJobsQueries.endDate : Not(IsNull()),
+        status: getJobsQueries.status != undefined ? getJobsQueries.status : Not(IsNull()),
         area: {
-          id: getJobsQuery.areaId != undefined ? getJobsQuery.areaId : Not(IsNull()),
+          id: getJobsQueries.areaId != undefined ? getJobsQueries.areaId : Not(IsNull()),
         },
       },
       relations: ['area', 'skills', 'businessFields', 'company'],
-      skip: getJobsQuery.page > 0 ? getJobsQuery.page - 1 : 0 * records,
+      skip: (getJobsQueries.page > 0 ? getJobsQueries.page - 1 : 0) * records,
       take: records,
       order: { createdAt: 'DESC' },
     });
@@ -79,14 +122,16 @@ export class JobsService {
     return response;
   }
 
-  async getJobDetail(getJobDetailParam: GetJobDetailParam): Promise<GetJobDetailResponse> {
+  async getJobDetail(getJobDetailParams: GetJobDetailParams): Promise<GetJobDetailResponse> {
     const _job = await this.jobRepository.findOne({
-      where: { id: getJobDetailParam.jobId },
+      where: { id: getJobDetailParams.jobId },
       relations: ['area', 'skills', 'businessFields', 'company'],
+      withDeleted: true,
     });
 
-    const response = new GetJobDetailResponse();
-    response.jobDetail = this.mapper.map(_job, JobDetail, JobEntity);
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
 
     let _relatedJobs: JobEntity[] = [];
 
@@ -106,11 +151,11 @@ export class JobsService {
       }
       case RelatedJobFilter.BUSINESSFIELD: {
         const businessFieldIds = _job.businessFields.map((businessField) => businessField.id);
-        const params = businessFieldIds.map((id, index) => `$${index + 1}`).join(',');
+        const params = businessFieldIds.map((id) => `${id}`).join(',');
         const query =
-          `SELECT * FROM "jobs_business_fields" WHERE business_field_id IN (${params})` +
+          `SELECT job_id FROM "jobs_business_fields" WHERE business_field_id IN (${params}) ` +
           'GROUP BY job_id, business_field_id';
-        const jobIds = (await getManager().query(query, businessFieldIds)).map((r) => r['job_id']);
+        const jobIds = (await getManager().query(query)).map((r: { job_id: number }) => r.job_id);
         if (jobIds.length != 0) {
           _relatedJobs = (
             await this.jobRepository.find({
@@ -126,8 +171,8 @@ export class JobsService {
       }
       default: {
         const params = _job.skills.map((skill) => `${skill.id}`);
-        const query = `SELECT * FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
-        const jobIds = (await getManager().query(query)).map((r) => r['job_id']);
+        const query = `SELECT job_id FROM "jobs_skills" WHERE skill_id IN (${params}) GROUP BY job_id, skill_id`;
+        const jobIds = (await getManager().query(query)).map((r: { job_id: number }) => r.job_id);
         _relatedJobs = (
           await this.jobRepository.find({
             where: { id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()) },
@@ -140,7 +185,385 @@ export class JobsService {
       }
     }
 
+    const response = new GetJobDetailResponse();
+    response.jobDetail = this.mapper.map(_job, JobDetail, JobEntity);
     response.relatedJobs = _relatedJobs.map((_relatedJob) => this.mapper.map(_relatedJob, Job, JobEntity));
     return response;
+  }
+
+  async createJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    createJobRequest: CreateJobRequest,
+  ): Promise<JobDetail> {
+    const _job = new JobEntity();
+    _job.maxEmployees = createJobRequest.maxEmployees;
+    _job.minEmployees = createJobRequest.minEmployees;
+    _job.description = createJobRequest.description;
+    _job.startDate = createJobRequest.startDate;
+    _job.workMode = createJobRequest.workMode;
+    _job.endDate = createJobRequest.endDate;
+    _job.salary = createJobRequest.salary;
+    _job.title = createJobRequest.title;
+    _job.status = JobStatus.PENDING;
+    _job.company = _currentCompany;
+    _job.creator = _currentUser;
+
+    _job.createdAt = new Date();
+    _job.updatedAt = _job.createdAt;
+
+    _job.skills = await getRepository(SkillEntity).find({ where: { id: In(createJobRequest.skillIds) } });
+
+    _job.area =
+      createJobRequest.areaId == 0
+        ? _currentCompany.area
+        : await getRepository(AreaEntity).findOne({ id: createJobRequest.areaId });
+
+    _job.experience = createJobRequest.experience;
+    _job.businessFields = await getRepository(BusinessFieldEntity).find({
+      where: {
+        id: createJobRequest.businessFields.length != 0 ? In(createJobRequest.businessFields) : Not(IsNull()),
+        name: createJobRequest.businessFields.length == 0 ? 'Information Technology' : Not(IsNull()),
+      },
+    });
+
+    _job.company = _currentCompany;
+    _job.creator = _currentUser;
+    await this.jobRepository.save(_job);
+
+    return this.mapper.map(_job, JobDetail, JobEntity);
+  }
+
+  async updateJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    updateJobParams: UpdateJobParams,
+    updateJobRequest: UpdateJobRequest,
+  ): Promise<JobDetail> {
+    const _job = await this.jobRepository.findOne({
+      where: { id: updateJobParams.jobId },
+      relations: ['company', 'area', 'businessFields', 'skills'],
+    });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_currentCompany.id != _job.company.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    _job.maxEmployees = updateJobRequest.maxEmployees;
+    _job.minEmployees = updateJobRequest.minEmployees;
+    _job.description = updateJobRequest.description;
+    _job.startDate = updateJobRequest.startDate;
+    _job.workMode = updateJobRequest.workMode;
+    _job.endDate = updateJobRequest.endDate;
+    _job.salary = updateJobRequest.salary;
+    _job.status = updateJobRequest.status;
+    _job.title = updateJobRequest.title;
+    _job.company = _currentCompany;
+
+    _job.skills = await getRepository(SkillEntity).find({ where: { id: In(updateJobRequest.skillIds) } });
+
+    _job.area =
+      updateJobRequest.areaId == 0
+        ? _currentCompany.area
+        : await getRepository(AreaEntity).findOne({ id: updateJobRequest.areaId });
+
+    _job.experience = updateJobRequest.experience;
+    _job.businessFields = await getRepository(BusinessFieldEntity).find({
+      where: {
+        id: updateJobRequest.businessFields.length != 0 ? In(updateJobRequest.businessFields) : Not(IsNull()),
+        name: updateJobRequest.businessFields.length == 0 ? 'Information Technology' : Not(IsNull()),
+      },
+    });
+
+    _job.lastUpdater = _currentUser;
+    _job.updatedAt = new Date();
+
+    await this.jobRepository.save(_job);
+
+    return this.mapper.map(_job, JobDetail, JobEntity);
+  }
+
+  async deleteJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    deleteJobParams: DeleteJobParams,
+  ): Promise<DeleteJobResponse> {
+    const _job = await this.jobRepository.findOne({
+      where: { id: deleteJobParams.jobId },
+      relations: ['company', 'area', 'businessFields', 'skills'],
+    });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_currentCompany.id != _job.company.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    _job.lastUpdater = _currentUser;
+    _job.deletedAt = new Date();
+    _job.updatedAt = new Date();
+    await this.jobRepository.save(_job);
+
+    return {
+      status: true,
+    };
+  }
+
+  async applyOrReapplyJob(
+    _currentUser: UserEntity,
+    applyJobParams: ApplyJobParams,
+    applyJobRequest: ApplyJobRequest,
+  ): Promise<CandidateOfJob> {
+    const _job = await this.jobRepository.findOne({ id: applyJobParams.jobId });
+
+    let _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
+      where: { jobId: applyJobParams.jobId, user: _currentUser },
+      relations: ['user'],
+    });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_jobCandidateRelation && _jobCandidateRelation.applyStatus != JobApplyStatus.REJECTED) {
+      throw new ForbiddenException('Already apply');
+    } else if (_jobCandidateRelation && _jobCandidateRelation.applyStatus == JobApplyStatus.REJECTED) {
+      _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
+      _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
+      _jobCandidateRelation.updatedAt = new Date();
+      _jobCandidateRelation.rejectMessage = null;
+      await this.jobCandidateRepositoty.save(_jobCandidateRelation);
+      return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
+    } else if (!_jobCandidateRelation) {
+      const _jobCandidateRelation = new JobCandidateRelation();
+      _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
+      _jobCandidateRelation.updatedAt = _jobCandidateRelation.createdAt;
+      _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
+      _jobCandidateRelation.createdAt = new Date();
+      _jobCandidateRelation.user = _currentUser;
+      _jobCandidateRelation.job = _job;
+      await this.jobCandidateRepositoty.save(_jobCandidateRelation);
+      return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
+    }
+  }
+
+  async getCandidatesOfJob(
+    getCandidatesOfJobParams: GetCandidatesOfJobParams,
+    getCandidatesOfJobQueries: GetCandidatesOfJobQuerires,
+  ): Promise<GetCandidatesOfJobResponse> {
+    const _job = await this.jobRepository.findOne({ id: getCandidatesOfJobParams.jobId });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    const records = getCandidatesOfJobQueries.records != undefined ? getCandidatesOfJobQueries.records : 10;
+
+    let appliedAtBeginning = null;
+    let appliedAtEnding = null;
+
+    if (getCandidatesOfJobQueries.appliedAt != undefined) {
+      let tempDate = new Date(getCandidatesOfJobQueries.appliedAt);
+      appliedAtBeginning = new Date(tempDate.toDateString());
+      appliedAtEnding = new Date(tempDate.setDate(appliedAtBeginning.getDate() + 1));
+    }
+
+    const [_jobCandidateRelations, totalRecods] = await this.jobCandidateRepositoty.findAndCount({
+      where: {
+        jobId: _job.id,
+        user: {
+          firstName:
+            getCandidatesOfJobQueries.name != undefined ? Like(`%${getCandidatesOfJobQueries.name}%`) : Not(IsNull()),
+        },
+        applyStatus:
+          getCandidatesOfJobQueries.applyStatus != undefined ? getCandidatesOfJobQueries.applyStatus : Not(IsNull()),
+        createdAt:
+          getCandidatesOfJobQueries.appliedAt != undefined
+            ? Between(appliedAtBeginning, appliedAtEnding)
+            : Not(IsNull()),
+      },
+      relations: ['user', 'approver'],
+      skip: (getCandidatesOfJobQueries.page > 0 ? getCandidatesOfJobQueries.page - 1 : 0) * records,
+      take: records,
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      totalRecods: totalRecods,
+      candidates: _jobCandidateRelations.map((_jobCandidateRelation) =>
+        this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation),
+      ),
+    };
+  }
+
+  async approveOrRejectCandidateForJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    changeJobApplyStatusParams: ChangeJobApplyStatusParams,
+    changeJobApplyStatusRequest: ChangeJobApplyStatusRequest,
+  ): Promise<CandidateOfJob> {
+    const _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
+      where: {
+        jobId: changeJobApplyStatusParams.jobId,
+        userId: changeJobApplyStatusParams.candidateId,
+      },
+      relations: ['job', 'job.company', 'user'],
+    });
+
+    if (!_jobCandidateRelation) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_currentCompany.id != _jobCandidateRelation.job.companyId) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    _jobCandidateRelation.updatedAt = new Date();
+    _jobCandidateRelation.editor = _currentUser;
+
+    if (changeJobApplyStatusParams.changeJobApplyStatus == 'Reject') {
+      if (_jobCandidateRelation.applyStatus == JobApplyStatus.WAITING) {
+        _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
+        _jobCandidateRelation.rejectMessage = changeJobApplyStatusRequest.rejectMessage;
+        await this.jobCandidateRepositoty.save(_jobCandidateRelation);
+      } else {
+        throw new ForbiddenException('User has been rejected or approved');
+      }
+    } else if (changeJobApplyStatusParams.changeJobApplyStatus == 'Approve') {
+      if (_jobCandidateRelation.applyStatus == JobApplyStatus.WAITING) {
+        _jobCandidateRelation.applyStatus = JobApplyStatus.APPROVED;
+        _jobCandidateRelation.rejectMessage = null;
+
+        await getManager().transaction(async (transactionalEntityManager) => {
+          const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
+            where: { jobId: _jobCandidateRelation.job, userId: _jobCandidateRelation.userId },
+          });
+
+          if (!_jobEmployeeRelation) {
+            const _jobEmployeeRelation = new JobEmployeeRelation();
+            _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.WORKING;
+            _jobEmployeeRelation.user = _jobCandidateRelation.user;
+            _jobEmployeeRelation.job = _jobCandidateRelation.job;
+            _jobEmployeeRelation.editor = _currentUser;
+            _jobEmployeeRelation.createdAt = new Date();
+            _jobEmployeeRelation.updatedAt = _jobEmployeeRelation.createdAt;
+            await transactionalEntityManager.save(_jobEmployeeRelation);
+            await transactionalEntityManager.save(_jobCandidateRelation);
+          } else if (_jobEmployeeRelation && _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVE) {
+            _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.WORKING;
+            _jobEmployeeRelation.updatedAt = new Date();
+            _jobEmployeeRelation.editor = _currentUser;
+            await transactionalEntityManager.save(_jobEmployeeRelation);
+            await transactionalEntityManager.save(_jobCandidateRelation);
+          } else {
+            throw new ForbiddenException('User is an employee');
+          }
+        });
+      } else {
+        throw new ForbiddenException('User has been rejected or approved');
+      }
+    } else {
+      throw new BadRequestException('Bad request');
+    }
+
+    return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
+  }
+
+  async removeEmployeeFromJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    removeEmployeeFromJobParams: RemoveEmployeeFromJobParams,
+  ): Promise<EmployeeOfJob> {
+    const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
+      where: { userId: removeEmployeeFromJobParams.employeeId, jobId: removeEmployeeFromJobParams.jobId },
+      relations: ['user', 'job', 'job.company'],
+    });
+
+    if (!_jobEmployeeRelation) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_jobEmployeeRelation.job.company != _currentCompany) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVE) {
+      throw new ForbiddenException('Employee had been removed');
+    }
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      const _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
+        where: { jobId: removeEmployeeFromJobParams.jobId, userId: removeEmployeeFromJobParams.employeeId },
+      });
+
+      _jobCandidateRelation.rejectMessage = 'Got remove from employee';
+      _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
+      _jobCandidateRelation.editor = _currentUser;
+
+      await transactionalEntityManager.save(_jobCandidateRelation);
+
+      _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.REMOVE;
+      _jobEmployeeRelation.updatedAt = new Date();
+      _jobEmployeeRelation.editor = _currentUser;
+
+      await transactionalEntityManager.save(_jobEmployeeRelation);
+    });
+
+    return this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation);
+  }
+
+  async getEmployeesOfJob(
+    getEmployeesOfJobParams: GetEmployeesOfJobParams,
+    getEmployeesOfJobQueries: GetEmployeesOfJobQuerires,
+  ): Promise<GetEmployeesOfJobResponse> {
+    const _job = await this.jobRepository.findOne({ id: getEmployeesOfJobParams.jobId });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    const records = getEmployeesOfJobQueries.records != undefined ? getEmployeesOfJobQueries.records : 10;
+
+    let appliedAtBeginning = null;
+    let appliedAtEnding = null;
+
+    if (getEmployeesOfJobQueries.joinedAt != undefined) {
+      let tempDate = new Date(getEmployeesOfJobQueries.joinedAt);
+      appliedAtBeginning = new Date(tempDate.toDateString());
+      appliedAtEnding = new Date(tempDate.setDate(appliedAtBeginning.getDate() + 1));
+    }
+
+    const [_jobEmployeeRelations, totalRecods] = await this.jobEmployeeRepositoty.findAndCount({
+      where: {
+        jobId: _job.id,
+        user: {
+          firstName:
+            getEmployeesOfJobQueries.name != undefined ? Like(`%${getEmployeesOfJobQueries.name}%`) : Not(IsNull()),
+        },
+        applyStatus:
+          getEmployeesOfJobQueries.jobEmployeeStatus != undefined
+            ? getEmployeesOfJobQueries.jobEmployeeStatus
+            : Not(IsNull()),
+        createdAt:
+          getEmployeesOfJobQueries.joinedAt != undefined ? Between(appliedAtBeginning, appliedAtEnding) : Not(IsNull()),
+      },
+      relations: ['user', 'approver'],
+      skip: (getEmployeesOfJobQueries.page > 0 ? getEmployeesOfJobQueries.page - 1 : 0) * records,
+      take: records,
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      totalRecods: totalRecods,
+      employees: _jobEmployeeRelations.map((_jobEmployeeRelation) =>
+        this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation),
+      ),
+    };
   }
 }

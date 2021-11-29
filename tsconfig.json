@@ -45,6 +45,7 @@
     }
   },
   "exclude": [
-    "public"
+    "public",
+    "unuser-code/*.ts"
   ]
 }

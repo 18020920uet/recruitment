@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
 import { Job } from '@Shared/responses/job';
+import { User } from '@Shared/responses/user';
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
+import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 
 export class JobDetail extends Job {
   @AutoMap()
@@ -15,6 +18,26 @@ export class JobDetail extends Job {
   @AutoMap()
   @ApiProperty()
   maxEmployees: number;
+
+  @AutoMap()
+  @ApiProperty()
+  createdAt: Date;
+
+  @AutoMap()
+  @ApiProperty()
+  updateAt: Date;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty()
+  creator: User;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty()
+  lastUpdater: User;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty()
+  deletedAt: Date;
 }
 
 export class GetJobDetailResponse {
@@ -32,4 +55,85 @@ export class GetJobsResponse {
 
   @ApiProperty()
   totalRecords: number;
+}
+
+export class DeleteJobResponse {
+  @ApiProperty({ type: 'boolean' })
+  status: boolean;
+}
+
+export class CandidateOfJob {
+  @AutoMap()
+  @ApiProperty()
+  jobId: number;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty({ type: User })
+  user: User;
+
+  @AutoMap()
+  @ApiProperty()
+  createdAt: Date;
+
+  @AutoMap()
+  @ApiProperty()
+  updatedAt: Date | null;
+
+  @AutoMap()
+  @ApiProperty({ enum: JobApplyStatus, enumName: 'JobApplyStatus' })
+  applyStatus: JobApplyStatus;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty({ type: User })
+  editor: User | null;
+
+  @AutoMap()
+  @ApiProperty()
+  introduceMessage: string;
+
+  @AutoMap()
+  @ApiProperty()
+  rejectMessage: string;
+}
+
+export class EmployeeOfJob {
+  @AutoMap()
+  @ApiProperty()
+  jobId: number;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty({ type: User })
+  user: User;
+
+  @AutoMap()
+  @ApiProperty()
+  createdAt: Date;
+
+  @AutoMap()
+  @ApiProperty()
+  updatedAt: Date | null;
+
+  @AutoMap()
+  @ApiProperty({ enum: JobEmployeeStatus, enumName: 'JobEmployeeStatus' })
+  employeeStatus: JobEmployeeStatus;
+
+  @AutoMap({ typeFn: () => User })
+  @ApiProperty({ type: User })
+  editor: User | null;
+}
+
+export class GetEmployeesOfJobResponse {
+  @ApiProperty({ type: [EmployeeOfJob] })
+  employees: EmployeeOfJob[];
+
+  @ApiProperty()
+  totalRecods: number;
+}
+
+export class GetCandidatesOfJobResponse {
+  @ApiProperty({ type: [CandidateOfJob] })
+  candidates: CandidateOfJob[];
+
+  @ApiProperty()
+  totalRecods: number;
 }

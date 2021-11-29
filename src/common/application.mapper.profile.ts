@@ -27,9 +27,11 @@ import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse } from '@Modules/companies/dtos/responses';
 import { FreeLancer } from '@Modules/users/dtos/responses';
-import { JobDetail } from '@Modules/jobs/dtos/responses';
+import { CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
 
 import { FileService } from '@Shared/services/file.service';
+import { JobCandidateRelation } from '@Entities/job-candidate.relation';
+import { JobEmployeeRelation } from '@Entities/job-employee.relation';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {
@@ -183,6 +185,8 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             }));
           }),
         );
+      mapper.createMap(JobCandidateRelation, CandidateOfJob, { useUndefined: false });
+      mapper.createMap(JobEmployeeRelation, EmployeeOfJob, { useUndefined: false });
     };
   }
 }
