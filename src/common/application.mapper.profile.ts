@@ -5,8 +5,10 @@ import { mapFrom } from '@automapper/core';
 
 import { CurriculumVitaeExperienceEntity } from '@Entities/curriculum-vitae-experience.entity';
 import { CompanyInformationEntity } from '@Entities/company-information.entity';
-import { BusinessFieldEntity } from '@Entities/business-field.entity';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
+import { BusinessFieldEntity } from '@Entities/business-field.entity';
+import { JobCandidateRelation } from '@Entities/job-candidate.relation';
+import { JobEmployeeRelation } from '@Entities/job-employee.relation';
 import { CountryEntity } from '@Entities/country.entity';
 import { CompanyEntity } from '@Entities/company.entity';
 import { ReviewEntity } from '@Entities/review.entity';
@@ -26,14 +28,13 @@ import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse, JobOfCompany } from '@Modules/companies/dtos/responses';
+import { ApplyJobResponse, CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
 import { FreeLancer } from '@Modules/users/dtos/responses';
-import { CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
 
-import { FileService } from '@Shared/services/file.service';
-import { JobCandidateRelation } from '@Entities/job-candidate.relation';
-import { JobEmployeeRelation } from '@Entities/job-employee.relation';
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
+
+import { FileService } from '@Shared/services/file.service';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {
@@ -42,37 +43,37 @@ export class ApplicationMapperProfile extends AutomapperProfile {
   }
 
   mapProfile() {
-    return (mapper) => {
+    return (mapper: Mapper) => {
       mapper.createMap(UserEntity, User).forMember(
-        (user) => user.avatar,
-        mapFrom((_user) => this.fileService.getAvatar(_user)),
+        (user: User) => user.avatar,
+        mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
       );
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper
         .createMap(CurriculumVitaeEntity, CurriculumVitae)
         .forMember(
-          (curriculumVitae) => curriculumVitae.email,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.email),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.email,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.email),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.firstName,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.firstName),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.firstName,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.firstName),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.lastName,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.lastName),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.lastName,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.lastName),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.avatar,
-          mapFrom((_curriculumVitae) => this.fileService.getAvatar(_curriculumVitae.user)),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.avatar,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => this.fileService.getAvatar(_curriculumVitae.user)),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.experiences,
-          mapFrom((_curriculumVitae) => _curriculumVitae.experiences),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.experiences,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.experiences),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.certifications,
-          mapFrom((_curriculumVitae) => {
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.certifications,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => {
             return _curriculumVitae.certifications
               .split('|')
               .filter((certification) => certification)
@@ -80,27 +81,28 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           }),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.languages,
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.languages,
           mapFrom((_curriculumVitae) => _curriculumVitae.languages),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.nationality,
-          mapFrom((_curriculumVitae) => _curriculumVitae.nationality),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.nationality,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.nationality),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.hobbies,
-          mapFrom((_curriculumVitae) => _curriculumVitae.hobbies.split('|').filter((hobby) => hobby)),
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.hobbies,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) =>
+            _curriculumVitae.hobbies.split('|').filter((hobby) => hobby)),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.dateOfBirth,
-          mapFrom((_curriculumVitae) => {
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.dateOfBirth,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => {
             const dateOfBirth = _curriculumVitae.dateOfBirth ? _curriculumVitae.dateOfBirth : new Date();
             return dateOfBirth.toLocaleDateString('en-Us');
           }),
         )
         .forMember(
-          (curriculumVitae) => curriculumVitae.skills,
-          mapFrom((_curriculumVitae) => {
+          (curriculumVitae: CurriculumVitae) => curriculumVitae.skills,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => {
             return _curriculumVitae.skillRelations.map((skillRelation) => ({
               id: skillRelation.skill.id,
               name: skillRelation.skill.name,
@@ -111,16 +113,16 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper.createMap(ReviewEntity, Review);
       mapper.createMap(ReviewEntity, ReviewByUser);
       mapper.createMap(CompanyEntity, Company).forMember(
-        (company) => company.logo,
-        mapFrom((_company) => this.fileService.getLogo(_company)),
+        (company: Company) => company.logo,
+        mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
       );
       mapper.createMap(CountryEntity, CountryEntity);
       mapper.createMap(AreaEntity, AreaEntity);
       mapper
         .createMap(CompanyInformationEntity, CompanyInformation)
         .forMember(
-          (information) => information.photos,
-          mapFrom((_companyInformation) =>
+          (information: CompanyInformation) => information.photos,
+          mapFrom((_companyInformation: CompanyInformationEntity) =>
             _companyInformation.photos
               .split('|')
               .filter((photo) => photo)
@@ -128,22 +130,24 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           ),
         )
         .forMember(
-          (information) => information.addresses,
-          mapFrom((_companyInformation) => _companyInformation.addresses.split('|').filter((address) => address)),
+          (information: CompanyInformation) => information.addresses,
+          mapFrom((_companyInformation: CompanyInformationEntity) =>
+            _companyInformation.addresses.split('|').filter((address) => address)
+          ),
         )
         .forMember(
-          (information) => information.socialNetworks,
-          mapFrom((_companyInformation) => _companyInformation.socialNetworks),
+          (information: CompanyInformation) => information.socialNetworks,
+          mapFrom((_companyInformation: CompanyInformationEntity) => _companyInformation.socialNetworks),
         );
       mapper
         .createMap(CompanyEntity, GetCompanyDetailResponse)
         .forMember(
-          (detail) => detail.logo,
-          mapFrom((_company) => this.fileService.getLogo(_company)),
+          (detail: GetCompanyDetailResponse) => detail.logo,
+          mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
         )
         .forMember(
-          (detail) => detail.businessFields,
-          mapFrom((_company) =>
+          (detail: GetCompanyDetailResponse) => detail.businessFields,
+          mapFrom((_company: CompanyEntity) =>
             _company.businessFields.map((_businessField) => ({ id: _businessField.id, name: _businessField.name })),
           ),
         );
@@ -167,32 +171,32 @@ export class ApplicationMapperProfile extends AutomapperProfile {
       mapper
         .createMap(CurriculumVitaeEntity, FreeLancer)
         .forMember(
-          (freelancer) => freelancer.email,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.email),
+          (freelancer: FreeLancer) => freelancer.email,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.email),
         )
         .forMember(
-          (freelancer) => freelancer.firstName,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.firstName),
+          (freelancer: FreeLancer) => freelancer.firstName,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.firstName),
         )
         .forMember(
-          (freelancer) => freelancer.lastName,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.lastName),
+          (freelancer: FreeLancer)  => freelancer.lastName,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.lastName),
         )
         .forMember(
-          (freelancer) => freelancer.id,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.id),
+          (freelancer: FreeLancer)  => freelancer.id,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.id),
         )
         .forMember(
-          (freelancer) => freelancer.role,
-          mapFrom((_curriculumVitae) => _curriculumVitae.user.role),
+          (freelancer: FreeLancer)  => freelancer.role,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.role),
         )
         .forMember(
-          (freelancer) => freelancer.avatar,
-          mapFrom((_curriculumVitae) => this.fileService.getAvatar(_curriculumVitae.user)),
+          (freelancer: FreeLancer)  => freelancer.avatar,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => this.fileService.getAvatar(_curriculumVitae.user)),
         )
         .forMember(
-          (freelancer) => freelancer.skills,
-          mapFrom((_curriculumVitae) => {
+          (freelancer: FreeLancer)  => freelancer.skills,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) => {
             return _curriculumVitae.skillRelations.map((skillRelation) => ({
               id: skillRelation.skill.id,
               name: skillRelation.skill.name,
@@ -200,8 +204,8 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             }));
           }),
         );
-      mapper.createMap(JobCandidateRelation, CandidateOfJob, { useUndefined: false });
-      mapper.createMap(JobEmployeeRelation, EmployeeOfJob, { useUndefined: false });
+      mapper.createMap(JobCandidateRelation, CandidateOfJob);
+      mapper.createMap(JobEmployeeRelation, EmployeeOfJob);
     };
   }
 }
