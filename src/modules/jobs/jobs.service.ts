@@ -18,30 +18,30 @@ import { JobEntity } from '@Entities/job.entity';
 
 import {
   RemoveEmployeeFromJobParams,
+  ChangeJobApplyStatusRequest,
+  GetCandidatesOfJobQuerires,
+  ChangeJobApplyStatusParams,
+  GetEmployeesOfJobQuerires,
   GetCandidatesOfJobParams,
   GetEmployeesOfJobParams,
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
-  ApplyJobRequest,
   UpdateJobParams,
+  ApplyJobRequest,
   DeleteJobParams,
   GetJobsQueries,
   ApplyJobParams,
-  GetCandidatesOfJobQuerires,
-  ChangeJobApplyStatusParams,
-  ChangeJobApplyStatusRequest,
-  GetEmployeesOfJobQuerires,
 } from './dtos/requests';
 import {
-  GetJobsResponse,
-  GetJobDetailResponse,
-  JobDetail,
-  DeleteJobResponse,
-  CandidateOfJob,
   GetCandidatesOfJobResponse,
-  EmployeeOfJob,
   GetEmployeesOfJobResponse,
+  GetJobDetailResponse,
+  DeleteJobResponse,
+  GetJobsResponse,
+  CandidateOfJob,
+  EmployeeOfJob,
+  JobDetail,
 } from './dtos/responses';
 import { Job } from '@Shared/responses/job';
 
@@ -326,35 +326,36 @@ export class JobsService {
   ): Promise<CandidateOfJob> {
     const _job = await this.jobRepository.findOne({ id: applyJobParams.jobId });
 
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
     let _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
       where: { jobId: applyJobParams.jobId, user: _currentUser },
       relations: ['user'],
     });
 
-    if (!_job) {
-      throw new NotFoundException('Not found');
-    }
-
     if (_jobCandidateRelation && _jobCandidateRelation.applyStatus != JobApplyStatus.REJECTED) {
       throw new ForbiddenException('Already apply');
-    } else if (_jobCandidateRelation && _jobCandidateRelation.applyStatus == JobApplyStatus.REJECTED) {
-      _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
-      _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
-      _jobCandidateRelation.updatedAt = new Date();
-      _jobCandidateRelation.rejectMessage = null;
-      await this.jobCandidateRepositoty.save(_jobCandidateRelation);
-      return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
-    } else if (!_jobCandidateRelation) {
-      const _jobCandidateRelation = new JobCandidateRelation();
+    }
+
+    if (!_jobCandidateRelation) {
+      _jobCandidateRelation = new JobCandidateRelation();
       _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
       _jobCandidateRelation.updatedAt = _jobCandidateRelation.createdAt;
       _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
       _jobCandidateRelation.createdAt = new Date();
       _jobCandidateRelation.user = _currentUser;
       _jobCandidateRelation.job = _job;
-      await this.jobCandidateRepositoty.save(_jobCandidateRelation);
-      return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
+    } else if (_jobCandidateRelation && _jobCandidateRelation.applyStatus == JobApplyStatus.REJECTED) {
+      _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
+      _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
+      _jobCandidateRelation.updatedAt = new Date();
+      _jobCandidateRelation.rejectMessage = null;
     }
+
+    await this.jobCandidateRepositoty.save(_jobCandidateRelation);
+    return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
   }
 
   async getCandidatesOfJob(
@@ -392,17 +393,23 @@ export class JobsService {
             ? Between(appliedAtBeginning, appliedAtEnding)
             : Not(IsNull()),
       },
-      relations: ['user', 'approver'],
+      relations: ['user', 'editor'],
       skip: (getCandidatesOfJobQueries.page > 0 ? getCandidatesOfJobQueries.page - 1 : 0) * records,
       take: records,
       order: { createdAt: 'DESC' },
     });
+
+    const totalEmployess = await this.jobEmployeeRepositoty.count({
+      where: { jobId: _job.id, jobEmployeeStatus: JobEmployeeStatus.WORKING }
+    })
 
     return {
       totalRecods: totalRecods,
       candidates: _jobCandidateRelations.map((_jobCandidateRelation) =>
         this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation),
       ),
+      maxEmployees: _job.maxEmployees,
+      totalEmployees: totalEmployess,
     };
   }
 
@@ -431,49 +438,44 @@ export class JobsService {
     _jobCandidateRelation.updatedAt = new Date();
     _jobCandidateRelation.editor = _currentUser;
 
+    if (!['Reject', 'Approve'].includes(changeJobApplyStatusParams.changeJobApplyStatus)) {
+      throw new BadRequestException('Bad Request');
+    }
+
+    if (_jobCandidateRelation.applyStatus != JobApplyStatus.WAITING) {
+      throw new ForbiddenException('User has been rejected or approved');
+    }
+
     if (changeJobApplyStatusParams.changeJobApplyStatus == 'Reject') {
-      if (_jobCandidateRelation.applyStatus == JobApplyStatus.WAITING) {
-        _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
-        _jobCandidateRelation.rejectMessage = changeJobApplyStatusRequest.rejectMessage;
-        await this.jobCandidateRepositoty.save(_jobCandidateRelation);
-      } else {
-        throw new ForbiddenException('User has been rejected or approved');
-      }
+      _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
+      _jobCandidateRelation.rejectMessage = changeJobApplyStatusRequest.rejectMessage;
+      await this.jobCandidateRepositoty.save(_jobCandidateRelation);
     } else if (changeJobApplyStatusParams.changeJobApplyStatus == 'Approve') {
-      if (_jobCandidateRelation.applyStatus == JobApplyStatus.WAITING) {
-        _jobCandidateRelation.applyStatus = JobApplyStatus.APPROVED;
-        _jobCandidateRelation.rejectMessage = null;
+      _jobCandidateRelation.applyStatus = JobApplyStatus.APPROVED;
+      _jobCandidateRelation.rejectMessage = null;
 
-        await getManager().transaction(async (transactionalEntityManager) => {
-          const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
-            where: { jobId: _jobCandidateRelation.job, userId: _jobCandidateRelation.userId },
-          });
+      let _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
+        where: { jobId: _jobCandidateRelation.job, userId: _jobCandidateRelation.userId },
+      });
 
-          if (!_jobEmployeeRelation) {
-            const _jobEmployeeRelation = new JobEmployeeRelation();
-            _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.WORKING;
-            _jobEmployeeRelation.user = _jobCandidateRelation.user;
-            _jobEmployeeRelation.job = _jobCandidateRelation.job;
-            _jobEmployeeRelation.editor = _currentUser;
-            _jobEmployeeRelation.createdAt = new Date();
-            _jobEmployeeRelation.updatedAt = _jobEmployeeRelation.createdAt;
-            await transactionalEntityManager.save(_jobEmployeeRelation);
-            await transactionalEntityManager.save(_jobCandidateRelation);
-          } else if (_jobEmployeeRelation && _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVE) {
-            _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.WORKING;
-            _jobEmployeeRelation.updatedAt = new Date();
-            _jobEmployeeRelation.editor = _currentUser;
-            await transactionalEntityManager.save(_jobEmployeeRelation);
-            await transactionalEntityManager.save(_jobCandidateRelation);
-          } else {
-            throw new ForbiddenException('User is an employee');
-          }
-        });
-      } else {
-        throw new ForbiddenException('User has been rejected or approved');
+      if (_jobEmployeeRelation && _jobEmployeeRelation.jobEmployeeStatus != JobEmployeeStatus.REMOVE) {
+        throw new ForbiddenException('User is an employee');
       }
-    } else {
-      throw new BadRequestException('Bad request');
+
+      await getManager().transaction(async (transactionalEntityManager) => {
+        if (!_jobEmployeeRelation) {
+          _jobEmployeeRelation = new JobEmployeeRelation();
+          _jobEmployeeRelation.user = _jobCandidateRelation.user;
+          _jobEmployeeRelation.job = _jobCandidateRelation.job;
+          _jobEmployeeRelation.createdAt = new Date();
+        }
+        _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.WORKING;
+        _jobEmployeeRelation.updatedAt = new Date();
+        _jobEmployeeRelation.editor = _currentUser;
+
+        await transactionalEntityManager.save(_jobEmployeeRelation);
+        await transactionalEntityManager.save(_jobCandidateRelation);
+      });
     }
 
     return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
@@ -501,21 +503,20 @@ export class JobsService {
       throw new ForbiddenException('Employee had been removed');
     }
 
-    await getManager().transaction(async (transactionalEntityManager) => {
-      const _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
-        where: { jobId: removeEmployeeFromJobParams.jobId, userId: removeEmployeeFromJobParams.employeeId },
-      });
+    const _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
+      where: { jobId: removeEmployeeFromJobParams.jobId, userId: removeEmployeeFromJobParams.employeeId },
+    });
 
-      _jobCandidateRelation.rejectMessage = 'Got remove from employee';
+    await getManager().transaction(async (transactionalEntityManager) => {
+      _jobCandidateRelation.rejectMessage = 'Got remove from job';
       _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
       _jobCandidateRelation.editor = _currentUser;
-
-      await transactionalEntityManager.save(_jobCandidateRelation);
 
       _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.REMOVE;
       _jobEmployeeRelation.updatedAt = new Date();
       _jobEmployeeRelation.editor = _currentUser;
 
+      await transactionalEntityManager.save(_jobCandidateRelation);
       await transactionalEntityManager.save(_jobEmployeeRelation);
     });
 
@@ -550,14 +551,14 @@ export class JobsService {
           firstName:
             getEmployeesOfJobQueries.name != undefined ? Like(`%${getEmployeesOfJobQueries.name}%`) : Not(IsNull()),
         },
-        applyStatus:
+        jobEmployeeStatus:
           getEmployeesOfJobQueries.jobEmployeeStatus != undefined
             ? getEmployeesOfJobQueries.jobEmployeeStatus
             : Not(IsNull()),
         createdAt:
           getEmployeesOfJobQueries.joinedAt != undefined ? Between(appliedAtBeginning, appliedAtEnding) : Not(IsNull()),
       },
-      relations: ['user', 'approver'],
+      relations: ['user', 'editor'],
       skip: (getEmployeesOfJobQueries.page > 0 ? getEmployeesOfJobQueries.page - 1 : 0) * records,
       take: records,
       order: { createdAt: 'DESC' },
@@ -568,6 +569,8 @@ export class JobsService {
       employees: _jobEmployeeRelations.map((_jobEmployeeRelation) =>
         this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation),
       ),
+      maxEmployees: _job.maxEmployees,
+      totalEmployees: _jobEmployeeRelations.filter((er) => er.jobEmployeeStatus == JobEmployeeStatus.WORKING).length,
     };
   }
 }

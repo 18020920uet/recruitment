@@ -28,7 +28,7 @@ import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse, JobOfCompany } from '@Modules/companies/dtos/responses';
-import { ApplyJobResponse, CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
+import { CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
 import { FreeLancer } from '@Modules/users/dtos/responses';
 
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';

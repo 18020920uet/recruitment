@@ -128,6 +128,12 @@ export class GetEmployeesOfJobResponse {
 
   @ApiProperty()
   totalRecods: number;
+
+  @ApiProperty()
+  maxEmployees: number;
+
+  @ApiProperty()
+  totalEmployees: number;
 }
 
 export class GetCandidatesOfJobResponse {
@@ -136,4 +142,10 @@ export class GetCandidatesOfJobResponse {
 
   @ApiProperty()
   totalRecods: number;
+
+  @ApiProperty()
+  maxEmployees: number;
+
+  @ApiProperty()
+  totalEmployees: number;
 }
