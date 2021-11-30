@@ -18,7 +18,12 @@ import { CompaniesService } from './companies.service';
 
 import { Company } from '@Shared/responses/company';
 import { GetCompanyDetailResponse, GetJobsOfCompanyResponse } from './dtos/responses';
-import { GetCompaniesFilterWithTheFirstCharacterInNameQuery, GetCompanyDetailParams, GetJobsOfCompanyParams, GetJobsOfCompanyQueries } from './dtos/requests';
+import {
+  GetCompaniesFilterWithTheFirstCharacterInNameQuery,
+  GetCompanyDetailParams,
+  GetJobsOfCompanyParams,
+  GetJobsOfCompanyQueries,
+} from './dtos/requests';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -46,12 +51,13 @@ export class CompaniesController {
   }
 
   @Get(':companyId/jobs')
-  @ApiOperation({ summary: "Get a company's jobs "})
+  @ApiOperation({ summary: "Get a company's jobs" })
   @ApplicationApiOkResponse(GetJobsOfCompanyResponse)
   @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getJobsOfCompany(
-    @Param() getJobsOfCompanyParams: GetJobsOfCompanyParams, @Query() getJobsOfCompanyQueries: GetJobsOfCompanyQueries
+    @Param() getJobsOfCompanyParams: GetJobsOfCompanyParams,
+    @Query() getJobsOfCompanyQueries: GetJobsOfCompanyQueries,
   ): Promise<GetJobsOfCompanyResponse> {
     return this.companiesService.getJobsOfCompany(getJobsOfCompanyParams, getJobsOfCompanyQueries);
   }

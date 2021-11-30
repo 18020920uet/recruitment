@@ -91,7 +91,8 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         .forMember(
           (curriculumVitae: CurriculumVitae) => curriculumVitae.hobbies,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) =>
-            _curriculumVitae.hobbies.split('|').filter((hobby) => hobby)),
+            _curriculumVitae.hobbies.split('|').filter((hobby) => hobby),
+          ),
         )
         .forMember(
           (curriculumVitae: CurriculumVitae) => curriculumVitae.dateOfBirth,
@@ -132,7 +133,7 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         .forMember(
           (information: CompanyInformation) => information.addresses,
           mapFrom((_companyInformation: CompanyInformationEntity) =>
-            _companyInformation.addresses.split('|').filter((address) => address)
+            _companyInformation.addresses.split('|').filter((address) => address),
           ),
         )
         .forMember(
@@ -153,19 +154,22 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         );
       mapper.createMap(SkillEntity, Skill);
       mapper.createMap(JobEntity, Job);
-      mapper.createMap(JobEntity, JobOfCompany)
+      mapper
+        .createMap(JobEntity, JobOfCompany)
         .forMember(
           (job: JobOfCompany) => job.totalEmployees,
-          mapFrom((_job: JobEntity) =>
-            _job.employeeRelations.filter((eR) => eR.jobEmployeeStatus == JobEmployeeStatus.WORKING).length
-          )
+          mapFrom(
+            (_job: JobEntity) =>
+              _job.employeeRelations.filter((eR) => eR.jobEmployeeStatus == JobEmployeeStatus.WORKING).length,
+          ),
         )
         .forMember(
           (job: JobOfCompany) => job.totalCandidates,
-          mapFrom((_job: JobEntity) =>
-            _job.candidateRelations.filter((cR) => cR.applyStatus == JobApplyStatus.WAITING).length
-          )
-        )
+          mapFrom(
+            (_job: JobEntity) =>
+              _job.candidateRelations.filter((cR) => cR.applyStatus == JobApplyStatus.WAITING).length,
+          ),
+        );
       mapper.createMap(JobEntity, JobDetail);
       mapper.createMap(BusinessFieldEntity, BusinessField);
       mapper
@@ -179,23 +183,23 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.firstName),
         )
         .forMember(
-          (freelancer: FreeLancer)  => freelancer.lastName,
+          (freelancer: FreeLancer) => freelancer.lastName,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.lastName),
         )
         .forMember(
-          (freelancer: FreeLancer)  => freelancer.id,
+          (freelancer: FreeLancer) => freelancer.id,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.id),
         )
         .forMember(
-          (freelancer: FreeLancer)  => freelancer.role,
+          (freelancer: FreeLancer) => freelancer.role,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => _curriculumVitae.user.role),
         )
         .forMember(
-          (freelancer: FreeLancer)  => freelancer.avatar,
+          (freelancer: FreeLancer) => freelancer.avatar,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => this.fileService.getAvatar(_curriculumVitae.user)),
         )
         .forMember(
-          (freelancer: FreeLancer)  => freelancer.skills,
+          (freelancer: FreeLancer) => freelancer.skills,
           mapFrom((_curriculumVitae: CurriculumVitaeEntity) => {
             return _curriculumVitae.skillRelations.map((skillRelation) => ({
               id: skillRelation.skill.id,

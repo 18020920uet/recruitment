@@ -10,8 +10,12 @@ import { JobRepository } from '@Repositories/job.repository';
 
 import { CompanyEntity } from '@Entities/company.entity';
 
-
-import { GetCompaniesFilterWithTheFirstCharacterInNameQuery, GetCompanyDetailParams, GetJobsOfCompanyParams, GetJobsOfCompanyQueries } from './dtos/requests';
+import {
+  GetCompaniesFilterWithTheFirstCharacterInNameQuery,
+  GetCompanyDetailParams,
+  GetJobsOfCompanyParams,
+  GetJobsOfCompanyQueries,
+} from './dtos/requests';
 import { GetCompanyDetailResponse, GetJobsOfCompanyResponse, JobOfCompany } from './dtos/responses';
 import { Company } from '@Shared/responses/company';
 import { JobEntity } from '@Entities/job.entity';
@@ -54,7 +58,8 @@ export class CompaniesService {
   }
 
   async getJobsOfCompany(
-    getJobsOfCompanyParams: GetJobsOfCompanyParams, getJobsOfCompanyQueries: GetJobsOfCompanyQueries
+    getJobsOfCompanyParams: GetJobsOfCompanyParams,
+    getJobsOfCompanyQueries: GetJobsOfCompanyQueries,
   ): Promise<GetJobsOfCompanyResponse> {
     console.log(getJobsOfCompanyQueries.withDeleted);
     const _company = await this.companyRepository.findOne({ id: getJobsOfCompanyParams.companyId });
@@ -68,10 +73,9 @@ export class CompaniesService {
     const [_jobs, totalRecords] = await this.jobRepository.findAndCount({
       where: {
         companyId: getJobsOfCompanyParams.companyId,
-        areaId: getJobsOfCompanyQueries.areaId != undefined ?
-          getJobsOfCompanyQueries.areaId : Not(IsNull()),
+        areaId: getJobsOfCompanyQueries.areaId != undefined ? getJobsOfCompanyQueries.areaId : Not(IsNull()),
         title: getJobsOfCompanyQueries.title != undefined ? Like(`%${getJobsOfCompanyQueries.title}%`) : Not(IsNull()),
-        status: getJobsOfCompanyQueries.status != undefined ? getJobsOfCompanyQueries.status : Not(IsNull())
+        status: getJobsOfCompanyQueries.status != undefined ? getJobsOfCompanyQueries.status : Not(IsNull()),
       },
       relations: ['employeeRelations', 'candidateRelations', 'area', 'businessFields', 'skills'],
       withDeleted: getJobsOfCompanyQueries.withDeleted,

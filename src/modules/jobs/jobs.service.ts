@@ -224,7 +224,8 @@ export class JobsService {
       where: {
         id:
           createJobRequest.businessFieldIds && createJobRequest.businessFieldIds.length != 0
-            ? In(createJobRequest.businessFieldIds) : Not(IsNull()),
+            ? In(createJobRequest.businessFieldIds)
+            : Not(IsNull()),
         name: createJobRequest.businessFieldIds.length == 0 ? 'Information Technology' : Not(IsNull()),
       },
     });
@@ -278,7 +279,8 @@ export class JobsService {
       where: {
         id:
           updateJobRequest.businessFieldIds && updateJobRequest.businessFieldIds.length != 0
-            ? In(updateJobRequest.businessFieldIds) : Not(IsNull()),
+            ? In(updateJobRequest.businessFieldIds)
+            : Not(IsNull()),
         name: updateJobRequest.businessFieldIds.length == 0 ? 'Information Technology' : Not(IsNull()),
       },
     });
@@ -400,8 +402,8 @@ export class JobsService {
     });
 
     const totalEmployess = await this.jobEmployeeRepositoty.count({
-      where: { jobId: _job.id, jobEmployeeStatus: JobEmployeeStatus.WORKING }
-    })
+      where: { jobId: _job.id, jobEmployeeStatus: JobEmployeeStatus.WORKING },
+    });
 
     return {
       totalRecods: totalRecods,

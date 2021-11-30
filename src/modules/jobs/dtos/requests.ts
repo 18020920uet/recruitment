@@ -118,9 +118,11 @@ export class CreateJobRequest {
   @ApiProperty({ description: 'End date >= today, Format: YYYY/MM/DD' })
   endDate: string;
 
-  @ApiProperty(
-    { type: 'array', items: { type: 'number' }, description: 'If array empty => businessFieldIds = ["IT"] ' }
-  )
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'number' },
+    description: 'If array empty => businessFieldIds = ["IT"] ',
+  })
   businessFieldIds: number[];
 
   @ApiProperty({ description: 'areaId = 0 => Company area' })

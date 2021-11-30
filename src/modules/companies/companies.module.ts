@@ -12,13 +12,8 @@ import { CompaniesController } from './companies.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      CompanyRepository,
-      JobRepository,
-      JobCandidateRepositoty,
-      JobEmployeeRepositoty,
-    ]),
-    ConfigModule
+    TypeOrmModule.forFeature([CompanyRepository, JobRepository, JobCandidateRepositoty, JobEmployeeRepositoty]),
+    ConfigModule,
   ],
   providers: [CompaniesService],
   controllers: [CompaniesController],
