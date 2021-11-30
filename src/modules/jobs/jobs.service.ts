@@ -55,8 +55,8 @@ import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 export class JobsService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private jobCandidateRepositoty: JobCandidateRepositoty,
+    private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private jobRepository: JobRepository,
   ) {}
 

@@ -1,19 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { Like, Not, IsNull } from 'typeorm';
 
+import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { CompanyRepository } from '@Repositories/company.repository';
+import { JobRepository } from '@Repositories/job.repository';
 
 import { CompanyEntity } from '@Entities/company.entity';
 
-import { GetCompaniesFilterWithTheFirstCharacterInNameQuery } from './dtos/requests';
-import { GetCompanyDetailResponse } from './dtos/responses';
+
+import { GetCompaniesFilterWithTheFirstCharacterInNameQuery, GetCompanyDetailParams, GetJobsOfCompanyParams, GetJobsOfCompanyQueries } from './dtos/requests';
+import { GetCompanyDetailResponse, GetJobsOfCompanyResponse, JobOfCompany } from './dtos/responses';
 import { Company } from '@Shared/responses/company';
+import { JobEntity } from '@Entities/job.entity';
 
 @Injectable()
 export class CompaniesService {
-  constructor(@InjectMapper() private readonly mapper: Mapper, private companyRepository: CompanyRepository) {}
+  constructor(
+    @InjectMapper() private readonly mapper: Mapper,
+    private jobCandidateRepositoty: JobCandidateRepositoty,
+    private jobEmployeeRepositoty: JobEmployeeRepositoty,
+    private companyRepository: CompanyRepository,
+    private jobRepository: JobRepository,
+  ) {}
 
   async getCompanies(
     getCompaniesFilterWithTheFirstCharacterInNameQuery: GetCompaniesFilterWithTheFirstCharacterInNameQuery,
@@ -34,11 +45,43 @@ export class CompaniesService {
     return _companies.map((_company) => this.mapper.map(_company, Company, CompanyEntity));
   }
 
-  async getCompanyDetail(companyId: string): Promise<GetCompanyDetailResponse> {
+  async getCompanyDetail(getCompanyDetailParams: GetCompanyDetailParams): Promise<GetCompanyDetailResponse> {
     const _company = await this.companyRepository.findOne({
-      where: { id: companyId },
+      where: { id: getCompanyDetailParams.companyId },
       relations: ['country', 'information', 'businessFields', 'area'],
     });
     return this.mapper.map(_company, GetCompanyDetailResponse, CompanyEntity);
+  }
+
+  async getJobsOfCompany(
+    getJobsOfCompanyParams: GetJobsOfCompanyParams, getJobsOfCompanyQueries: GetJobsOfCompanyQueries
+  ): Promise<GetJobsOfCompanyResponse> {
+    console.log(getJobsOfCompanyQueries.withDeleted);
+    const _company = await this.companyRepository.findOne({ id: getJobsOfCompanyParams.companyId });
+
+    if (!_company) {
+      throw new NotFoundException('Not found');
+    }
+
+    const records = getJobsOfCompanyQueries.records != undefined ? getJobsOfCompanyQueries.records : 10;
+
+    const [_jobs, totalRecords] = await this.jobRepository.findAndCount({
+      where: {
+        companyId: getJobsOfCompanyParams.companyId,
+        areaId: getJobsOfCompanyQueries.areaId != undefined ?
+          getJobsOfCompanyQueries.areaId : Not(IsNull()),
+        title: getJobsOfCompanyQueries.title != undefined ? Like(`%${getJobsOfCompanyQueries.title}%`) : Not(IsNull()),
+        status: getJobsOfCompanyQueries.status != undefined ? getJobsOfCompanyQueries.status : Not(IsNull())
+      },
+      relations: ['employeeRelations', 'candidateRelations'],
+      withDeleted: getJobsOfCompanyQueries.withDeleted,
+      skip: (getJobsOfCompanyQueries.page > 0 ? getJobsOfCompanyQueries.page - 1 : 0) * records,
+      take: records,
+    });
+
+    const response = new GetJobsOfCompanyResponse();
+    response.jobs = _jobs.map((_job) => this.mapper.map(_job, JobOfCompany, JobEntity));
+    response.totalRecods = totalRecords;
+    return response;
   }
 }

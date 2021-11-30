@@ -12,8 +12,8 @@ import {
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
-import { JobEmployeeRelation } from './job-employee.relation';
 import { JobCandidateRelation } from './job-candidate.relation';
+import { JobEmployeeRelation } from './job-employee.relation';
 import { BusinessFieldEntity } from './business-field.entity';
 import { CompanyEntity } from './company.entity';
 import { SkillEntity } from './skill.entity';

@@ -4,6 +4,7 @@ import { AutoMap } from '@automapper/classes';
 import { AreaEntity } from '@Entities/area.entity';
 
 import { Company } from '@Shared/responses/company';
+import { Job } from '@Shared/responses/job';
 
 export class CompanyInformation {
   @AutoMap()
@@ -59,4 +60,20 @@ export class GetCompanyDetailResponse extends Company {
   @AutoMap()
   @ApiProperty({ type: AreaEntity })
   area: AreaEntity;
+}
+
+export class JobOfCompany extends Job {
+  @ApiProperty()
+  totalEmployees: number;
+
+  @ApiProperty()
+  totalCandidates: number;
+}
+
+export class GetJobsOfCompanyResponse {
+  @ApiProperty({ type: JobOfCompany })
+  jobs: JobOfCompany[];
+
+  @ApiProperty()
+  totalRecods: number;
 }

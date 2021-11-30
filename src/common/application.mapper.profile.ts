@@ -25,13 +25,15 @@ import { Skill } from '@Shared/responses/skill';
 import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
-import { CompanyInformation, GetCompanyDetailResponse } from '@Modules/companies/dtos/responses';
+import { CompanyInformation, GetCompanyDetailResponse, JobOfCompany } from '@Modules/companies/dtos/responses';
 import { FreeLancer } from '@Modules/users/dtos/responses';
 import { CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
 
 import { FileService } from '@Shared/services/file.service';
 import { JobCandidateRelation } from '@Entities/job-candidate.relation';
 import { JobEmployeeRelation } from '@Entities/job-employee.relation';
+import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {
@@ -147,6 +149,19 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         );
       mapper.createMap(SkillEntity, Skill);
       mapper.createMap(JobEntity, Job);
+      mapper.createMap(JobEntity, JobOfCompany)
+        .forMember(
+          (job: JobOfCompany) => job.totalEmployees,
+          mapFrom((_job: JobEntity) =>
+            _job.employeeRelations.filter((eR) => eR.jobEmployeeStatus == JobEmployeeStatus.WORKING).length
+          )
+        )
+        .forMember(
+          (job: JobOfCompany) => job.totalCandidates,
+          mapFrom((_job: JobEntity) =>
+            _job.candidateRelations.filter((cR) => cR.applyStatus == JobApplyStatus.WAITING).length
+          )
+        )
       mapper.createMap(JobEntity, JobDetail);
       mapper.createMap(BusinessFieldEntity, BusinessField);
       mapper
