@@ -222,8 +222,10 @@ export class JobsService {
     _job.experience = createJobRequest.experience;
     _job.businessFields = await getRepository(BusinessFieldEntity).find({
       where: {
-        id: createJobRequest.businessFields.length != 0 ? In(createJobRequest.businessFields) : Not(IsNull()),
-        name: createJobRequest.businessFields.length == 0 ? 'Information Technology' : Not(IsNull()),
+        id:
+          createJobRequest.businessFieldIds && createJobRequest.businessFieldIds.length != 0
+            ? In(createJobRequest.businessFieldIds) : Not(IsNull()),
+        name: createJobRequest.businessFieldIds.length == 0 ? 'Information Technology' : Not(IsNull()),
       },
     });
 
@@ -274,8 +276,10 @@ export class JobsService {
     _job.experience = updateJobRequest.experience;
     _job.businessFields = await getRepository(BusinessFieldEntity).find({
       where: {
-        id: updateJobRequest.businessFields.length != 0 ? In(updateJobRequest.businessFields) : Not(IsNull()),
-        name: updateJobRequest.businessFields.length == 0 ? 'Information Technology' : Not(IsNull()),
+        id:
+          updateJobRequest.businessFieldIds && updateJobRequest.businessFieldIds.length != 0
+            ? In(updateJobRequest.businessFieldIds) : Not(IsNull()),
+        name: updateJobRequest.businessFieldIds.length == 0 ? 'Information Technology' : Not(IsNull()),
       },
     });
 
