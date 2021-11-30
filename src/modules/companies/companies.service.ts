@@ -73,7 +73,7 @@ export class CompaniesService {
         title: getJobsOfCompanyQueries.title != undefined ? Like(`%${getJobsOfCompanyQueries.title}%`) : Not(IsNull()),
         status: getJobsOfCompanyQueries.status != undefined ? getJobsOfCompanyQueries.status : Not(IsNull())
       },
-      relations: ['employeeRelations', 'candidateRelations'],
+      relations: ['employeeRelations', 'candidateRelations', 'area', 'businessFields', 'skills'],
       withDeleted: getJobsOfCompanyQueries.withDeleted,
       skip: (getJobsOfCompanyQueries.page > 0 ? getJobsOfCompanyQueries.page - 1 : 0) * records,
       take: records,
