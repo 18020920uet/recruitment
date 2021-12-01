@@ -36,13 +36,12 @@ export class UserService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
     private curriculumVitaeRepository: CurriculumVitaeRepository,
-    private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private configService: ConfigService,
     private fileService: FileService,
   ) {}
 
-  getCurrentUser(_currentUser: UserEntity): User {
+  getCurrentUser(_currentUser: UserEntity) {
     return this.mapper.map(_currentUser, User, UserEntity);
   }
 

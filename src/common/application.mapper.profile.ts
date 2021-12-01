@@ -44,10 +44,24 @@ export class ApplicationMapperProfile extends AutomapperProfile {
 
   mapProfile() {
     return (mapper: Mapper) => {
-      mapper.createMap(UserEntity, User).forMember(
-        (user: User) => user.avatar,
-        mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
-      );
+      mapper
+        .createMap(UserEntity, User)
+        .forMember(
+          (user: User) => user.avatar,
+          mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
+        )
+        .forMember(
+          (user: User) => user.company,
+          mapFrom((_user: UserEntity) =>
+            _user.role == 1 && _user.employeeOfCompany ? _user.employeeOfCompany.company : null,
+          ),
+        )
+        .forMember(
+          (user: User) => user.companyRole,
+          mapFrom((_user: UserEntity) =>
+            _user.role == 1 && _user.employeeOfCompany ? _user.employeeOfCompany.role : null,
+          ),
+        );
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper
         .createMap(CurriculumVitaeEntity, CurriculumVitae)

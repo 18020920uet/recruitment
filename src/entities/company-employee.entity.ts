@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, PrimaryColumn, OneToOne } from 'typeorm';
 
 import { CompanyRole } from '@Shared/enums/company-role';
 
@@ -20,7 +20,7 @@ export class CompanyEmployeeEntity {
   @JoinColumn([{ name: 'company_id', referencedColumnName: 'id' }])
   company: CompanyEntity;
 
-  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: UserEntity;
 

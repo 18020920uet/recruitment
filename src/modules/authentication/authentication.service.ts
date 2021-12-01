@@ -20,7 +20,7 @@ export class AuthenticationService {
   ) {}
 
   async validateUser(userId: string): Promise<UserEntity> {
-    return await this.userRepository.findOne(userId);
+    return await this.userRepository.findOne(userId, { relations: ['employeeOfCompany', 'employeeOfCompany.company'] });
   }
 
   async generateAccessToken(_user: UserEntity): Promise<string> {

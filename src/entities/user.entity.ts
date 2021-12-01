@@ -1,7 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
+import { CompanyEntity } from './company.entity';
 import { Role } from '@Shared/enums/role';
+import { CompanyEmployeeEntity } from './company-employee.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -55,4 +57,9 @@ export class UserEntity {
   @AutoMap()
   @Column({ default: '' })
   avatar: string;
+
+  @OneToOne(() => CompanyEmployeeEntity, (_companyEmployee: CompanyEmployeeEntity) => _companyEmployee.user, {
+    cascade: true,
+  })
+  employeeOfCompany: CompanyEmployeeEntity;
 }

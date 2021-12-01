@@ -41,6 +41,8 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 
+import { RoleGuard } from '@Common/guard/role.guard';
+
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import {
   UpdateCurriculumnVitaeRequest,
@@ -62,7 +64,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtAuthenticationGuard, RoleGuard)
   @ApiOperation({ summary: 'Get current user' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(User)
@@ -101,7 +103,7 @@ export class UserController {
   @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
   async updateAvatar(
     @CurrentUser() _currentUser: UserEntity,
-    @Body() changeAvatarRequest: ChangeAvatarRequest,
+    @Body() _changeAvatarRequest: ChangeAvatarRequest,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ChangeAvatarResponse> {
     return await this.userService.updateAvatar(_currentUser, file);
@@ -135,7 +137,7 @@ export class UserController {
   @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
   async updateCertifications(
     @CurrentUser() _currentUser: UserEntity,
-    @Body() updateCertificationsRequest: UpdateCertificationsRequest,
+    @Body() _updateCertificationsRequest: UpdateCertificationsRequest,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
     return await this.userService.updateCertifications(_currentUser, files);
@@ -155,7 +157,7 @@ export class UserController {
   @ApiUnsupportedMediaTypeResponse({ description: 'Wrong file extensions', type: UnsupportedMediaTypeResponse })
   async updateCertification(
     @CurrentUser() _currentUser: UserEntity,
-    @Body() updateCertificationRequest: UpdateCertificationRequest,
+    @Body() _updateCertificationRequest: UpdateCertificationRequest,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<UpdateCertificationsResponse> {
     return await this.userService.updateCertification(_currentUser, file);
