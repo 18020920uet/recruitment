@@ -12,7 +12,8 @@ import { AreaEntity } from '@Entities/area.entity';
 
 import { ResourcesService } from './resources.service';
 
-import { GetAreasQuery } from './dtos/requests';
+import { BusinessField } from '@Shared/responses/business-field';
+import { GetAreasQueries } from './dtos/requests';
 
 @ApiTags('resources')
 @Controller('resources')
@@ -20,7 +21,7 @@ export class ResourcesController {
   constructor(private resourcesService: ResourcesService) {}
 
   @Get('languages')
-  @ApiOperation({ summary: 'Get system languages' })
+  @ApiOperation({ summary: "Get system's languages" })
   @ApplicationArrayApiOkResponse(LanguageEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getLanguages(): Promise<LanguageEntity[]> {
@@ -28,7 +29,7 @@ export class ResourcesController {
   }
 
   @Get('nationnalities')
-  @ApiOperation({ summary: 'Get system nationalities' })
+  @ApiOperation({ summary: "Get system's nationalities" })
   @ApplicationArrayApiOkResponse(NationalityEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getNationnalities(): Promise<NationalityEntity[]> {
@@ -44,15 +45,15 @@ export class ResourcesController {
   }
 
   @Get('areas')
-  @ApiOperation({ summary: 'Get system areas' })
+  @ApiOperation({ summary: "Get system's areas" })
   @ApplicationArrayApiOkResponse(AreaEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getAreasByCountry(@Query() getAreasQuery: GetAreasQuery): Promise<AreaEntity[]> {
-    return await this.resourcesService.getAreas(getAreasQuery);
+  async getAreasByCountry(@Query() getAreasQueries: GetAreasQueries): Promise<AreaEntity[]> {
+    return await this.resourcesService.getAreas(getAreasQueries);
   }
 
   @Get('skills')
-  @ApiOperation({ summary: 'Get system skills' })
+  @ApiOperation({ summary: "Get system's skills" })
   @ApplicationArrayApiOkResponse(SkillEntity)
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getSkills(): Promise<SkillEntity[]> {
@@ -60,7 +61,7 @@ export class ResourcesController {
   }
 
   @Get('skill-experiences')
-  @ApiOperation({ summary: 'Get system skill experiences' })
+  @ApiOperation({ summary: "Get system's skill experiences" })
   @ApiOkResponse({
     description: 'Success',
     content: {
@@ -79,5 +80,13 @@ export class ResourcesController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   getSkillExperiences(): string[] {
     return this.resourcesService.getSkillExperiences();
+  }
+
+  @Get('business-fields')
+  @ApiOperation({ summary: "Get system's business fields" })
+  @ApplicationArrayApiOkResponse(BusinessField)
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getBusinessFields(): Promise<BusinessField[]> {
+    return await this.resourcesService.getBusinessFields();
   }
 }
