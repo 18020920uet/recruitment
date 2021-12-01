@@ -1,8 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
 import { ApiInternalServerErrorResponse, ApiOperation, ApiTags, ApiOkResponse } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
 
-import { ApplicationArrayApiOkResponse } from '@Common/decorators/swagger.decorator';
 import { InternalServerErrorResponse } from '@Decorators/swagger.error-responses.decorator';
+import { ApplicationArrayApiOkResponse } from '@Common/decorators/swagger.decorator';
 
 import { NationalityEntity } from '@Entities/nationality.entity';
 import { LanguageEntity } from '@Entities/language.entity';

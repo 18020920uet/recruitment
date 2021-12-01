@@ -17,7 +17,7 @@ import { User } from '@Shared/responses/user';
 
 import { RequestResetPasswordResponse, AccountResponse } from './dtos/responses';
 
-import { MailService } from '@Modules/mail/mail.service';
+// import { MailService } from '@Modules/mail/mail.service';
 
 @Injectable()
 export class AccountService {
@@ -27,8 +27,8 @@ export class AccountService {
     private userRepository: UserRepository,
     private encryptService: EncryptService,
     private configService: ConfigService,
-    private mailService: MailService,
-  ) {}
+  ) // private mailService: MailService,
+  {}
 
   private async getAccountResponse(_user: UserEntity): Promise<AccountResponse> {
     const response: AccountResponse = {

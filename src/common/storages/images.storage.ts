@@ -6,7 +6,7 @@ import path from 'path';
 export const saveAvatarStorage = {
   storage: diskStorage({
     destination: 'public/avatars',
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
       const fileExtensions: string = path.extname(file.originalname);
       const fileName: string = uuidv4() + fileExtensions;
       const mimetype = file.mimetype;

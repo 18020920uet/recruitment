@@ -1,7 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
-import { CompanyEntity } from './company.entity';
 import { Role } from '@Shared/enums/role';
 import { CompanyEmployeeEntity } from './company-employee.entity';
 

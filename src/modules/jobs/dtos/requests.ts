@@ -2,11 +2,11 @@ import { IsArray, IsString, Min, Max, IsOptional, MinLength, MaxLength } from 'c
 import { Type, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
+import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 import { JobExperience } from '@Shared/enums/job-experience';
 import { JobWorkMode } from '@Shared/enums/job-work-mode';
 import { JobStatus } from '@Shared/enums/job-status';
-import { JobApplyStatus } from '@Shared/enums/job-apply-status';
-import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 
 export class GetJobsQueries {
   @IsOptional()

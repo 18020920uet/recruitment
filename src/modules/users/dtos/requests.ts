@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MaxLength, Min, Max, IsOptional } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { JobExperience } from '@Shared/enums/job-experience';
 import { Role } from '@Shared/enums/role';

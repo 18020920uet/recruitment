@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+import { Module } from '@nestjs/common';
 
-import { UserRepository } from '@Repositories/user.repository';
-import { ReviewRepository } from '@Repositories/review.repository';
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+import { ReviewRepository } from '@Repositories/review.repository';
+import { UserRepository } from '@Repositories/user.repository';
 
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
 

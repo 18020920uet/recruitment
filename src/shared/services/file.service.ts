@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserEntity } from '@Entities/user.entity';
 import { CompanyEntity } from '@Entities/company.entity';
+import { UserEntity } from '@Entities/user.entity';
 
 @Injectable()
 export class FileService {

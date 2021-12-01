@@ -2,9 +2,9 @@ import { Controller, Get, Body } from '@nestjs/common';
 import {
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
+  ApiBearerAuth,
   ApiOperation,
   ApiTags,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { ApplicationApiOkResponse } from '@Decorators/swagger.decorator';

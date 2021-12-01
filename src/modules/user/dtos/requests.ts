@@ -1,18 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEmail,
+  IsNumberString,
+  NotContains,
   IsNotEmpty,
+  IsPositive,
   MinLength,
   IsString,
-  IsNumberString,
+  IsEmail,
   Matches,
-  IsPositive,
-  NotContains,
 } from 'class-validator';
 
-import { Gender } from '@Shared/enums/gender';
 import { CurriculumVitaeExperienceType } from '@Shared/enums/curriculum-vitae-experience-type';
 import { JobExperience } from '@Shared/enums/job-experience';
+import { Gender } from '@Shared/enums/gender';
 
 export class ChangePasswordRequest {
   @IsNotEmpty()

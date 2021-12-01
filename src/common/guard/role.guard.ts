@@ -1,13 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable, Inject, forwardRef } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { UserEntity } from '@Entities/user.entity';
 
 import { Role } from '@Shared/enums/role';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

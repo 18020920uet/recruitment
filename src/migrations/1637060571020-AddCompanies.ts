@@ -9,10 +9,10 @@ import rawCompanies from './data/raw_companies.json';
 
 export class AddCompanies1637060571020 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const businessFieldRepository = await queryRunner.connection.getRepository(BusinessFieldEntity);
-    const countryRepository = await queryRunner.connection.getRepository(CountryEntity);
-    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
-    const areaRepository = await queryRunner.connection.getRepository(AreaEntity);
+    const businessFieldRepository = queryRunner.connection.getRepository(BusinessFieldEntity);
+    const countryRepository = queryRunner.connection.getRepository(CountryEntity);
+    const companyRepository = queryRunner.connection.getRepository(CompanyEntity);
+    const areaRepository = queryRunner.connection.getRepository(AreaEntity);
 
     const businessFields = await businessFieldRepository.find();
     const countries = await countryRepository.find();
@@ -43,7 +43,7 @@ export class AddCompanies1637060571020 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
+    const companyRepository = queryRunner.connection.getRepository(CompanyEntity);
     await companyRepository.clear();
   }
 }

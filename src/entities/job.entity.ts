@@ -3,12 +3,12 @@ import {
   DeleteDateColumn,
   ManyToMany,
   JoinColumn,
+  OneToMany,
   ManyToOne,
   JoinTable,
   Column,
   Entity,
   Index,
-  OneToMany,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 

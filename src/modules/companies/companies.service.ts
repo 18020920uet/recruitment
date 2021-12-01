@@ -3,12 +3,13 @@ import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import { Like, Not, IsNull } from 'typeorm';
 
-import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
-import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
+// import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
+// import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { CompanyRepository } from '@Repositories/company.repository';
 import { JobRepository } from '@Repositories/job.repository';
 
 import { CompanyEntity } from '@Entities/company.entity';
+import { JobEntity } from '@Entities/job.entity';
 
 import {
   GetCompaniesFilterWithTheFirstCharacterInNameQuery,
@@ -17,15 +18,15 @@ import {
   GetJobsOfCompanyQueries,
 } from './dtos/requests';
 import { GetCompanyDetailResponse, GetJobsOfCompanyResponse, JobOfCompany } from './dtos/responses';
+
 import { Company } from '@Shared/responses/company';
-import { JobEntity } from '@Entities/job.entity';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    private jobCandidateRepositoty: JobCandidateRepositoty,
-    private jobEmployeeRepositoty: JobEmployeeRepositoty,
+    // private jobCandidateRepositoty: JobCandidateRepositoty,
+    // private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private companyRepository: CompanyRepository,
     private jobRepository: JobRepository,
   ) {}

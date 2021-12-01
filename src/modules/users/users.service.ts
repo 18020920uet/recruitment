@@ -1,8 +1,8 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectMapper } from '@automapper/nestjs';
-import type { Mapper } from '@automapper/types';
 import { IsNull, Not, In, getManager, getRepository, Like, Between } from 'typeorm';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { InjectMapper } from '@automapper/nestjs';
+// import { ConfigService } from '@nestjs/config';
+import type { Mapper } from '@automapper/types';
 
 import { CurriculumVitaeSkillRelation } from '@Entities/curriculum-vitae-skill.relation';
 import { CurriculumVitaeEntity } from '@Entities/curriculum-vitae.entity';
@@ -35,8 +35,8 @@ export class UsersService {
     private curriculumVitaeRepository: CurriculumVitaeRepository,
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
-    private configService: ConfigService,
-  ) {}
+  ) // private configService: ConfigService,
+  {}
 
   async getUsers(getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
     let _cvIds: number[] = [];
@@ -71,17 +71,17 @@ export class UsersService {
         getUsersQuery.skillIds.length != 0 &&
         getUsersQuery.experience != undefined
       ) {
-        queryString = `SELECT * FROM "curriculum_vitaes_languages" WHERE language_id IN (${params}) GROUP BY cv_id, language_id`;
+        queryString = `SELECT cv_id FROM "curriculum_vitaes_languages" WHERE language_id IN (${params}) GROUP BY cv_id, language_id`;
       } else {
         if (_cvIds.length != 0) {
           queryString =
-            `SELECT * FROM "curriculum_vitaes_languages" WHERE language_id IN (${params}) ` +
+            `SELECT cv_id FROM "curriculum_vitaes_languages" WHERE language_id IN (${params}) ` +
             `AND cv_id IN (${_cvIds.map((cvId) => `'${cvId}'`).join(',')}) GROUP BY cv_id, language_id`;
         }
       }
 
       if (queryString != '') {
-        _cvIds = (await getManager().query(queryString)).map((r) => r['cv_id']);
+        _cvIds = (await getManager().query(queryString)).map((r: { cv_id: number }) => r['cv_id']);
       }
     }
 
@@ -182,6 +182,7 @@ export class UsersService {
     updateReviewRequest: UpdateReviewRequest,
   ): Promise<Review> {
     const _user = await this.userRepository.findOne({ id: updateReviewParams.userId });
+
     if (!_user) {
       throw new NotFoundException('Cannot find user');
     }
@@ -208,6 +209,7 @@ export class UsersService {
 
   async deleteReview(_currentUser: UserEntity, deleteReviewParams: DeleteReviewParams): Promise<DeleteReviewResponse> {
     const _user = await this.userRepository.findOne({ id: deleteReviewParams.userId });
+
     if (!_user) {
       throw new NotFoundException('Cannot find user');
     }

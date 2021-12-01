@@ -7,8 +7,8 @@ import rawInformationOfCompanies from './data/raw_information_of_companies.json'
 
 export class AddInformationOfCompanies1637072431806 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const companyInformationRepository = await queryRunner.connection.getRepository(CompanyInformationEntity);
-    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
+    const companyInformationRepository = queryRunner.connection.getRepository(CompanyInformationEntity);
+    const companyRepository = queryRunner.connection.getRepository(CompanyEntity);
 
     const _companies = await companyRepository.find();
 
@@ -35,7 +35,7 @@ export class AddInformationOfCompanies1637072431806 implements MigrationInterfac
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
+    const companyRepository = queryRunner.connection.getRepository(CompanyEntity);
     await companyRepository.clear();
   }
 }

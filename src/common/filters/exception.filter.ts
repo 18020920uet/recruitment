@@ -52,7 +52,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  writeLogs(exceptionResponse, request: Request) {
+  writeLogs(exceptionResponse: any, request: Request) {
     const logDirectory = './logs';
     if (!fs.existsSync(logDirectory)) {
       fs.mkdirSync(logDirectory);

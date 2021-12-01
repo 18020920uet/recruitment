@@ -7,8 +7,9 @@ import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { CompanyRepository } from '@Repositories/company.repository';
 import { JobRepository } from '@Repositories/job.repository';
 
-import { CompaniesService } from './companies.service';
 import { CompaniesController } from './companies.controller';
+
+import { CompaniesService } from './companies.service';
 
 @Module({
   imports: [

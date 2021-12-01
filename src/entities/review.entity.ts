@@ -1,11 +1,11 @@
 import {
   PrimaryGeneratedColumn,
-  Column,
-  Entity,
+  UpdateDateColumn,
+  CreateDateColumn,
   JoinColumn,
   OneToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Column,
+  Entity,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 

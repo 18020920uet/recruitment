@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-import { Job } from '@Shared/responses/job';
-import { User } from '@Shared/responses/user';
-import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
+import { User } from '@Shared/responses/user';
+import { Job } from '@Shared/responses/job';
 
 export class JobDetail extends Job {
   @AutoMap()

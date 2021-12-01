@@ -7,7 +7,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 export const saveCertificationsStorage: MulterOptions = {
   storage: diskStorage({
     destination: 'public/certifications',
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
       const fileExtensions: string = path.extname(file.originalname);
       const fileName: string = uuidv4() + fileExtensions;
       const mimetype = file.mimetype;

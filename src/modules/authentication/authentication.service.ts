@@ -4,8 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { CompanyEmployeeRepository } from '@Repositories/company-employee.repository';
 import { UserRepository } from '@Repositories/user.repository';
 
-import { UserEntity } from '@Entities/user.entity';
 import { CompanyEmployeeEntity } from '@Entities/company-employee.entity';
+import { UserEntity } from '@Entities/user.entity';
 
 import { Payload } from '@Shared/responses/payload';
 

@@ -16,12 +16,12 @@ import rawUsers from './data/raw_users.json';
 
 export class AddCurriculumVitaes1637931362828 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const curriculumViateRepository = await queryRunner.connection.getRepository(CurriculumVitaeEntity);
-    const countryRepository = await queryRunner.connection.getRepository(CountryEntity);
+    const curriculumViateRepository = queryRunner.connection.getRepository(CurriculumVitaeEntity);
     const languageRespository = queryRunner.connection.getRepository(LanguageEntity);
-    const skillRepository = await queryRunner.connection.getRepository(SkillEntity);
-    const areaRepository = await queryRunner.connection.getRepository(AreaEntity);
-    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    const countryRepository = queryRunner.connection.getRepository(CountryEntity);
+    const skillRepository = queryRunner.connection.getRepository(SkillEntity);
+    const areaRepository = queryRunner.connection.getRepository(AreaEntity);
+    const userRepository = queryRunner.connection.getRepository(UserEntity);
 
     const languages = await languageRespository.find();
     const countries = await countryRepository.find();
@@ -30,8 +30,8 @@ export class AddCurriculumVitaes1637931362828 implements MigrationInterface {
     const users = await userRepository.find();
 
     // Save CV
-
     let cvs: CurriculumVitaeEntity[] = [];
+
     for (let _i = 0; _i < 1000; _i++) {
       const user = users[_i];
       const rawUser = rawUsers[_i];
@@ -98,7 +98,7 @@ export class AddCurriculumVitaes1637931362828 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    const userRepository = queryRunner.connection.getRepository(UserEntity);
     await userRepository.delete({ password: '' });
   }
 }

@@ -14,11 +14,11 @@ import rawJobs from './data/raw_jobs.json';
 
 export class AddJobs1637258873110 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const businessFieldRepository = await queryRunner.connection.getRepository(BusinessFieldEntity);
-    const companyRepository = await queryRunner.connection.getRepository(CompanyEntity);
-    const skillRepository = await queryRunner.connection.getRepository(SkillEntity);
-    const areaRepository = await queryRunner.connection.getRepository(AreaEntity);
-    const jobRepository = await queryRunner.connection.getRepository(JobEntity);
+    const businessFieldRepository = queryRunner.connection.getRepository(BusinessFieldEntity);
+    const companyRepository = queryRunner.connection.getRepository(CompanyEntity);
+    const skillRepository = queryRunner.connection.getRepository(SkillEntity);
+    const areaRepository = queryRunner.connection.getRepository(AreaEntity);
+    const jobRepository = queryRunner.connection.getRepository(JobEntity);
 
     const businessFields = await businessFieldRepository
       .createQueryBuilder('businessField')

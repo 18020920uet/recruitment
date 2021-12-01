@@ -1,16 +1,16 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { UserRepository } from '@Repositories/user.repository';
 import { CompanyEmployeeRepository } from '@Repositories/company-employee.repository';
+import { UserRepository } from '@Repositories/user.repository';
 
 import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
 import { CompanyGuard } from '@Common/guard/company.guard';
 
-import { AuthenticationService } from './authentication.service';
 import { AuthenticationController } from './authentication.controller';
+import { AuthenticationService } from './authentication.service';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({

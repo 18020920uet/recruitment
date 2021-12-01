@@ -7,8 +7,8 @@ import rawSkills from './data/raw_skills.json';
 
 export class AddSkills1637249704194 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const skillRepository = await queryRunner.connection.getRepository(SkillEntity);
-    const businessFieldRepository = await queryRunner.connection.getRepository(BusinessFieldEntity);
+    const skillRepository = queryRunner.connection.getRepository(SkillEntity);
+    const businessFieldRepository = queryRunner.connection.getRepository(BusinessFieldEntity);
 
     const itBusinessField = await businessFieldRepository.find({ name: 'Information Technology' });
 
@@ -24,7 +24,7 @@ export class AddSkills1637249704194 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const skillRepository = await queryRunner.connection.getRepository(SkillEntity);
+    const skillRepository = queryRunner.connection.getRepository(SkillEntity);
     await skillRepository.clear();
   }
 }

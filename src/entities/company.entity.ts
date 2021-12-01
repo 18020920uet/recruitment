@@ -1,13 +1,13 @@
 import {
-  Entity,
   PrimaryGeneratedColumn,
-  Column,
   JoinColumn,
-  OneToOne,
-  ManyToOne,
   ManyToMany,
+  ManyToOne,
   JoinTable,
   OneToMany,
+  OneToOne,
+  Entity,
+  Column,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 

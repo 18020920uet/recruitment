@@ -6,7 +6,7 @@ import rawUsers from './data/raw_users.json';
 
 export class AddUsers1637924248165 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    const userRepository = queryRunner.connection.getRepository(UserEntity);
 
     let users: UserEntity[] = [];
 
@@ -30,7 +30,7 @@ export class AddUsers1637924248165 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const userRepository = await queryRunner.connection.getRepository(UserEntity);
+    const userRepository = queryRunner.connection.getRepository(UserEntity);
     await userRepository.delete({ password: '' });
   }
 }

@@ -40,11 +40,11 @@ import {
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
+  ApplyJobRequest,
   UpdateJobParams,
   DeleteJobParams,
   GetJobsQueries,
   ApplyJobParams,
-  ApplyJobRequest,
 } from './dtos/requests';
 import {
   GetCandidatesOfJobResponse,
