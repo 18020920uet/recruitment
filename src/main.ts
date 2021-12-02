@@ -42,7 +42,7 @@ async function bootstrap() {
 
   // Swagger
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Rescruitment API')
+    .setTitle('Recruitment API')
     .setDescription('Recruitment API description')
     .setVersion('1.0')
     .addBearerAuth(

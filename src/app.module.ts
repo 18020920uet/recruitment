@@ -21,6 +21,7 @@ import { AccountModule } from '@Modules/account/account.module';
 import { UsersModule } from './modules/users/users.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { UserModule } from '@Modules/user/user.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { UserModule } from '@Modules/user/user.module';
     UsersModule,
     CompaniesModule,
     JobsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
