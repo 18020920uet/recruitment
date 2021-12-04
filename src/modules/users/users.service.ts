@@ -131,7 +131,6 @@ export class UsersService {
         'country'
       ],
     });
-
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }
 
