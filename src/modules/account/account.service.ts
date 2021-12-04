@@ -26,9 +26,8 @@ export class AccountService {
     private authenticationService: AuthenticationService,
     private userRepository: UserRepository,
     private encryptService: EncryptService,
-    private configService: ConfigService,
-  ) // private mailService: MailService,
-  {}
+    private configService: ConfigService, // private mailService: MailService,
+  ) {}
 
   private async getAccountResponse(_user: UserEntity): Promise<AccountResponse> {
     const response: AccountResponse = {
@@ -78,7 +77,10 @@ export class AccountService {
   }
 
   async login(request: LoginRequest): Promise<AccountResponse> {
-    const _user = await this.userRepository.findOne({ email: request.email });
+    const _user = await this.userRepository.findOne({
+      where: { email: request.email },
+      relations: ['employeeOfCompany', 'employeeOfCompany.company']
+    });
 
     if (!_user) {
       throw new HttpException('No account', HttpStatus.NOT_FOUND);

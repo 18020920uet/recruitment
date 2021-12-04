@@ -223,7 +223,12 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           }),
         );
       mapper.createMap(JobCandidateRelation, CandidateOfJob);
-      mapper.createMap(JobEmployeeRelation, EmployeeOfJob);
+      mapper.createMap(JobEmployeeRelation, EmployeeOfJob)
+      .forMember(
+        (employeeOfJob: EmployeeOfJob) => employeeOfJob.employeeStatus,
+        mapFrom((_jobEmployeeRelation: JobEmployeeRelation) => _jobEmployeeRelation.jobEmployeeStatus),
+      )
+      ;
     };
   }
 }

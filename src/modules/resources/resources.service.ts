@@ -41,6 +41,6 @@ export class ResourcesService {
 
   async getBusinessFields(): Promise<BusinessField[]> {
     const _businessFields = await getRepository(BusinessFieldEntity).find();
-    return _businessFields.map(_businessField => ({ id: _businessField.id, name: _businessField.name }));
+    return _businessFields.map((_businessField) => ({ id: _businessField.id, name: _businessField.name }));
   }
 }

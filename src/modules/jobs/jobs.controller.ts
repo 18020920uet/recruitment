@@ -219,7 +219,7 @@ export class JobsController {
     return await this.jobsService.getEmployeesOfJob(getEmployeesOfJobParams, getEmployeesOfJobQuerires);
   }
 
-  @Delete(':jobId/employees/:employeesId')
+  @Delete(':jobId/employees/:employeeId')
   @RequireRole(Role.COMPANY)
   @RequireCompanyRole(CompanyRole.OWNER, CompanyRole.EMPLOYEE)
   @UseGuards(JwtAuthenticationGuard, CompanyGuard, CompanyRoleGuard)

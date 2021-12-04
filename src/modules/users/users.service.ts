@@ -34,9 +34,8 @@ export class UsersService {
     @InjectMapper() private readonly mapper: Mapper,
     private curriculumVitaeRepository: CurriculumVitaeRepository,
     private reviewRepository: ReviewRepository,
-    private userRepository: UserRepository,
-  ) // private configService: ConfigService,
-  {}
+    private userRepository: UserRepository, // private configService: ConfigService,
+  ) {}
 
   async getUsers(getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
     let _cvIds: number[] = [];
@@ -127,7 +126,10 @@ export class UsersService {
   async getCurriculumVitae(userId: string): Promise<CurriculumVitae> {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
-      relations: ['experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area'],
+      relations: [
+        'experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area',
+        'country'
+      ],
     });
 
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);

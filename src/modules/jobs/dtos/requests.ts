@@ -238,7 +238,6 @@ export class RemoveEmployeeFromJobParams {
   @ApiProperty()
   jobId: number;
 
-  @IsString()
   @ApiProperty()
   employeeId: string;
 }

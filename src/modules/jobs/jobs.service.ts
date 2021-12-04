@@ -489,7 +489,10 @@ export class JobsService {
     removeEmployeeFromJobParams: RemoveEmployeeFromJobParams,
   ): Promise<EmployeeOfJob> {
     const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
-      where: { userId: removeEmployeeFromJobParams.employeeId, jobId: removeEmployeeFromJobParams.jobId },
+      where: {
+        userId: removeEmployeeFromJobParams.employeeId,
+        jobId: removeEmployeeFromJobParams.jobId,
+      },
       relations: ['user', 'job', 'job.company'],
     });
 
@@ -497,7 +500,7 @@ export class JobsService {
       throw new NotFoundException('Not found');
     }
 
-    if (_jobEmployeeRelation.job.company != _currentCompany) {
+    if (_jobEmployeeRelation.job.company.id != _currentCompany.id) {
       throw new ForbiddenException('Forbidden Resource');
     }
 

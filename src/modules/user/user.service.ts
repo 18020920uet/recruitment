@@ -48,7 +48,8 @@ export class UserService {
   async getCurriculumVitae(userId: string): Promise<CurriculumVitaeEntity> {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
-      relations: ['experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area'],
+      relations:
+      ['country', 'experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area'],
     });
     return _cv;
   }
@@ -88,7 +89,7 @@ export class UserService {
   ): Promise<CurriculumVitae> {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { user: _currentUser },
-      relations: ['experiences', 'user', 'skillRelations', 'languages'],
+      relations: ['experiences', 'user', 'skillRelations', 'languages', 'country'],
     });
 
     await getManager().transaction(async (transactionalEntityManager) => {
