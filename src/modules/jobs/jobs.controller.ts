@@ -40,6 +40,7 @@ import {
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
+  FinishJobParams,
   ApplyJobRequest,
   UpdateJobParams,
   DeleteJobParams,
@@ -50,6 +51,7 @@ import {
   GetCandidatesOfJobResponse,
   GetEmployeesOfJobResponse,
   GetJobDetailResponse,
+  FinishJobResponse,
   DeleteJobResponse,
   GetJobsResponse,
   CandidateOfJob,
@@ -146,6 +148,26 @@ export class JobsController {
     @Param() deleteJobParams: DeleteJobParams,
   ): Promise<DeleteJobResponse> {
     return await this.jobsService.deleteJob(_currentUser, _currentCompany, deleteJobParams);
+  }
+
+  @Put(':jobId/finish')
+  @RequireRole(Role.COMPANY)
+  @RequireCompanyRole(CompanyRole.OWNER, CompanyRole.EMPLOYEE)
+  @UseGuards(JwtAuthenticationGuard, CompanyGuard, CompanyRoleGuard)
+  @ApiOperation({ summary: 'Finish this job' })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(FinishJobResponse)
+  @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
+  @ApiForbiddenResponse({ description: 'Forbidden|Job is done', type: ForbiddenResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async finishJob(
+    @CurrentUser() _currentUser: UserEntity,
+    @CurrentCompany() _currentCompany: CompanyEntity,
+    @Param() finishJobParams: FinishJobParams,
+  ): Promise<FinishJobResponse> {
+    console.log(_currentCompany);
+    return await this.jobsService.finishJob(_currentUser, _currentCompany, finishJobParams);
   }
 
   @Post(':jobId/apply')

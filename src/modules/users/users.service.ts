@@ -127,8 +127,14 @@ export class UsersService {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
       relations: [
-        'experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area',
-        'country'
+        'experiences',
+        'user',
+        'skillRelations',
+        'skillRelations.skill',
+        'languages',
+        'nationality',
+        'area',
+        'country',
       ],
     });
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);

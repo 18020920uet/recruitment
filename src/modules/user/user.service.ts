@@ -48,8 +48,16 @@ export class UserService {
   async getCurriculumVitae(userId: string): Promise<CurriculumVitaeEntity> {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
-      relations:
-      ['country', 'experiences', 'user', 'skillRelations', 'skillRelations.skill', 'languages', 'nationality', 'area'],
+      relations: [
+        'country',
+        'experiences',
+        'user',
+        'skillRelations',
+        'skillRelations.skill',
+        'languages',
+        'nationality',
+        'area',
+      ],
     });
     return _cv;
   }

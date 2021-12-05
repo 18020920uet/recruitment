@@ -29,8 +29,20 @@ export class GetJobsQueries {
   experience: JobExperience | null;
 
   @IsOptional()
-  @ApiProperty({ enum: JobStatus, enumName: 'JobStatus', required: false })
-  status: JobStatus | null;
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    return [value];
+  })
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'string',
+      enum: ['Inprogress', 'Pending', 'Await', 'Cancel', 'Done'],
+    },
+    required: false,
+    description: 'Enum: Inprogress, Pending, Await, Cancel, Done',
+  })
+  statuses: JobStatus[] | null;
 
   @IsOptional()
   @ApiProperty({ enum: JobWorkMode, enumName: 'JobWorkMode', required: false })
@@ -240,4 +252,9 @@ export class RemoveEmployeeFromJobParams {
 
   @ApiProperty()
   employeeId: string;
+}
+
+export class FinishJobParams {
+  @ApiProperty()
+  jobId: number;
 }

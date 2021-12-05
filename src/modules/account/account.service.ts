@@ -79,7 +79,7 @@ export class AccountService {
   async login(request: LoginRequest): Promise<AccountResponse> {
     const _user = await this.userRepository.findOne({
       where: { email: request.email },
-      relations: ['employeeOfCompany', 'employeeOfCompany.company']
+      relations: ['employeeOfCompany', 'employeeOfCompany.company'],
     });
 
     if (!_user) {

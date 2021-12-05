@@ -27,6 +27,7 @@ import {
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
+  FinishJobParams,
   UpdateJobParams,
   ApplyJobRequest,
   DeleteJobParams,
@@ -38,6 +39,7 @@ import {
   GetEmployeesOfJobResponse,
   GetJobDetailResponse,
   DeleteJobResponse,
+  FinishJobResponse,
   GetJobsResponse,
   CandidateOfJob,
   EmployeeOfJob,
@@ -61,6 +63,17 @@ export class JobsService {
   ) {}
 
   async getJobs(getJobsQueries: GetJobsQueries): Promise<GetJobsResponse> {
+    if (getJobsQueries.statuses != undefined && getJobsQueries.statuses.length != 0) {
+      const jobStatuses = Object.values(JobStatus);
+      console.log(jobStatuses);
+
+      for (const inputStatus of getJobsQueries.statuses) {
+        if (!jobStatuses.includes(inputStatus)) {
+          throw new BadRequestException('Unknown job status');
+        }
+      }
+    }
+
     let jobIds: number[] = [];
 
     if (getJobsQueries.skillIds != undefined && getJobsQueries.skillIds.length != 0) {
@@ -105,7 +118,10 @@ export class JobsService {
         workMode: getJobsQueries.workMode != undefined ? getJobsQueries.workMode : Not(IsNull()),
         salary: getJobsQueries.salary != undefined ? getJobsQueries.salary : MoreThanOrEqual(0),
         endDate: getJobsQueries.endDate != undefined ? getJobsQueries.endDate : Not(IsNull()),
-        status: getJobsQueries.status != undefined ? getJobsQueries.status : Not(IsNull()),
+        status:
+          getJobsQueries.statuses != undefined && getJobsQueries.statuses.length != 0
+            ? In(getJobsQueries.statuses)
+            : Not(IsNull()),
         area: {
           id: getJobsQueries.areaId != undefined ? getJobsQueries.areaId : Not(IsNull()),
         },
@@ -252,7 +268,7 @@ export class JobsService {
       throw new NotFoundException('Not found');
     }
 
-    if (_currentCompany.id != _job.company.id) {
+    if (_currentCompany.id != _job.companyId) {
       throw new ForbiddenException('Forbidden Resource');
     }
 
@@ -576,6 +592,47 @@ export class JobsService {
       ),
       maxEmployees: _job.maxEmployees,
       totalEmployees: _jobEmployeeRelations.filter((er) => er.jobEmployeeStatus == JobEmployeeStatus.WORKING).length,
+      jobStatus: _job.status,
+    };
+  }
+
+  async finishJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    finishJobParams: FinishJobParams,
+  ): Promise<FinishJobResponse> {
+    const _job = await this.jobRepository.findOne({ id: finishJobParams.jobId });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_job.companyId != _currentCompany.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    if (_job.status == JobStatus.DONE) {
+      throw new ForbiddenException('Job is done');
+    }
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      _job.status = JobStatus.DONE;
+
+      const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
+        where: { jobId: finishJobParams.jobId, jobEmployeeStatus: JobEmployeeStatus.WORKING },
+      });
+
+      for (const _jobEmployeeRelation of _jobEmployeeRelations) {
+        _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.DONE;
+        _jobEmployeeRelation.updatedAt = new Date();
+      }
+
+      await transactionalEntityManager.save(_job);
+      await transactionalEntityManager.save(_jobEmployeeRelations);
+    });
+
+    return {
+      status: true,
     };
   }
 }

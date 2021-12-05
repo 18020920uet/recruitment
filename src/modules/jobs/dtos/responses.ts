@@ -5,6 +5,7 @@ import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
+import { JobStatus } from '@Shared/enums/job-status';
 
 export class JobDetail extends Job {
   @AutoMap()
@@ -134,6 +135,9 @@ export class GetEmployeesOfJobResponse {
 
   @ApiProperty()
   totalEmployees: number;
+
+  @ApiProperty({ enum: JobStatus, enumName: 'JobStatuss' })
+  jobStatus: JobStatus;
 }
 
 export class GetCandidatesOfJobResponse {
@@ -148,4 +152,9 @@ export class GetCandidatesOfJobResponse {
 
   @ApiProperty()
   totalEmployees: number;
+}
+
+export class FinishJobResponse {
+  @ApiProperty({ type: 'boolean' })
+  status: boolean;
 }
