@@ -1,20 +1,30 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { getConnection, ILike, IsNull, Not } from 'typeorm';
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { GetUsersQuery } from './dtos/requests';
-import { GetUsersResponse, FreeLancer } from './dtos/responses';
+import { GetUsersQuery, UpdateUserRequest } from './dtos/requests';
+import { CompanyOwner, UserInfo, GetUsersResponse } from './dtos/responses';
 import { Role } from '@Shared/enums/role';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/types';
+import { UserRepository } from '@Repositories/user.repository';
+import { User } from '@Shared/responses/user';
+import { CompanyEmployeeEntity } from '@Entities/company-employee.entity';
+import { CompanyEntity } from '@Entities/company.entity';
+import { CompanyRepository } from '@Repositories/company.repository';
+import { Company } from '@Shared/responses/company';
 
 @Injectable()
 export class AdminService {
-  constructor(@InjectMapper() private readonly mapper: Mapper) {}
+  constructor(
+    @InjectMapper() private readonly mapper: Mapper,
+    private userRepository: UserRepository,
+    private companyRepository: CompanyRepository,
+  ) {}
 
   async getUsers(userRole: Role, roleParam: Role, getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
-    if (userRole != 0) {
+    if (userRole != Role.ADMIN) {
       throw new HttpException('No permission to access', HttpStatus.FORBIDDEN);
     } else {
       const options = {
@@ -24,8 +34,8 @@ export class AdminService {
       };
 
       Object.keys(options).forEach((field) => !options[field] && delete options[field]);
-      let data: [UserEntity[], number];
-      if (roleParam != 1) {
+      let data: [UserEntity[] | CompanyEntity[], number];
+      if (roleParam != Role.COMPANY) {
         data = await getConnection()
           .getRepository(UserEntity)
           .createQueryBuilder('user')
@@ -50,45 +60,43 @@ export class AdminService {
           .take(getUsersQuery.records || 10)
           .getManyAndCount();
       } else {
-        // data  = await this.userRepository.createQueryBuilder(GetUsersResponse,'users')
-        // .leftJoinAndSelect("photos", "photo", "photo.userId = user.id")
-        // .getMany();
-        // let data = await getConnection()
-        //   .getRepository(UserEntity)
-        //   .createQueryBuilder('user')
-        // .leftJoinAndSelect('companies', 'company', 'company.owner_id = users.id')
-        // .select([
-        //   'users.id',
-        //   'users.email',
-        //   'users.firstName',
-        //   'users.lastName',
-        //   'users.isActivated',
-        //   'users.isLock',
-        //   'users.avatar',
-        //   'company.id',
-        //   'company.logo',
-        //   'company.name',
-        //   'company.stars',
-        //   'company.email',
-        //   'company.isVerified',
-        // ])
-        // .where("(users.first_name || ' ' || users.last_name) ILIKE :fullName", {
-        //   fullName: `%${getUsersQuery.name || ''}%`,
-        // })
-        // .andWhere({ ...options })
-        // .orderBy({
-        //   [getUsersQuery.order_by ? `user.${getUsersQuery.order_by}` : 'users.firstName']: getUsersQuery.sort_by || 'ASC',
-        // })
-        // .skip((getUsersQuery.page > 0 ? getUsersQuery.page - 1 : 0) * (getUsersQuery.records || 10))
-        // .take(getUsersQuery.records || 10)
-        // .getManyAndCount();
+        data = await this.companyRepository.findAndCount({
+          relations: ['owner'],
+          where: {
+            owner: {
+              firstName: getUsersQuery.name != undefined ? ILike(`%${getUsersQuery.name}%`) : Not(IsNull()),
+              ...options,
+            },
+          },
+        });
       }
 
       const [_listUser, totalRecords] = data;
       const response = new GetUsersResponse();
       response.totalRecords = totalRecords;
-      response.users = _listUser;
+      response.users =
+        roleParam == Role.COMPANY
+          ? _listUser.map((user: UserEntity | CompanyEntity) => this.mapper.map(user, CompanyOwner, CompanyEntity))
+          : _listUser.map((user: UserEntity | CompanyEntity) => this.mapper.map(user, UserInfo, UserEntity));
       return response;
+    }
+  }
+
+  async updateUser(userRole: Role, updateUserRequest: UpdateUserRequest): Promise<UserInfo> {
+    if (userRole != Role.ADMIN) {
+      throw new HttpException('No permission to access', HttpStatus.FORBIDDEN);
+    } else {
+      let _updateRequest = new UpdateUserRequest();
+      _updateRequest.isActivated = updateUserRequest.isActivated;
+      _updateRequest.isLock = updateUserRequest.isLock;
+      const property = await this.userRepository.findOne({
+        where: { id: updateUserRequest.id },
+      });
+      let newUser = await this.userRepository.save({
+        ...property,
+        ..._updateRequest,
+      });
+      return this.mapper.map(newUser, UserInfo, UserEntity);
     }
   }
 }

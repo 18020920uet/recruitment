@@ -46,3 +46,17 @@ export class GetUsersQuery {
   @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
   records: number;
 }
+
+export class UpdateUserRequest {
+  @Type(() => String)
+  @ApiProperty({ type: 'string', required: true })
+  id: string | null;
+
+  @IsOptional()
+  @ApiProperty({ type: 'boolean', required: false })
+  isActivated: boolean | null;
+
+  @IsOptional()
+  @ApiProperty({ type: 'boolean', required: false })
+  isLock: boolean | null;
+}

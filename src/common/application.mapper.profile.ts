@@ -35,6 +35,7 @@ import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 
 import { FileService } from '@Shared/services/file.service';
+import { CompanyOwner, UserInfo } from '@Modules/admin/dtos/responses';
 
 @Injectable()
 export class ApplicationMapperProfile extends AutomapperProfile {
@@ -131,6 +132,21 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         (company: Company) => company.logo,
         mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
       );
+      mapper
+        .createMap(CompanyEntity, CompanyOwner)
+        .forMember(
+          (company: Company) => company.logo,
+          mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
+        )
+        .forMember(
+          (companyOwner: CompanyOwner) => companyOwner.owner,
+          mapFrom((_company: CompanyEntity) => mapper.map(_company.owner, UserInfo, UserEntity)),
+        );
+      mapper.createMap(UserEntity, UserInfo).forMember(
+        (userInfo: UserInfo) => userInfo.avatar,
+        mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
+      );
+
       mapper.createMap(CountryEntity, CountryEntity);
       mapper.createMap(AreaEntity, AreaEntity);
       mapper

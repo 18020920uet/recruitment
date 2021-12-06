@@ -9,8 +9,10 @@ import { Review } from '@Shared/responses/review';
 import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 import { Role } from '@Shared/enums/role';
+import { UserEntity } from '@Entities/user.entity';
+import { CompanyInformationEntity } from '@Entities/company-information.entity';
 
-export class FreeLancer {
+export class UserInfo {
   @AutoMap()
   @ApiProperty()
   id: string;
@@ -44,13 +46,38 @@ export class FreeLancer {
   isLock: boolean;
 }
 
-export class Company extends User {}
+export class CompanyOwner {
+  @AutoMap()
+  id: string;
 
-export class Admin extends User {}
+  @AutoMap()
+  logo: string;
+
+  @AutoMap()
+  name: string;
+
+  @AutoMap()
+  stars: number;
+
+  @AutoMap()
+  isVerified: boolean;
+
+  @AutoMap({ typeFn: () => UserInfo })
+  owner: UserInfo;
+
+  @AutoMap({ typeFn: () => CountryEntity })
+  country: CountryEntity;
+
+  @AutoMap({ typeFn: () => AreaEntity })
+  area: AreaEntity;
+
+  @AutoMap({ typeFn: () => CompanyInformationEntity })
+  information: CompanyInformationEntity;
+}
 
 export class GetUsersResponse {
   @ApiProperty()
-  users: FreeLancer[];
+  users: UserInfo[] | CompanyOwner[];
 
   @ApiProperty()
   totalRecords: number;

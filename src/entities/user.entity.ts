@@ -25,6 +25,7 @@ export class UserEntity {
   @Column({ name: 'last_name' })
   lastName: string;
 
+  @AutoMap()
   @Column({ type: 'boolean', name: 'is_activated' })
   isActivated: boolean;
 
@@ -40,6 +41,7 @@ export class UserEntity {
   @Column({ nullable: true, default: null, name: 'reset_code' })
   resetCode: string;
 
+  @AutoMap()
   @Column({ name: 'is_lock' })
   isLock: boolean;
 
