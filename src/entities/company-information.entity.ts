@@ -50,4 +50,12 @@ export class CompanyInformationEntity {
 
   @Column({ name: 'date_of_establishment' })
   dateOfEstablishment: string;
+
+  @AutoMap()
+  @Column({ name: 'created_at', type: 'timestamp', nullable: true })
+  createdAt: Date;
+
+  @AutoMap()
+  @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
+  updatedAt: Date;
 }

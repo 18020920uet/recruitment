@@ -1,6 +1,6 @@
-import { IsString, MaxLength, IsAlpha, Min, IsOptional } from 'class-validator';
+import { IsString, MaxLength, IsAlpha, Min, IsOptional, IsNumberString, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 import { JobStatus } from '@Shared/enums/job-status';
 
@@ -37,8 +37,66 @@ export class UpdateCompanyInformationRequest {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }, required: false })
   photos: any[];
+
+  @Type(() => Number)
+  @ApiProperty()
+  countryId: number;
+
+  @Type(() => Number)
+  @IsNumber()
+  @ApiProperty()
+  areaId: number;
+
+  @Transform(({ value }) =>
+    String(value)
+      .split(',')
+      .map((v) => Number(v))
+      .filter((v) => v),
+  )
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'number' },
+    description: 'Format: "businessFieldIds=1,2,3"',
+    required: false,
+  })
+  businessFieldIds: number[];
+
+  @IsNumberString()
+  @ApiProperty()
+  phoneNumber: string;
+
+  @IsNumberString()
+  @ApiProperty()
+  paxNumber: string;
+
+  @ApiProperty()
+  description: string;
+
+  @Type(() => Number)
+  @IsNumber()
+  @ApiProperty()
+  numberOfEmployees: number;
+
+  @ApiProperty({ type: 'object' })
+  socialNetworks: Record<string, string>;
+
+  @ApiProperty({ description: 'mm-dd-yyyy' })
+  dateOfEstablishment: string;
+
+  @Transform(({ value }) =>
+    String(value)
+      .split(',')
+      .filter((v) => v),
+  )
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string' },
+    description: 'Format: "addresses=23 Cau giay,24 Cau giay"',
+    required: false,
+  })
+  addresses: string[];
 }
 
 export class GetJobsOfCompanyParams {

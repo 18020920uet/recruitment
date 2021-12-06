@@ -23,11 +23,11 @@ export class FileService {
     if (_company.logo == '') {
       return `${host}/resources/images/company-logo.png`;
     }
-    return `${host}/public/photos/${_company.logo}`;
+    return `${host}/public/companies/logos/${_company.logo}`;
   }
 
   getPhoto(photoId: string) {
     const host = process.env.HOST;
-    return `${host}/public/photos/${photoId}`;
+    return `${host}/public/companies/photos/${photoId}`;
   }
 }

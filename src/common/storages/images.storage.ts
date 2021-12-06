@@ -8,7 +8,7 @@ export const imagesOfUsersStorage: MulterOptions = {
   storage: diskStorage({
     destination: (_req, file, cb) => {
       if (file.fieldname == 'avatar') {
-        cb(null, 'public/avatars/');
+        cb(null, 'public/avatars');
       }
     },
     filename: (_req, file, cb) => {
@@ -28,7 +28,7 @@ export const imagesOfCompaniesStorage: MulterOptions = {
   storage: diskStorage({
     destination: (_req, file, cb) => {
       if (file.fieldname == 'logo') {
-        cb(null, 'public/companies/logo');
+        cb(null, 'public/companies/logos');
       } else if (file.fieldname == 'photos') {
         cb(null, 'public/companies/photos');
       }
@@ -42,6 +42,6 @@ export const imagesOfCompaniesStorage: MulterOptions = {
       } else {
         cb(new UnsupportedMediaTypeException('File extensions must be .png, .jpg or .jpeg'), null);
       }
-    }
-  })
-}
+    },
+  }),
+};

@@ -48,10 +48,16 @@ export class CompanyEntity {
   @JoinColumn({ name: 'owner_id' })
   owner: UserEntity;
 
+  @Column({ name: 'country_id' })
+  countryId: number;
+
   @AutoMap()
   @ManyToOne(() => CountryEntity)
   @JoinColumn({ name: 'country_id' })
   country: CountryEntity;
+
+  @Column({ name: 'area_id', nullable: true })
+  areaId: number;
 
   @AutoMap({ typeFn: () => AreaEntity })
   @ManyToOne(() => AreaEntity)
