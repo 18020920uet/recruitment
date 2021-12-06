@@ -1,10 +1,10 @@
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { UnsupportedMediaTypeException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 
-export const saveCertificationsStorage: MulterOptions = {
+export const certificationsOfUsersStorage: MulterOptions = {
   storage: diskStorage({
     destination: 'public/certifications',
     filename: (_req, file, cb) => {

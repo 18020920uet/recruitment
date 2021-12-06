@@ -23,8 +23,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { saveAvatarStorage } from '@Common/storages/images.storage';
-import { saveCertificationsStorage } from '@Common/storages/certifications.storage';
+import { imagesOfUsersStorage } from '@Common/storages/images.storage';
+import { certificationsOfUsersStorage } from '@Common/storages/certifications.storage';
 
 import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
 
@@ -92,7 +92,7 @@ export class UserController {
 
   @Put('avatar')
   @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FileInterceptor('file', saveAvatarStorage))
+  @UseInterceptors(FileInterceptor('avatar', imagesOfUsersStorage))
   @ApiOperation({ summary: 'Change avatar' })
   @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
@@ -126,7 +126,7 @@ export class UserController {
 
   @Put('certifications')
   @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FilesInterceptor('files', 3, saveCertificationsStorage))
+  @UseInterceptors(FilesInterceptor('certifications', 3, certificationsOfUsersStorage))
   @ApiOperation({ summary: 'Update/Replace certifications' })
   @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')
@@ -145,7 +145,7 @@ export class UserController {
 
   @Put('certification')
   @UseGuards(JwtAuthenticationGuard)
-  @UseInterceptors(FileInterceptor('file', saveCertificationsStorage))
+  @UseInterceptors(FileInterceptor('certification', certificationsOfUsersStorage))
   @ApiOperation({ summary: 'Add certification' })
   @ApiBearerAuth('access-token')
   @ApiConsumes('multipart/form-data')

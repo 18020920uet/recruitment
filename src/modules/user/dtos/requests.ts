@@ -142,17 +142,17 @@ export class UpdateCurriculumnVitaeRequest {
 
 export class ChangeAvatarRequest {
   @ApiProperty({ type: 'string', format: 'binary' })
-  file: any;
+  avatar: any;
 }
 
 export class UpdateCertificationRequest {
   @ApiProperty({ type: 'string', format: 'binary' })
-  file: any;
+  certification: any;
 }
 
 export class UpdateCertificationsRequest {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
-  files: any[];
+  certifications: any[];
 }
 
 export class RemoveCertificationsRequest {

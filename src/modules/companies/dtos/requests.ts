@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 import { JobStatus } from '@Shared/enums/job-status';
 
-export class GetCompaniesFilterWithTheFirstCharacterInNameQuery {
+export class GetCompaniesFilterWithTheFirstCharacterInNameQueries {
   @IsAlpha()
   @IsString()
   @IsOptional()
@@ -22,6 +22,23 @@ export class GetCompanyDetailParams {
   @IsString()
   @ApiProperty()
   companyId: string;
+}
+
+export class UpdateCompanyInformationParams {
+  @IsString()
+  @ApiProperty()
+  companyId: string;
+}
+
+export class UpdateCompanyInformationRequest {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  logo: any;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+  photos: any[];
 }
 
 export class GetJobsOfCompanyParams {
