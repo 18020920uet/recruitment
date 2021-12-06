@@ -104,9 +104,9 @@ export class UserController {
   async updateAvatar(
     @CurrentUser() _currentUser: UserEntity,
     @Body() _changeAvatarRequest: ChangeAvatarRequest,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() avatar: Express.Multer.File,
   ): Promise<ChangeAvatarResponse> {
-    return await this.userService.updateAvatar(_currentUser, file);
+    return await this.userService.updateAvatar(_currentUser, avatar);
   }
 
   @Put('cv')
@@ -138,9 +138,9 @@ export class UserController {
   async updateCertifications(
     @CurrentUser() _currentUser: UserEntity,
     @Body() _updateCertificationsRequest: UpdateCertificationsRequest,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles() certifications: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
-    return await this.userService.updateCertifications(_currentUser, files);
+    return await this.userService.updateCertifications(_currentUser, certifications);
   }
 
   @Put('certification')
@@ -158,9 +158,9 @@ export class UserController {
   async updateCertification(
     @CurrentUser() _currentUser: UserEntity,
     @Body() _updateCertificationRequest: UpdateCertificationRequest,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() certification: Express.Multer.File,
   ): Promise<UpdateCertificationsResponse> {
-    return await this.userService.updateCertification(_currentUser, file);
+    return await this.userService.updateCertification(_currentUser, certification);
   }
 
   @Delete('certifications')

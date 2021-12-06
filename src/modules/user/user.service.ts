@@ -80,11 +80,11 @@ export class UserService {
     return changePasswordResponse;
   }
 
-  async updateAvatar(_currentUser: UserEntity, file: Express.Multer.File): Promise<ChangeAvatarResponse> {
+  async updateAvatar(_currentUser: UserEntity, avatar: Express.Multer.File): Promise<ChangeAvatarResponse> {
     if (_currentUser.avatar != '') {
       fs.unlinkSync(`./public/avatars/${_currentUser.avatar}`);
     }
-    _currentUser.avatar = file.filename;
+    _currentUser.avatar = avatar.filename;
     await this.userRepository.save(_currentUser);
     return {
       avatar: this.fileService.getAvatar(_currentUser),
@@ -167,7 +167,7 @@ export class UserService {
 
   async updateCertifications(
     _currentUser: UserEntity,
-    files: Express.Multer.File[],
+    certifications: Express.Multer.File[],
   ): Promise<UpdateCertificationsResponse> {
     const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
@@ -180,26 +180,26 @@ export class UserService {
       }
     }
 
-    const certifications = files.map((file) => file.filename);
-    _cv.certifications = certifications.join('|');
+    const newCertifications = certifications.map((certification) => certification.filename);
+    _cv.certifications = newCertifications.join('|');
     await this.curriculumVitaeRepository.save(_cv);
     return {
-      certifications: certifications.map((_c) => this.fileService.getCertification(_c)),
+      certifications: newCertifications.map((_c) => this.fileService.getCertification(_c)),
     };
   }
 
   async updateCertification(
     _currentUser: UserEntity,
-    file: Express.Multer.File,
+    certification: Express.Multer.File,
   ): Promise<UpdateCertificationsResponse> {
     const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
     if (_certifications.length >= 3) {
-      fs.unlinkSync(`./public/certifications/${file.filename}`);
+      fs.unlinkSync(`./public/certifications/${certification.filename}`);
       throw new ForbiddenException('Total certifications greater than 3');
     } else {
-      _certifications.push(file.filename);
+      _certifications.push(certification.filename);
       _cv.certifications = _certifications.join('|');
       await this.curriculumVitaeRepository.save(_cv);
       return {
