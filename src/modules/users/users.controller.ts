@@ -1,58 +1,31 @@
-import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,
-  ApiUnauthorizedResponse,
   ApiBadRequestResponse,
-  ApiForbiddenResponse,
   ApiNotFoundResponse,
-  ApiBearerAuth,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 
-import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
-
 import {
   InternalServerErrorResponse,
   ValidationFailResponse,
-  UnauthorizedResponse,
-  ForbiddenResponse,
+  BadRequestResponse,
   NotFoundResponse,
 } from '@Decorators/swagger.error-responses.decorator';
-import {
-  ApplicationArrayApiOkResponse,
-  ApplicationApiCreateResponse,
-  ApplicationApiOkResponse,
-} from '@Common/decorators/swagger.decorator';
-import { CurrentUser } from '@Common/decorators/current-user.decorator';
-
-import { UserEntity } from '@Entities/user.entity';
+import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
-import { ReviewByUser } from '@Shared/responses/review-by-user';
-import { Review } from '@Shared/responses/review';
 
 import {
   GetUserProfileParams,
   GetJobsOfUserQueries,
   GetJobsOfUserParams,
-  CreateReviewRequest,
-  UpdateReviewRequest,
-  DeleteReviewParams,
-  UpdateReviewParams,
-  CreateReviewParam,
-  GetReviewsParam,
-  GetReviewsQuery,
   GetUsersQuery,
   GetCvParam,
 } from './dtos/requests';
-import {
-  GetUserProfileResponse,
-  GetJobsOfUserResponse,
-  DeleteReviewResponse,
-  GetUsersResponse,
-} from './dtos/responses';
+import { GetUserProfileResponse, GetJobsOfUserResponse, GetUsersResponse } from './dtos/responses';
 
 import { UsersService } from './users.service';
 
@@ -83,7 +56,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get jobs of user' })
   @ApplicationApiOkResponse(GetJobsOfUserResponse)
   @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
-  @ApiBadRequestResponse({ description: 'Unknown Job Status|Unknown type', type: BadRequestException })
+  @ApiBadRequestResponse({ description: 'Unknown Job Status|Unknown type', type: BadRequestResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getJobsOfUser(
     @Param() getJobsOfUserParams: GetJobsOfUserParams,
@@ -99,82 +72,5 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getCurriculumVitae(@Param() getCvParam: GetCvParam): Promise<CurriculumVitae> {
     return await this.usersService.getCurriculumVitae(getCvParam.userId);
-  }
-
-  @Get(':userId/reviews')
-  @ApiOperation({ summary: 'Get user reviews' })
-  @ApplicationArrayApiOkResponse(Review)
-  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getReviews(
-    @Param() getReviewsParam: GetReviewsParam,
-    @Query() getReviewsQuery: GetReviewsQuery,
-  ): Promise<Review[]> {
-    return await this.usersService.getReviews(getReviewsParam.userId, getReviewsQuery.page);
-  }
-
-  @Get(':userId/reviewsByUser')
-  @ApiOperation({ summary: 'Get reviews write by user' })
-  @ApplicationArrayApiOkResponse(ReviewByUser)
-  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getReviewsByUser(
-    @Param() getReviewsParam: GetReviewsParam,
-    @Query() getReviewsQuery: GetReviewsQuery,
-  ): Promise<ReviewByUser[]> {
-    return await this.usersService.getReviewsByUser(getReviewsParam.userId, getReviewsQuery.page);
-  }
-
-  @Post(':userId/review')
-  @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Post a review' })
-  @ApiBearerAuth('access-token')
-  @ApplicationApiCreateResponse(Review)
-  @ApiNotFoundResponse({ description: 'Cannot find user', type: NotFoundResponse })
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async createReview(
-    @CurrentUser() _currentUser: UserEntity,
-    @Param() createReviewParam: CreateReviewParam,
-    @Body() createReviewRequest: CreateReviewRequest,
-  ): Promise<Review> {
-    return await this.usersService.createReview(_currentUser, createReviewParam, createReviewRequest);
-  }
-
-  @Put(':userId/reviews/:reviewId')
-  @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Update review' })
-  @ApiBearerAuth('access-token')
-  @ApplicationApiOkResponse(Review)
-  @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
-  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  @ApiNotFoundResponse({ description: 'Cannot find user or review', type: NotFoundResponse })
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async updateReview(
-    @CurrentUser() _currentUser: UserEntity,
-    @Param() updateReviewParams: UpdateReviewParams,
-    @Body() updateReviewRequest: UpdateReviewRequest,
-  ): Promise<Review> {
-    return await this.usersService.updateReview(_currentUser, updateReviewParams, updateReviewRequest);
-  }
-
-  @Delete(':userId/reviews/:reviewId')
-  @UseGuards(JwtAuthenticationGuard)
-  @ApiOperation({ summary: 'Delete review' })
-  @ApiBearerAuth('access-token')
-  @ApplicationApiOkResponse(DeleteReviewResponse)
-  @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
-  @ApiNotFoundResponse({ description: 'Cannot find user or review', type: NotFoundResponse })
-  @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async deleteReview(
-    @CurrentUser() _currentUser: UserEntity,
-    @Param() deleteReviewParams: DeleteReviewParams,
-  ): Promise<DeleteReviewResponse> {
-    return await this.usersService.deleteReview(_currentUser, deleteReviewParams);
   }
 }

@@ -5,7 +5,6 @@ import { Module } from '@nestjs/common';
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
 import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
 import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
-import { ReviewRepository } from '@Repositories/review.repository';
 import { UserRepository } from '@Repositories/user.repository';
 
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
@@ -19,7 +18,6 @@ import { UsersService } from './users.service';
       CurriculumVitaeRepository,
       JobCandidateRepositoty,
       JobEmployeeRepositoty,
-      ReviewRepository,
       UserRepository,
     ]),
     AuthenticationModule, // JwtAuthenticationGuard
