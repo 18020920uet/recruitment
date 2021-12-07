@@ -1,26 +1,25 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { getConnection, ILike, IsNull, Not } from 'typeorm';
+import { InjectMapper } from '@automapper/nestjs';
+import { Mapper } from '@automapper/types';
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { GetUsersQuery, UpdateUserRequest } from './dtos/requests';
-import { CompanyOwner, UserInfo, GetUsersResponse } from './dtos/responses';
-import { Role } from '@Shared/enums/role';
-import { InjectMapper } from '@automapper/nestjs';
-import { Mapper } from '@automapper/types';
-import { UserRepository } from '@Repositories/user.repository';
-import { User } from '@Shared/responses/user';
-import { CompanyEmployeeEntity } from '@Entities/company-employee.entity';
-import { CompanyEntity } from '@Entities/company.entity';
 import { CompanyRepository } from '@Repositories/company.repository';
-import { Company } from '@Shared/responses/company';
+import { UserRepository } from '@Repositories/user.repository';
 
+import { CompanyEntity } from '@Entities/company.entity';
+import { Role } from '@Shared/enums/role';
+
+import { GetUsersQuery, UpdateUserRequest } from './dtos/requests';
+
+import { CompanyOwner, UserInfo, GetUsersResponse } from './dtos/responses';
 @Injectable()
 export class AdminService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    private userRepository: UserRepository,
     private companyRepository: CompanyRepository,
+    private userRepository: UserRepository,
   ) {}
 
   async getUsers(userRole: Role, roleParam: Role, getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
