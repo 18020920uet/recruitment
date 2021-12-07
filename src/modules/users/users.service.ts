@@ -17,12 +17,7 @@ import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 import { JobStatus } from '@Shared/enums/job-status';
 
-import {
-  GetUserProfileParams,
-  GetJobsOfUserQueries,
-  GetJobsOfUserParams,
-  GetUsersQuery,
-} from './dtos/requests';
+import { GetUserProfileParams, GetJobsOfUserQueries, GetJobsOfUserParams, GetUsersQuery } from './dtos/requests';
 import {
   GetUserProfileResponse,
   GetJobsOfUserResponse,

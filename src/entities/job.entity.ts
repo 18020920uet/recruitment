@@ -23,6 +23,7 @@ import { UserEntity } from './user.entity';
 import { JobExperience } from '@Shared/enums/job-experience';
 import { JobWorkMode } from '@Shared/enums/job-work-mode';
 import { JobStatus } from '@Shared/enums/job-status';
+import { ReviewEntity } from './review.entity';
 
 @Entity('jobs')
 export class JobEntity {
@@ -130,7 +131,7 @@ export class JobEntity {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => JobEmployeeRelation, (jobEmployeeRelation) => jobEmployeeRelation.job, {
+  @OneToMany(() => JobEmployeeRelation, (_jobEmployeeRelation) => _jobEmployeeRelation.job, {
     primary: true,
     onDelete: 'CASCADE',
     onUpdate: 'RESTRICT',
@@ -138,11 +139,14 @@ export class JobEntity {
   })
   employeeRelations: JobEmployeeRelation[];
 
-  @OneToMany(() => JobCandidateRelation, (jobCandidateRelation) => jobCandidateRelation.job, {
+  @OneToMany(() => JobCandidateRelation, (_jobCandidateRelation) => _jobCandidateRelation.job, {
     primary: true,
     onDelete: 'CASCADE',
     onUpdate: 'RESTRICT',
     orphanedRowAction: 'delete',
   })
   candidateRelations: JobCandidateRelation[];
+
+  @OneToMany(() => ReviewEntity, (_review) => _review.job)
+  reviews: ReviewEntity[];
 }

@@ -41,3 +41,29 @@ export class User {
   @ApiProperty({ enum: CompanyRole, enumName: 'CompanyName' })
   companyRole: CompanyRole;
 }
+
+export class SimpleUser {
+  @AutoMap()
+  @ApiProperty()
+  id: string;
+
+  @AutoMap()
+  @ApiProperty()
+  email: string;
+
+  @AutoMap()
+  @ApiProperty()
+  firstName: string;
+
+  @AutoMap()
+  @ApiProperty()
+  lastName: string;
+
+  @AutoMap()
+  @ApiProperty()
+  role: Role;
+
+  @AutoMap()
+  @ApiProperty()
+  avatar: string;
+}

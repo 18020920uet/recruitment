@@ -1,20 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AutoMap } from '@automapper/classes';
 
-import { User } from '@Shared/responses/user';
+import { Company } from '@Shared/responses/company';
+import { SimpleUser } from '@Shared/responses/user';
+
+import { ReviewBy } from '@Shared/enums/review-by';
 
 export class Review {
+  @AutoMap()
+  jobId: number;
+
+  @AutoMap()
+  jobTitle: string;
+
   @AutoMap()
   @ApiProperty()
   id: number;
 
-  @AutoMap()
+  @AutoMap({ typeFn: () => SimpleUser })
   @ApiProperty()
-  reviewer: User;
+  reviewer: SimpleUser;
+
+  @AutoMap({ typeFn: () => SimpleUser })
+  @ApiProperty()
+  reviewee: SimpleUser;
 
   @AutoMap()
   @ApiProperty()
-  revieweeId: string;
+  reviewBy: ReviewBy;
 
   @AutoMap()
   @ApiProperty()
@@ -28,7 +41,12 @@ export class Review {
   @ApiProperty()
   createdAt: Date;
 
-  @AutoMap()
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  deletedAt: Date;
+
+  @ApiProperty()
+  company: Company;
 }

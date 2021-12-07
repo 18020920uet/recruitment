@@ -64,7 +64,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  @UseGuards(JwtAuthenticationGuard, RoleGuard)
+  @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Get current user' })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(User)

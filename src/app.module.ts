@@ -22,6 +22,7 @@ import { UsersModule } from './modules/users/users.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { UserModule } from '@Modules/user/user.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AdminModule } from './modules/admin/admin.module';
     CompaniesModule,
     JobsModule,
     AdminModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

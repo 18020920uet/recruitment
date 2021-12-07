@@ -20,11 +20,10 @@ import { JobEntity } from '@Entities/job.entity';
 import { CurriculumVitaeExperience } from '@Shared/responses/curriculum-vitae-experience';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { BusinessField } from '@Shared/responses/business-field';
-import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Company } from '@Shared/responses/company';
 import { Review } from '@Shared/responses/review';
 import { Skill } from '@Shared/responses/skill';
-import { User } from '@Shared/responses/user';
+import { SimpleUser, User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse, JobOfCompany } from '@Modules/companies/dtos/responses';
@@ -63,6 +62,10 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             _user.role == 1 && _user.employeeOfCompany ? _user.employeeOfCompany.role : null,
           ),
         );
+      mapper.createMap(UserEntity, SimpleUser).forMember(
+        (user: User) => user.avatar,
+        mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
+      );
       mapper.createMap(CurriculumVitaeExperienceEntity, CurriculumVitaeExperience);
       mapper
         .createMap(CurriculumVitaeEntity, CurriculumVitae)
@@ -126,8 +129,32 @@ export class ApplicationMapperProfile extends AutomapperProfile {
             }));
           }),
         );
-      mapper.createMap(ReviewEntity, Review);
-      mapper.createMap(ReviewEntity, ReviewByUser);
+      mapper
+        .createMap(ReviewEntity, Review)
+        .forMember(
+          (review: Review) => review.company,
+          mapFrom((_review: ReviewEntity) => _review.job.company),
+        )
+        .forMember(
+          (review: Review) => review.updatedAt,
+          mapFrom((_review: ReviewEntity) => _review.updatedAt),
+        )
+        .forMember(
+          (review: Review) => review.jobId,
+          mapFrom((_review: ReviewEntity) => _review.job.id),
+        )
+        .forMember(
+          (review: Review) => review.jobTitle,
+          mapFrom((_review: ReviewEntity) => _review.job.title),
+        )
+        .forMember(
+          (review: Review) => review.deletedAt,
+          mapFrom((_review: ReviewEntity) => _review.deletedAt),
+        )
+        .forMember(
+          (review: Review) => review.company.logo,
+          mapFrom((_review: ReviewEntity) => this.fileService.getLogo(_review.job.company)),
+        );
       mapper.createMap(CompanyEntity, Company).forMember(
         (company: Company) => company.logo,
         mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
@@ -146,7 +173,6 @@ export class ApplicationMapperProfile extends AutomapperProfile {
         (userInfo: UserInfo) => userInfo.avatar,
         mapFrom((_user: UserEntity) => this.fileService.getAvatar(_user)),
       );
-
       mapper.createMap(CountryEntity, CountryEntity);
       mapper.createMap(AreaEntity, AreaEntity);
       mapper
