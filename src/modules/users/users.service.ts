@@ -1,5 +1,5 @@
-import { IsNull, Not, In, getManager, getRepository, Like, Between } from 'typeorm';
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { IsNull, Not, In, getManager, getRepository, Like, Between, MoreThan } from 'typeorm';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 // import { ConfigService } from '@nestjs/config';
 import type { Mapper } from '@automapper/types';
@@ -10,6 +10,8 @@ import { ReviewEntity } from '@Entities/review.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { ReviewRepository } from '@Repositories/review.repository';
 import { UserRepository } from '@Repositories/user.repository';
 
@@ -17,24 +19,38 @@ import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { ReviewByUser } from '@Shared/responses/review-by-user';
 import { Review } from '@Shared/responses/review';
 
+import { JobApplyStatus } from '@Shared/enums/job-apply-status';
+import { JobStatus } from '@Shared/enums/job-status';
+
 import {
   GetUserProfileParams,
+  GetJobsOfUserQueries,
   CreateReviewRequest,
   UpdateReviewRequest,
+  GetJobsOfUserParams,
   UpdateReviewParams,
   DeleteReviewParams,
   CreateReviewParam,
   GetUsersQuery,
 } from './dtos/requests';
-import { DeleteReviewResponse, GetUsersResponse, GetUserProfileResponse, FreeLancer } from './dtos/responses';
+import {
+  GetUserProfileResponse,
+  GetJobsOfUserResponse,
+  DeleteReviewResponse,
+  GetUsersResponse,
+  FreeLancer,
+  JobOfUser,
+} from './dtos/responses';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
     private curriculumVitaeRepository: CurriculumVitaeRepository,
+    private jobCandidateRepositoty: JobCandidateRepositoty,
+    private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private reviewRepository: ReviewRepository,
-    private userRepository: UserRepository, // private configService: ConfigService,
+    private userRepository: UserRepository,
   ) {}
 
   async getUsers(getUsersQuery: GetUsersQuery): Promise<GetUsersResponse> {
@@ -127,14 +143,14 @@ export class UsersService {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
       relations: [
-        'experiences',
-        'user',
-        'skillRelations',
         'skillRelations.skill',
-        'languages',
+        'skillRelations',
+        'experiences',
         'nationality',
-        'area',
+        'languages',
         'country',
+        'user',
+        'area',
       ],
     });
     return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
@@ -235,5 +251,114 @@ export class UsersService {
     return {
       status: true,
     };
+  }
+
+  async getJobsOfUser(
+    getJobsOfUserParams: GetJobsOfUserParams,
+    getJobsOfUserQueries: GetJobsOfUserQueries,
+  ): Promise<GetJobsOfUserResponse> {
+    if (getJobsOfUserQueries.jobStatuses != undefined && getJobsOfUserQueries.jobStatuses.length != 0) {
+      for (const jobStatus of getJobsOfUserQueries.jobStatuses) {
+        if (!['Inprogress', 'Pending', 'Await', 'Cancel', 'Done'].includes(jobStatus)) {
+          throw new BadRequestException('Unknown Job Status');
+        }
+      }
+    }
+
+    const _user = await this.userRepository.findOne({ id: getJobsOfUserParams.userId });
+
+    if (!_user) {
+      throw new NotFoundException("Can't find user");
+    }
+
+    switch (getJobsOfUserParams.type) {
+      case 'applied': {
+        const records = getJobsOfUserQueries.records != undefined ? getJobsOfUserQueries.records : 10;
+
+        const [appliedJobs, totalRecords] = await this.jobCandidateRepositoty.findAndCount({
+          relations: ['job', 'user'],
+          where: {
+            userId: getJobsOfUserParams.userId,
+            createdAt:
+              getJobsOfUserQueries.appliedFrom != undefined
+                ? MoreThan(getJobsOfUserQueries.appliedFrom)
+                : Not(IsNull()),
+            job: {
+              title:
+                getJobsOfUserQueries.jobTitle != undefined ? Like(`%${getJobsOfUserQueries.jobTitle}%`) : Not(IsNull()),
+              status:
+                getJobsOfUserQueries.jobStatuses != undefined && getJobsOfUserQueries.jobStatuses.length != 0
+                  ? In(getJobsOfUserQueries.jobStatuses)
+                  : Not(IsNull()),
+            },
+          },
+          order: { createdAt: getJobsOfUserQueries.appliedFrom != undefined ? 'ASC' : 'DESC' },
+          skip: (getJobsOfUserQueries.page > 0 ? getJobsOfUserQueries.page - 1 : 0) * records,
+          take: records,
+        });
+
+        return {
+          jobsOfUser: appliedJobs.map((appliedJob) => {
+            const jobOfUser = new JobOfUser();
+            jobOfUser.isFinished = appliedJob.job.status == JobStatus.DONE ? true : false;
+            jobOfUser.isJoined = appliedJob.applyStatus == JobApplyStatus.APPROVED ? true : false;
+            jobOfUser.jobApplyStatus = appliedJob.applyStatus;
+            jobOfUser.rejectMessage = appliedJob.rejectMessage;
+            jobOfUser.jobStatus = appliedJob.job.status;
+            jobOfUser.appliedAt = appliedJob.createdAt;
+            jobOfUser.jobName = appliedJob.job.title;
+            jobOfUser.jobId = appliedJob.job.id;
+            jobOfUser.jobEmployeeStatus = null;
+            jobOfUser.joinedAt = null;
+            return jobOfUser;
+          }),
+          totalRecords: totalRecords,
+        };
+      }
+      case 'joined': {
+        const records = getJobsOfUserQueries.records != undefined ? getJobsOfUserQueries.records : 10;
+        const [joinedJobs, totalRecords] = await this.jobEmployeeRepositoty.findAndCount({
+          relations: ['job', 'user'],
+          where: {
+            userId: getJobsOfUserParams.userId,
+            createdAt:
+              getJobsOfUserQueries.joinedFrom != undefined ? MoreThan(getJobsOfUserQueries.joinedFrom) : Not(IsNull()),
+            job: {
+              title:
+                getJobsOfUserQueries.jobTitle != undefined ? Like(`%${getJobsOfUserQueries.jobTitle}%`) : Not(IsNull()),
+              status:
+                getJobsOfUserQueries.jobStatuses != undefined && getJobsOfUserQueries.jobStatuses.length != 0
+                  ? In(getJobsOfUserQueries.jobStatuses)
+                  : Not(IsNull()),
+            },
+          },
+          order: { createdAt: getJobsOfUserQueries.joinedFrom != undefined ? 'ASC' : 'DESC' },
+          skip: (getJobsOfUserQueries.page > 0 ? getJobsOfUserQueries.page - 1 : 0) * records,
+          take: records,
+        });
+
+        return {
+          jobsOfUser: joinedJobs.map((joinedJob) => {
+            const jobOfUser = new JobOfUser();
+            jobOfUser.isFinished = joinedJob.job.status == JobStatus.DONE ? true : false;
+            jobOfUser.jobEmployeeStatus = joinedJob.jobEmployeeStatus;
+            jobOfUser.jobStatus = joinedJob.job.status;
+            jobOfUser.joinedAt = joinedJob.createdAt;
+            jobOfUser.jobName = joinedJob.job.title;
+            jobOfUser.jobId = joinedJob.job.id;
+            jobOfUser.jobApplyStatus = null;
+            jobOfUser.rejectMessage = null;
+            jobOfUser.isJoined = true;
+            jobOfUser.appliedAt = null;
+
+            return jobOfUser;
+          }),
+          totalRecords: totalRecords,
+        };
+      }
+      default: {
+        throw new BadRequestException('Unknown type');
+      }
+    }
   }
 }

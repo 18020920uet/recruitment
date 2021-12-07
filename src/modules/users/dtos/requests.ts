@@ -136,3 +136,53 @@ export class GetUserProfileParams {
   @ApiProperty()
   userId: string;
 }
+
+export class GetJobsOfUserParams {
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty({ type: 'string', enum: ['applied', 'joined'] })
+  type: string;
+}
+
+export class GetJobsOfUserQueries {
+  @IsOptional()
+  @ApiProperty({ required: false })
+  jobTitle: string;
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    return [value];
+  })
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'string',
+      enum: ['Inprogress', 'Pending', 'Await', 'Cancel', 'Done'],
+    },
+    required: false,
+    description: 'Enum: Inprogress, Pending, Await, Cancel, Done',
+    maximum: 5,
+  })
+  jobStatuses: string[];
+
+  @IsOptional()
+  @ApiProperty({ required: false })
+  joinedFrom: Date;
+
+  @IsOptional()
+  @ApiProperty({ required: false })
+  appliedFrom: Date;
+
+  @Type(() => Number)
+  @Min(1)
+  @ApiProperty({ type: 'number', minimum: 1, description: 'page > 1' })
+  page: number;
+
+  @Type(() => Number)
+  @IsOptional()
+  @Min(1)
+  @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
+  records: number;
+}

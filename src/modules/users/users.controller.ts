@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Put, Param, Post, Query, Delete, Body, BadRequestException } from '@nestjs/common';
 
 import {
   ApiInternalServerErrorResponse,
@@ -35,6 +35,8 @@ import { Review } from '@Shared/responses/review';
 
 import {
   GetUserProfileParams,
+  GetJobsOfUserQueries,
+  GetJobsOfUserParams,
   CreateReviewRequest,
   UpdateReviewRequest,
   DeleteReviewParams,
@@ -45,7 +47,12 @@ import {
   GetUsersQuery,
   GetCvParam,
 } from './dtos/requests';
-import { DeleteReviewResponse, GetUsersResponse, GetUserProfileResponse } from './dtos/responses';
+import {
+  GetUserProfileResponse,
+  GetJobsOfUserResponse,
+  DeleteReviewResponse,
+  GetUsersResponse,
+} from './dtos/responses';
 
 import { UsersService } from './users.service';
 
@@ -70,6 +77,19 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getUserProfile(@Param() getUserProfileParams: GetUserProfileParams): Promise<GetUserProfileResponse> {
     return await this.usersService.getUserProfile(getUserProfileParams);
+  }
+
+  @Get(':userId/jobs/:type')
+  @ApiOperation({ summary: 'Get jobs of user' })
+  @ApplicationApiOkResponse(GetJobsOfUserResponse)
+  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Unknown Job Status|Unknown type', type: BadRequestException })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getJobsOfUser(
+    @Param() getJobsOfUserParams: GetJobsOfUserParams,
+    @Query() getJobsOfUserQueries: GetJobsOfUserQueries,
+  ): Promise<GetJobsOfUserResponse> {
+    return await this.usersService.getJobsOfUser(getJobsOfUserParams, getJobsOfUserQueries);
   }
 
   @Get(':userId/cv')

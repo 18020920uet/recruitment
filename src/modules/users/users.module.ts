@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 
 import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
+import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { ReviewRepository } from '@Repositories/review.repository';
 import { UserRepository } from '@Repositories/user.repository';
 
@@ -13,7 +15,13 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CurriculumVitaeRepository, ReviewRepository, UserRepository]),
+    TypeOrmModule.forFeature([
+      CurriculumVitaeRepository,
+      JobCandidateRepositoty,
+      JobEmployeeRepositoty,
+      ReviewRepository,
+      UserRepository,
+    ]),
     AuthenticationModule, // JwtAuthenticationGuard
     ConfigModule,
   ],
