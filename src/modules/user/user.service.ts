@@ -30,6 +30,9 @@ import {
   ChangePasswordRequest,
 } from './dtos/requests';
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
+import { CountryEntity } from '@Entities/country.entity';
+import { AreaEntity } from '@Entities/area.entity';
+import { NationalityEntity } from '@Entities/nationality.entity';
 
 @Injectable()
 export class UserService {
@@ -49,13 +52,13 @@ export class UserService {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { userId: userId },
       relations: [
-        'country',
-        'experiences',
-        'user',
-        'skillRelations',
         'skillRelations.skill',
-        'languages',
+        'skillRelations',
+        'experiences',
         'nationality',
+        'languages',
+        'country',
+        'user',
         'area',
       ],
     });
@@ -97,7 +100,16 @@ export class UserService {
   ): Promise<CurriculumVitae> {
     const _cv = await this.curriculumVitaeRepository.findOne({
       where: { user: _currentUser },
-      relations: ['experiences', 'user', 'skillRelations', 'languages', 'country'],
+      relations: [
+        'skillRelations.skill',
+        'skillRelations',
+        'nationality',
+        'experiences',
+        'languages',
+        'country',
+        'user',
+        'area'
+      ],
     });
 
     await getManager().transaction(async (transactionalEntityManager) => {
@@ -115,30 +127,13 @@ export class UserService {
       _cv.address = updateCurriculumnVitaeRequest.address;
       _cv.gender = updateCurriculumnVitaeRequest.gender;
 
-      _cv.nationalityId = updateCurriculumnVitaeRequest.nationalityId;
-      _cv.countryId = updateCurriculumnVitaeRequest.countryId;
-      _cv.areaId = updateCurriculumnVitaeRequest.areaId;
-
-      const _skills = await getRepository(SkillEntity).find({
-        id: In(updateCurriculumnVitaeRequest.skills.map((s) => s.skillId)),
-      });
-      _cv.skillRelations = [];
-      for (const updateSkill of updateCurriculumnVitaeRequest.skills) {
-        const _skill = _skills.find((_skill) => _skill.id == updateSkill.skillId);
-        if (_skill != null) {
-          const skillRelation = new CurriculumVitaeSkillRelation();
-          skillRelation.experience = updateSkill.experience;
-          skillRelation.skill = _skill;
-          skillRelation.cv = _cv;
-          skillRelation.cvId = _cv.id;
-          skillRelation.skillId = _skill.id;
-          _cv.skillRelations.push(skillRelation);
-        }
-      }
-
+      _cv.nationality = await getRepository(NationalityEntity).findOne();
+      _cv.country = await getRepository(CountryEntity).findOne({ id: updateCurriculumnVitaeRequest.countryId });
+      _cv.area = await getRepository(AreaEntity).findOne({ id: updateCurriculumnVitaeRequest.areaId });
       _cv.languages = await getRepository(LanguageEntity).find({
         where: { id: In(updateCurriculumnVitaeRequest.languageIds) },
       });
+      _cv.skillRelations = [];
 
       const _experiences: CurriculumVitaeExperienceEntity[] = [];
       if (updateCurriculumnVitaeRequest.experiences != null && updateCurriculumnVitaeRequest.experiences.length != 0) {
@@ -160,9 +155,27 @@ export class UserService {
       }
       _cv.experiences = _experiences;
       await transactionalEntityManager.save(_cv);
+
+      const _skills = await getRepository(SkillEntity).find({
+        id: In(updateCurriculumnVitaeRequest.skills.map((s) => s.skillId)),
+      });
+      const skillRelations: CurriculumVitaeSkillRelation[] = [];
+      for (const updateSkill of updateCurriculumnVitaeRequest.skills) {
+        const _skill = _skills.find((_skill) => _skill.id == updateSkill.skillId);
+        if (_skill != null) {
+          const skillRelation = new CurriculumVitaeSkillRelation();
+          skillRelation.experience = updateSkill.experience;
+          skillRelation.skillId = _skill.id;
+          skillRelation.skill = _skill;
+          skillRelation.cvId = _cv.id;
+          skillRelations.push(skillRelation);
+        }
+      }
+      await transactionalEntityManager.save(skillRelations);
+      _cv.skillRelations = skillRelations;
     });
 
-    return this.mapper.map(await this.getCurriculumVitae(_currentUser.id), CurriculumVitae, CurriculumVitaeEntity);
+    return this.mapper.map(_cv, CurriculumVitae, CurriculumVitaeEntity);
   }
 
   async updateCertifications(

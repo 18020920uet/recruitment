@@ -20,7 +20,7 @@ export class CurriculumVitaeSkillRelation {
   @ManyToOne(() => CurriculumVitaeEntity, (curriculumnVitae) => curriculumnVitae.skillRelations, {
     primary: true,
     onDelete: 'CASCADE',
-    onUpdate: 'RESTRICT',
+    onUpdate: 'CASCADE',
     orphanedRowAction: 'delete',
   })
   @JoinColumn([{ name: 'cv_id', referencedColumnName: 'id' }])
