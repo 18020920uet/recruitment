@@ -108,7 +108,7 @@ export class UserService {
         'languages',
         'country',
         'user',
-        'area'
+        'area',
       ],
     });
 

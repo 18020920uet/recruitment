@@ -50,11 +50,11 @@ export class GetJobsQueries {
 
   @IsOptional()
   @ApiProperty({ description: 'Start date: "yyyy-mm-dd"', type: 'string', required: false })
-  startDate: string;
+  startDateBegin: string;
 
   @IsOptional()
   @ApiProperty({ description: 'End date: "yyyy-mm-dd"', type: 'string', required: false })
-  endDate: string;
+  startDateEnd: string;
 
   @Type(() => Number)
   @IsOptional()

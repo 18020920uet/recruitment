@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like, Between } from 'typeorm';
+import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like, Between, LessThanOrEqual } from 'typeorm';
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 
@@ -65,8 +65,6 @@ export class JobsService {
   async getJobs(getJobsQueries: GetJobsQueries): Promise<GetJobsResponse> {
     if (getJobsQueries.statuses != undefined && getJobsQueries.statuses.length != 0) {
       const jobStatuses = Object.values(JobStatus);
-      console.log(jobStatuses);
-
       for (const inputStatus of getJobsQueries.statuses) {
         if (!jobStatuses.includes(inputStatus)) {
           throw new BadRequestException('Unknown job status');
@@ -114,10 +112,16 @@ export class JobsService {
         id: jobIds.length != 0 ? In(jobIds) : Not(IsNull()),
         experience: getJobsQueries.experience != undefined ? getJobsQueries.experience : Not(IsNull()),
         title: getJobsQueries.title != undefined ? Like(`%${getJobsQueries.title}%`) : Not(IsNull()),
-        startDate: getJobsQueries.startDate != undefined ? getJobsQueries.startDate : Not(IsNull()),
+        startDate:
+          getJobsQueries.startDateBegin != undefined && getJobsQueries.startDateEnd != undefined
+            ? Between(getJobsQueries.startDateBegin, getJobsQueries.startDateEnd)
+            : getJobsQueries.startDateBegin != undefined && getJobsQueries.startDateEnd == undefined
+            ? MoreThanOrEqual(getJobsQueries.startDateBegin)
+            : getJobsQueries.startDateBegin == undefined && getJobsQueries.startDateEnd != undefined
+            ? LessThanOrEqual(getJobsQueries.startDateEnd)
+            : Not(IsNull()),
         workMode: getJobsQueries.workMode != undefined ? getJobsQueries.workMode : Not(IsNull()),
         salary: getJobsQueries.salary != undefined ? getJobsQueries.salary : MoreThanOrEqual(0),
-        endDate: getJobsQueries.endDate != undefined ? getJobsQueries.endDate : Not(IsNull()),
         status:
           getJobsQueries.statuses != undefined && getJobsQueries.statuses.length != 0
             ? In(getJobsQueries.statuses)
