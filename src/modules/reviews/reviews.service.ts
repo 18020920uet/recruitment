@@ -149,7 +149,10 @@ export class ReviewsService {
     _review.job.company.reviewPoint = _review.job.company.reviewPoint - _review.rate;
     _review.job.company.totalReviews -= 1;
 
-    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({ userId: _currentUser.id, jobId: _review.job.id });
+    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({
+      userId: _currentUser.id,
+      jobId: _review.job.id,
+    });
 
     _jobEmployeeRelation.wroteReview = false;
 
@@ -258,7 +261,7 @@ export class ReviewsService {
     _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - oldPoint + _review.rate;
 
     const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({
-      where: { userId: _review.reviewee.id, jobId: _review.job.id, },
+      where: { userId: _review.reviewee.id, jobId: _review.job.id },
       relations: ['user'],
     });
 

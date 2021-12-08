@@ -41,8 +41,6 @@ import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
 
-import { RoleGuard } from '@Common/guard/role.guard';
-
 import { UpdateCertificationsResponse, ChangePasswordResponse, ChangeAvatarResponse } from './dtos/responses';
 import {
   UpdateCurriculumnVitaeRequest,

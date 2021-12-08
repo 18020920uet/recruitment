@@ -432,7 +432,7 @@ export class JobsService {
       ),
       maxEmployees: _job.maxEmployees,
       totalEmployees: totalEmployess,
-      jobStatus: _job.status
+      jobStatus: _job.status,
     };
   }
 

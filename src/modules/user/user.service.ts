@@ -149,7 +149,6 @@ export class UserService {
           _experience.type = experience.type;
           _experience.index = index;
           _experience.cvId = _cv.id;
-          // _experience.curriculumnVitae = _cv;
           _experiences.push(_experience);
         }
       }
