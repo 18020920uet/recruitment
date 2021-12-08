@@ -160,6 +160,9 @@ export class GetCandidatesOfJobResponse {
 
   @ApiProperty()
   totalEmployees: number;
+
+  @ApiProperty({ enum: JobStatus, enumName: 'JobStatuss' })
+  jobStatus: JobStatus;
 }
 
 export class FinishJobResponse {
