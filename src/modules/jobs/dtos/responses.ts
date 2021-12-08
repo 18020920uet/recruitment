@@ -121,6 +121,14 @@ export class EmployeeOfJob {
   @AutoMap({ typeFn: () => User })
   @ApiProperty({ type: User })
   editor: User | null;
+
+  @AutoMap()
+  @ApiProperty()
+  wroteReview: boolean;
+
+  @AutoMap()
+  @ApiProperty()
+  hasBeenReview: boolean;
 }
 
 export class GetEmployeesOfJobResponse {

@@ -43,4 +43,12 @@ export class JobEmployeeRelation {
   @ManyToOne(() => UserEntity)
   @JoinColumn([{ name: 'editor_id', referencedColumnName: 'id' }])
   editor: UserEntity;
+
+  @AutoMap()
+  @Column({ name: 'wrote_review', type: 'boolean', default: false })
+  wroteReview: boolean;
+
+  @AutoMap()
+  @Column({ name: 'has_been_review', type: 'boolean', default: false })
+  hasBeenReview: boolean;
 }

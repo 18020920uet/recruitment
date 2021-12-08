@@ -86,7 +86,10 @@ export class ReviewsService {
     _job.company.reviewPoint += _review.rate;
     _job.company.totalReviews += 1;
 
+    _jobEmployeeRelation.wroteReview = true;
+
     await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_job.company);
       await transactionalEntityManager.save(_review);
     });
@@ -146,7 +149,12 @@ export class ReviewsService {
     _review.job.company.reviewPoint = _review.job.company.reviewPoint - _review.rate;
     _review.job.company.totalReviews -= 1;
 
+    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({ userId: _currentUser.id, jobId: _review.job.id });
+
+    _jobEmployeeRelation.wroteReview = false;
+
     await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_review.job.company);
       await transactionalEntityManager.save(_review);
     });
@@ -209,7 +217,10 @@ export class ReviewsService {
     _user.reviewPoint += _review.rate;
     _user.totalReviews += 1;
 
+    _jobEmployeeRelation.hasBeenReview = true;
+
     await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_user);
       await transactionalEntityManager.save(_review);
     });
@@ -246,7 +257,15 @@ export class ReviewsService {
     // Cập nhật điểm
     _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - oldPoint + _review.rate;
 
+    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({
+      where: { userId: _review.reviewee.id, jobId: _review.job.id, },
+      relations: ['user'],
+    });
+
+    _jobEmployeeRelation.hasBeenReview = false;
+
     await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_review.reviewee);
       await transactionalEntityManager.save(_review);
     });
@@ -318,7 +337,7 @@ export class ReviewsService {
         rate: getReviewsQueries.rateFrom != undefined ? MoreThanOrEqual(getReviewsQueries.rateFrom) : Not(IsNull()),
       },
       relations: ['reviewer', 'reviewee', 'job', 'job.company'],
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
       skip: (getReviewsQueries.page > 0 ? getReviewsQueries.page - 1 : 0) * records,
       take: records,
     });
@@ -397,7 +416,7 @@ export class ReviewsService {
         rate: getReviewsQueries.rateFrom != undefined ? MoreThanOrEqual(getReviewsQueries.rateFrom) : Not(IsNull()),
       },
       relations: ['reviewer', 'reviewee', 'job', 'job.company'],
-      order: { createdAt: 'ASC' },
+      order: { createdAt: 'DESC' },
       skip: (getReviewsQueries.page > 0 ? getReviewsQueries.page - 1 : 0) * records,
       take: records,
     });

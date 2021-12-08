@@ -2,12 +2,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  DeleteDateColumn,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   Column,
   Entity,
-  ManyToOne,
-  DeleteDateColumn,
 } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
