@@ -63,4 +63,10 @@ export class UserEntity {
     cascade: true,
   })
   employeeOfCompany: CompanyEmployeeEntity;
+
+  @Column({ name: 'total_reviews', default: 0 })
+  totalReviews: number;
+
+  @Column({ name: 'review_point', default: 0, type: 'real' })
+  reviewPoint: number;
 }

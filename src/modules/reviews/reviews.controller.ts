@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import {
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
@@ -22,9 +22,12 @@ import {
 import { CurrentUser } from '@Common/decorators/current-user.decorator';
 
 import { UserEntity } from '@Entities/user.entity';
+import { CompanyEntity } from '@Entities/company.entity';
 
 import { RequireCompanyRole } from '@Common/decorators/require-company-roles.decorator';
+import { CurrentCompany } from '@Common/decorators/current-company.decorator';
 import { RequireRole } from '@Common/decorators/require-role.decorator';
+
 import { CompanyRoleGuard } from '@Common/guard/company-role.guard';
 import { FreelanceGuard } from '@Common/guard/freelance.guard';
 import { CompanyGuard } from '@Common/guard/company.guard';
@@ -43,10 +46,13 @@ import {
   UpdateReviewParams,
   DeleteReviewParams,
   GetReviewParams,
+  GetReviewsOfJobParams,
+  GetReviewsQueries,
+  GetReviewsOfUserParams,
+  GetReviewsOfCompanyParams,
 } from './dtos/requests';
 import { ReviewsService } from './reviews.service';
-import { CurrentCompany } from '@Common/decorators/current-company.decorator';
-import { CompanyEntity } from '@Entities/company.entity';
+import { GetReviewsResponse } from './dtos/responses';
 
 @ApiTags('reviews')
 @Controller('reviews')
@@ -189,24 +195,40 @@ export class ReviewsController {
     return await this.reviewsService.deleteReviewOfJobFromCompany(_currentUser, _currentCompany, deleteReviewParams);
   }
 
-  @Get('jobs/:jobId/:byUserOrByCompany')
+  @Get('jobs/:jobId/:type')
   @ApiOperation({ summary: 'Get reviews of a job' })
+  @ApplicationApiOkResponse(GetReviewsResponse)
   @ApiNotFoundResponse({ description: "Can't find job", type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  async getReviewsOfJob(): Promise<Review[]> {
-    return [];
+  async getReviewsOfJob(
+    @Param() getReviewsOfJobParams: GetReviewsOfJobParams,
+    @Query() getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    return await this.reviewsService.getReviewsOfJob(getReviewsOfJobParams, getReviewsQueries);
   }
 
-  @Get('users/:userId/:byUserOrToUser')
+  @Get('users/:userId/:type')
   @ApiOperation({ summary: 'Get reviews of a user' })
-  async getReviewsOfUser(): Promise<Review[]> {
-    return [];
+  @ApplicationApiOkResponse(GetReviewsResponse)
+  @ApiNotFoundResponse({ description: "Can't find user", type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getReviewsOfUser(
+    @Param() getReviewsOfUserParams: GetReviewsOfUserParams,
+    @Query() getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    return await this.reviewsService.getReviewsOfUser(getReviewsOfUserParams, getReviewsQueries);
   }
 
-  @Get('companies/:companyId/:byCompanyOrToCompany')
+  @Get('companies/:companyId/:type')
   @ApiOperation({ summary: 'Get reviews of a company' })
-  async getReviewsOfCompany(): Promise<Review[]> {
-    return [];
+  @ApplicationApiOkResponse(GetReviewsResponse)
+  @ApiNotFoundResponse({ description: "Can't find company", type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getReviewsOfCompany(
+    @Param() getReviewsOfCompanyParams: GetReviewsOfCompanyParams,
+    @Query() getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    return await this.reviewsService.getReviewsOfCompany(getReviewsOfCompanyParams, getReviewsQueries);
   }
 
   @Get(':reviewId')
@@ -216,89 +238,4 @@ export class ReviewsController {
   async getReview(@Param() getReviewParams: GetReviewParams): Promise<Review> {
     return await this.reviewsService.getReview(getReviewParams);
   }
-
-  // @UseGuards(JwtAuthenticationGuard)
-  // @ApiOperation({ summary: 'Post a review' })
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiCreateResponse(Review)
-  // @ApiNotFoundResponse({ description: 'Cannot find user', type: NotFoundResponse })
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async createReviewForCompany(
-  //   @CurrentUser() _currentUser: UserEntity,
-  //   // @Param() createReviewParam: CreateReviewParam,
-  //   // @Body() createReviewRequest: CreateReviewRequest,
-  // ): Promise<Review> {
-  //   return null;
-  // }
-
-  // @Put(':userId/reviews/:reviewId')
-  // @UseGuards(JwtAuthenticationGuard)
-  // @ApiOperation({ summary: 'Update review' })
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiOkResponse(Review)
-  // @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiNotFoundResponse({ description: 'Cannot find user or review', type: NotFoundResponse })
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async updateReview(
-  //   @CurrentUser() _currentUser: UserEntity,
-  //   // @Param() updateReviewParams: UpdateReviewParams,
-  //   // @Body() updateReviewRequest: UpdateReviewRequest,
-  // ): Promise<Review> {
-  //   return null;
-  //   // return await this.usersService.updateReview(_currentUser, updateReviewParams, updateReviewRequest);
-  // }
-  //
-  // @Get(':userId/reviews')
-  // @ApiOperation({ summary: 'Get user reviews' })
-  // @ApplicationArrayApiOkResponse(Review)
-  // @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async getReviews(): Promise<Review[]> {
-  //   return [];
-  // }
-  //
-  // @Get(':userId/reviewsByUser')
-  // @ApiOperation({ summary: 'Get reviews write by user' })
-  // @ApplicationArrayApiOkResponse(ReviewByUser)
-  // @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async getReviewsByUser(
-  // ): Promise<ReviewByUser[]> {
-  //   return [];
-  // }
-  //
-  // @Post(':userId/review')
-  // @UseGuards(JwtAuthenticationGuard)
-  // @ApiOperation({ summary: 'Post a review' })
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiCreateResponse(Review)
-  // @ApiNotFoundResponse({ description: 'Cannot find user', type: NotFoundResponse })
-  // @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async createReview(
-  //   @CurrentUser() _currentUser: UserEntity,
-  // ): Promise<Review> {
-  //   return null;
-  // }
-  //
-  // @Delete(':userId/reviews/:reviewId')
-  // @UseGuards(JwtAuthenticationGuard)
-  // @ApiOperation({ summary: 'Delete review' })
-  // @ApiBearerAuth('access-token')
-  // @ApplicationApiOkResponse(Review)
-  // @ApiForbiddenResponse({ description: 'No permission', type: ForbiddenResponse })
-  // @ApiNotFoundResponse({ description: 'Cannot find user or review', type: NotFoundResponse })
-  // @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
-  // @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
-  // async deleteReview(
-  // ): Promise<Review> {
-  //   return null;
-  // }
 }

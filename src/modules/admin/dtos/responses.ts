@@ -4,12 +4,7 @@ import { AutoMap } from '@automapper/classes';
 import { CountryEntity } from '@Entities/country.entity';
 import { AreaEntity } from '@Entities/area.entity';
 
-import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
-import { Review } from '@Shared/responses/review';
-import { User } from '@Shared/responses/user';
-import { Job } from '@Shared/responses/job';
 import { Role } from '@Shared/enums/role';
-import { UserEntity } from '@Entities/user.entity';
 import { CompanyInformationEntity } from '@Entities/company-information.entity';
 
 export class UserInfo {
@@ -73,6 +68,12 @@ export class CompanyOwner {
 
   @AutoMap({ typeFn: () => CompanyInformationEntity })
   information: CompanyInformationEntity;
+
+  @AutoMap()
+  totalReviews: number;
+
+  @AutoMap()
+  reviewPoint: number;
 }
 
 export class GetUsersResponse {

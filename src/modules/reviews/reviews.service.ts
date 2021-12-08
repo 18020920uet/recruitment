@@ -1,3 +1,4 @@
+import { Between, getManager, IsNull, LessThanOrEqual, MoreThanOrEqual, Not } from 'typeorm';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/types';
@@ -6,6 +7,7 @@ import { ReviewEntity } from '@Entities/review.entity';
 import { UserEntity } from '@Entities/user.entity';
 
 import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
+import { CompanyRepository } from '@Repositories/company.repository';
 import { ReviewRepository } from '@Repositories/review.repository';
 import { UserRepository } from '@Repositories/user.repository';
 import { JobRepository } from '@Repositories/job.repository';
@@ -17,14 +19,20 @@ import {
   CreateReviewOfJobFromCompanyRequest,
   CreateReviewOfJobFromUserParams,
   CreateReviewOfJobFromUserRequest,
-  DeleteReviewParams,
-  GetReviewParams,
-  UpdateReviewParams,
+  GetReviewsOfCompanyParams,
+  GetReviewsOfUserParams,
+  GetReviewsOfJobParams,
   UpdateReviewRequest,
+  DeleteReviewParams,
+  UpdateReviewParams,
+  GetReviewsQueries,
+  GetReviewParams,
 } from './dtos/requests';
 import { ReviewBy } from '@Shared/enums/review-by';
 import { JobStatus } from '@Shared/enums/job-status';
 import { CompanyEntity } from '@Entities/company.entity';
+
+import { GetReviewsResponse } from './dtos/responses';
 
 // import { CreateReviewParam, CreateReviewRequest, UpdateReviewParams } from './dtos/requests';
 
@@ -33,6 +41,7 @@ export class ReviewsService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
     private jobEmployeeRepository: JobEmployeeRepositoty,
+    private companyRepository: CompanyRepository,
     private reviewRepository: ReviewRepository,
     private userRepository: UserRepository,
     private jobRepository: JobRepository,
@@ -73,9 +82,14 @@ export class ReviewsService {
     _review.reviewee = null;
     _review.job = _job;
 
-    // Tinh toan review
+    // Cập nhật điểm
+    _job.company.reviewPoint += _review.rate;
+    _job.company.totalReviews += 1;
 
-    await this.reviewRepository.save(_review);
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_job.company);
+      await transactionalEntityManager.save(_review);
+    });
 
     return this.mapper.map(_review, Review, ReviewEntity);
   }
@@ -98,12 +112,18 @@ export class ReviewsService {
       throw new ForbiddenException('No permission to edit');
     }
 
+    const oldRate = _review.rate;
     _review.rate = updateReviewRequest.rate;
     _review.comment = updateReviewRequest.comment;
 
     // Cập nhật điểm
+    _review.job.company.reviewPoint = _review.job.company.reviewPoint - oldRate + _review.rate;
 
-    await this.reviewRepository.save(_review);
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_review.job.company);
+      await transactionalEntityManager.save(_review);
+    });
+
     return this.mapper.map(_review, Review, ReviewEntity);
   }
 
@@ -123,7 +143,14 @@ export class ReviewsService {
 
     _review.deletedAt = new Date();
 
-    await this.reviewRepository.save(_review);
+    _review.job.company.reviewPoint = _review.job.company.reviewPoint - _review.rate;
+    _review.job.company.totalReviews -= 1;
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_review.job.company);
+      await transactionalEntityManager.save(_review);
+    });
+
     return this.mapper.map(_review, Review, ReviewEntity);
   }
 
@@ -179,7 +206,14 @@ export class ReviewsService {
     _review.deletedAt = null;
     _review.job = _job;
 
-    await this.reviewRepository.save(_review);
+    _user.reviewPoint += _review.rate;
+    _user.totalReviews += 1;
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_user);
+      await transactionalEntityManager.save(_review);
+    });
+
     return this.mapper.map(_review, Review, ReviewEntity);
   }
 
@@ -202,14 +236,21 @@ export class ReviewsService {
       throw new ForbiddenException('No permission to write review');
     }
 
+    const oldPoint = _review.rate;
+
     _review.comment = updateReviewRequest.comment;
     _review.rate = updateReviewRequest.rate;
     _review.reviewer = _currentUser;
     _review.updatedAt = new Date();
 
     // Cập nhật điểm
+    _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - oldPoint + _review.rate;
 
-    await this.reviewRepository.save(_review);
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_review.reviewee);
+      await transactionalEntityManager.save(_review);
+    });
+
     return this.mapper.map(_review, Review, ReviewEntity);
   }
 
@@ -233,19 +274,138 @@ export class ReviewsService {
 
     _review.deletedAt = new Date();
 
-    await this.reviewRepository.save(_review);
+    _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - _review.rate;
+    _review.reviewee.totalReviews -= 1;
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_review.reviewee);
+      await transactionalEntityManager.save(_review);
+    });
+
     return this.mapper.map(_review, Review, ReviewEntity);
   }
 
-  async getReviews(userId: string, page: number): Promise<Review[]> {
-    const _reviews = await this.reviewRepository.find({
-      where: { revieweeId: userId },
-      relations: ['reviewer'],
-      order: { createdAt: 'ASC' },
-      skip: page > 0 ? page - 1 : 0 * 10,
-      take: 10,
+  async getReviewsOfJob(
+    getReviewsOfJobParams: GetReviewsOfJobParams,
+    getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    const _job = await this.jobRepository.findOne({
+      where: { id: getReviewsOfJobParams.jobId },
     });
-    return _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
+
+    if (!_job) {
+      throw new NotFoundException("Can't find job");
+    }
+
+    const records = getReviewsQueries.records != undefined ? getReviewsQueries.records : 10;
+    const [_reviews, totalRecords] = await this.reviewRepository.findAndCount({
+      where: {
+        jobId: getReviewsOfJobParams.jobId,
+        reviewBy:
+          getReviewsOfJobParams.type == 'byUser'
+            ? ReviewBy.FREELANCE
+            : getReviewsOfJobParams.type == 'byCompany'
+            ? ReviewBy.COMPANY
+            : Not(IsNull()),
+        createdAt:
+          getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd != undefined
+            ? Between(getReviewsQueries.createdAtBegin, getReviewsQueries.createdAtEnd)
+            : getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd == undefined
+            ? MoreThanOrEqual(getReviewsQueries.createdAtBegin)
+            : getReviewsQueries.createdAtBegin == undefined && getReviewsQueries.createdAtEnd != undefined
+            ? LessThanOrEqual(getReviewsQueries.createdAtEnd)
+            : Not(IsNull()),
+        rate: getReviewsQueries.rateFrom != undefined ? MoreThanOrEqual(getReviewsQueries.rateFrom) : Not(IsNull()),
+      },
+      relations: ['reviewer', 'reviewee', 'job', 'job.company'],
+      order: { createdAt: 'ASC' },
+      skip: (getReviewsQueries.page > 0 ? getReviewsQueries.page - 1 : 0) * records,
+      take: records,
+    });
+
+    const response = new GetReviewsResponse();
+    response.totalRecords = totalRecords;
+    response.reviews = _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
+    return response;
+  }
+
+  async getReviewsOfUser(
+    getReviewsOfUserParams: GetReviewsOfUserParams,
+    getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    const _user = await this.userRepository.findOne({ id: getReviewsOfUserParams.userId });
+
+    if (!_user) {
+      throw new NotFoundException("Can't find user");
+    }
+
+    const records = getReviewsQueries.records != undefined ? getReviewsQueries.records : 10;
+    const [_reviews, totalRecords] = await this.reviewRepository.findAndCount({
+      where: {
+        reviewer: {
+          id: getReviewsOfUserParams.type == 'byUser' ? getReviewsOfUserParams.userId : Not(IsNull()),
+        },
+        reviewee: {
+          id: getReviewsOfUserParams.type == 'fromCompany' ? getReviewsOfUserParams.userId : IsNull(),
+        },
+        reviewBy: getReviewsOfUserParams.type == 'byUser' ? ReviewBy.FREELANCE : ReviewBy.COMPANY,
+        createdAt:
+          getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd != undefined
+            ? Between(getReviewsQueries.createdAtBegin, getReviewsQueries.createdAtEnd)
+            : getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd == undefined
+            ? MoreThanOrEqual(getReviewsQueries.createdAtBegin)
+            : getReviewsQueries.createdAtBegin == undefined && getReviewsQueries.createdAtEnd != undefined
+            ? LessThanOrEqual(getReviewsQueries.createdAtEnd)
+            : Not(IsNull()),
+        rate: getReviewsQueries.rateFrom != undefined ? MoreThanOrEqual(getReviewsQueries.rateFrom) : Not(IsNull()),
+      },
+      relations: ['reviewer', 'reviewee', 'job', 'job.company'],
+      order: { createdAt: 'DESC' },
+      skip: (getReviewsQueries.page > 0 ? getReviewsQueries.page - 1 : 0) * records,
+      take: records,
+    });
+
+    const response = new GetReviewsResponse();
+    response.totalRecords = totalRecords;
+    response.reviews = _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
+    return response;
+  }
+
+  async getReviewsOfCompany(
+    getReviewsOfCompanyParams: GetReviewsOfCompanyParams,
+    getReviewsQueries: GetReviewsQueries,
+  ): Promise<GetReviewsResponse> {
+    const _company = await this.companyRepository.findOne({ id: getReviewsOfCompanyParams.companyId });
+
+    if (!_company) {
+      throw new NotFoundException("Can't find copmany");
+    }
+
+    const records = getReviewsQueries.records != undefined ? getReviewsQueries.records : 10;
+    const [_reviews, totalRecords] = await this.reviewRepository.findAndCount({
+      where: {
+        job: { company: { id: getReviewsOfCompanyParams.companyId } },
+        reviewBy: getReviewsOfCompanyParams.type == 'byCompany' ? ReviewBy.COMPANY : ReviewBy.FREELANCE,
+        createdAt:
+          getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd != undefined
+            ? Between(getReviewsQueries.createdAtBegin, getReviewsQueries.createdAtEnd)
+            : getReviewsQueries.createdAtBegin != undefined && getReviewsQueries.createdAtEnd == undefined
+            ? MoreThanOrEqual(getReviewsQueries.createdAtBegin)
+            : getReviewsQueries.createdAtBegin == undefined && getReviewsQueries.createdAtEnd != undefined
+            ? LessThanOrEqual(getReviewsQueries.createdAtEnd)
+            : Not(IsNull()),
+        rate: getReviewsQueries.rateFrom != undefined ? MoreThanOrEqual(getReviewsQueries.rateFrom) : Not(IsNull()),
+      },
+      relations: ['reviewer', 'reviewee', 'job', 'job.company'],
+      order: { createdAt: 'ASC' },
+      skip: (getReviewsQueries.page > 0 ? getReviewsQueries.page - 1 : 0) * records,
+      take: records,
+    });
+
+    const response = new GetReviewsResponse();
+    response.totalRecords = totalRecords;
+    response.reviews = _reviews.map((_review) => this.mapper.map(_review, Review, ReviewEntity));
+    return response;
   }
 
   async getReview(getReviewParams: GetReviewParams): Promise<Review> {

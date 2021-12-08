@@ -80,6 +80,14 @@ export class CompanyEntity {
   @OneToMany(() => JobEntity, (job) => job.company, { cascade: true })
   jobs: JobEntity[];
 
+  @AutoMap()
+  @Column({ name: 'review_point', type: 'real', default: 0 })
+  reviewPoint: number;
+
+  @AutoMap()
+  @Column({ name: 'total_reviews', default: 0 })
+  totalReviews: number;
+
   @OneToMany(() => CompanyEmployeeEntity, (employee) => employee.company, { cascade: true })
   employees: CompanyEmployeeEntity[];
 }

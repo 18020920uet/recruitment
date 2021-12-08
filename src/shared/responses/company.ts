@@ -27,4 +27,12 @@ export class Company {
   @AutoMap()
   @ApiProperty()
   isVerified: boolean;
+
+  @AutoMap()
+  @ApiProperty()
+  totalReviews: number;
+
+  @AutoMap()
+  @ApiProperty()
+  reviewPoint: number;
 }
