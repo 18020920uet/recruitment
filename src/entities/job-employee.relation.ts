@@ -53,6 +53,6 @@ export class JobEmployeeRelation {
   hasBeenReview: boolean;
 
   @AutoMap()
-  @Column({ name: 'earn', type: 'real', default: 0 })
+  @Column({ name: 'salary', type: 'real', default: 0 })
   salary: number;
 }
