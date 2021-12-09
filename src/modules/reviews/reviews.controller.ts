@@ -42,14 +42,15 @@ import {
   CreateReviewOfJobFromCompanyParams,
   CreateReviewOfJobFromUserRequest,
   CreateReviewOfJobFromUserParams,
+  GetReviewsOfCompanyParams,
+  GetReviewsOfUserParams,
+  GetReviewsOfJobParams,
+  GetReviewOfJobParams,
   UpdateReviewRequest,
   UpdateReviewParams,
   DeleteReviewParams,
-  GetReviewParams,
-  GetReviewsOfJobParams,
   GetReviewsQueries,
-  GetReviewsOfUserParams,
-  GetReviewsOfCompanyParams,
+  GetReviewParams,
 } from './dtos/requests';
 import { ReviewsService } from './reviews.service';
 import { GetReviewsResponse } from './dtos/responses';
@@ -237,5 +238,13 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Get review' })
   async getReview(@Param() getReviewParams: GetReviewParams): Promise<Review> {
     return await this.reviewsService.getReview(getReviewParams);
+  }
+
+  @Get('jobs/:jobId/:type/:userId')
+  @ApiNotFoundResponse({ description: 'Cannot find review of job', type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  @ApiOperation({ summary: 'Get review of job from user or company' })
+  async getReviewOfJob (@Param() getReviewOfJobParams: GetReviewOfJobParams): Promise<Review> {
+    return await this.reviewsService.getReviewOfJob(getReviewOfJobParams);
   }
 }

@@ -27,6 +27,7 @@ import {
   UpdateReviewParams,
   GetReviewsQueries,
   GetReviewParams,
+  GetReviewOfJobParams,
 } from './dtos/requests';
 import { ReviewBy } from '@Shared/enums/review-by';
 import { JobStatus } from '@Shared/enums/job-status';
@@ -435,6 +436,28 @@ export class ReviewsService {
       where: { id: getReviewParams.reviewId },
       relations: ['reviewer', 'reviewee', 'job', 'job.company'],
       withDeleted: true,
+    });
+    if (!_review) {
+      throw new NotFoundException('Cannot find review of job');
+    }
+    return this.mapper.map(_review, Review, ReviewEntity);
+  }
+
+  async getReviewOfJob(getReviewOfJobParams: GetReviewOfJobParams): Promise<Review> {
+    const _review = await this.reviewRepository.findOne({
+      where: {
+        job: {
+          id: getReviewOfJobParams.jobId,
+        },
+        reviewBy: getReviewOfJobParams.type == 'byCompany' ? ReviewBy.COMPANY : ReviewBy.FREELANCE,
+        reviewer: {
+          id: getReviewOfJobParams.type == 'byCompany' ? Not(getReviewOfJobParams.userId) : getReviewOfJobParams.userId
+        },
+        reviewee: {
+          id: getReviewOfJobParams.type == 'byCompany' ?  getReviewOfJobParams.userId : IsNull()
+        }
+      },
+      relations: ['reviewer', 'reviewee', 'job', 'job.company'],
     });
 
     if (!_review) {

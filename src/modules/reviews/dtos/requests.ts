@@ -143,3 +143,19 @@ export class GetReviewsQueries {
   @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
   records: number;
 }
+
+export class GetReviewOfJobParams {
+  @Type(() => Number)
+  @IsNumber()
+  @ApiProperty()
+  jobId: number;
+
+  @IsEnum(['byUser', 'byCompany'])
+  @IsString()
+  @ApiProperty({ type: 'string', enum: ['byUser', 'byCompany'] })
+  type: string;
+
+  @IsString()
+  @ApiProperty()
+  userId: string;
+}
