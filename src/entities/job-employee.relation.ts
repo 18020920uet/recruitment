@@ -1,4 +1,4 @@
-import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
+import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { UserEntity } from '@Entities/user.entity';
@@ -51,4 +51,8 @@ export class JobEmployeeRelation {
   @AutoMap()
   @Column({ name: 'has_been_review', type: 'boolean', default: false })
   hasBeenReview: boolean;
+
+  @AutoMap()
+  @Column({ name: 'earn', type: 'real', default: 0 })
+  salary: number;
 }

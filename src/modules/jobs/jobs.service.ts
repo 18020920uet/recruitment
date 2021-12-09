@@ -672,49 +672,6 @@ export class JobsService {
     return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
   }
 
-  async finishJob(
-    _currentUser: UserEntity,
-    _currentCompany: CompanyEntity,
-    finishJobParams: FinishJobParams,
-  ): Promise<FinishJobResponse> {
-    const _job = await this.jobRepository.findOne({ id: finishJobParams.jobId });
-
-    if (!_job) {
-      throw new NotFoundException('Not found');
-    }
-
-    if (_job.companyId != _currentCompany.id) {
-      throw new ForbiddenException('Forbidden Resource');
-    }
-
-    if (_job.status == JobStatus.DONE) {
-      throw new ForbiddenException('Job is done');
-    }
-
-    await getManager().transaction(async (transactionalEntityManager) => {
-      _job.status = JobStatus.DONE;
-
-      const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
-        where: {
-          jobId: finishJobParams.jobId,
-          jobEmployeeStatus: In[(JobEmployeeStatus.WORKING, JobEmployeeStatus.COMPLETEDBYUSER)],
-        },
-      });
-
-      for (const _jobEmployeeRelation of _jobEmployeeRelations) {
-        _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.DONE;
-        _jobEmployeeRelation.updatedAt = new Date();
-      }
-
-      await transactionalEntityManager.save(_job);
-      await transactionalEntityManager.save(_jobEmployeeRelations);
-    });
-
-    return {
-      status: true,
-    };
-  }
-
   async changeEmployeeStatusJob(
     _currentUser: UserEntity,
     _currentCompany: CompanyEntity,
@@ -747,4 +704,55 @@ export class JobsService {
     await this.jobEmployeeRepositoty.save(_jobEmployeeRelation);
     return this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation);
   }
+
+  async finishJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    finishJobParams: FinishJobParams,
+  ): Promise<FinishJobResponse> {
+    const _job = await this.jobRepository.findOne({ id: finishJobParams.jobId });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_job.companyId != _currentCompany.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    if (_job.status == JobStatus.DONE) {
+      throw new ForbiddenException('Job is done');
+    }
+
+    await getManager().transaction(async (transactionalEntityManager) => {
+      _job.status = JobStatus.DONE;
+
+      const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
+        where: {
+          jobId: finishJobParams.jobId,
+          jobEmployeeStatus: In[(JobEmployeeStatus.WORKING, JobEmployeeStatus.COMPLETEDBYUSER)],
+        },
+      });
+
+      const salary = _job.salary;
+      const totalEmployees = _jobEmployeeRelations.length;
+
+      const employeeSalary = totalEmployees == 0 ? 0 : salary / totalEmployees;
+
+      for (const _jobEmployeeRelation of _jobEmployeeRelations) {
+        _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.DONE;
+        _jobEmployeeRelation.salary = employeeSalary;
+        _jobEmployeeRelation.updatedAt = new Date();
+      }
+
+      await transactionalEntityManager.save(_job);
+      await transactionalEntityManager.save(_jobEmployeeRelations);
+    });
+
+    return {
+      status: true,
+    };
+  }
+
+
 }

@@ -101,6 +101,9 @@ export class JobOfUser {
 
   @ApiProperty()
   rejectMessage: string;
+
+  @ApiProperty()
+  salary: number;
 }
 
 export class GetJobsOfUserResponse {

@@ -161,7 +161,7 @@ export class UsersService {
       case 'applied': {
         const records = getJobsOfUserQueries.records != undefined ? getJobsOfUserQueries.records : 10;
 
-        const [appliedJobs, totalRecords] = await this.jobCandidateRepositoty.findAndCount({
+        const [_appliedJobs, totalRecords] = await this.jobCandidateRepositoty.findAndCount({
           relations: ['job', 'user'],
           where: {
             userId: getJobsOfUserParams.userId,
@@ -184,18 +184,19 @@ export class UsersService {
         });
 
         return {
-          jobsOfUser: appliedJobs.map((appliedJob) => {
+          jobsOfUser: _appliedJobs.map((_appliedJob) => {
             const jobOfUser = new JobOfUser();
-            jobOfUser.isFinished = appliedJob.job.status == JobStatus.DONE ? true : false;
-            jobOfUser.isJoined = appliedJob.applyStatus == JobApplyStatus.APPROVED ? true : false;
-            jobOfUser.jobApplyStatus = appliedJob.applyStatus;
-            jobOfUser.rejectMessage = appliedJob.rejectMessage;
-            jobOfUser.jobStatus = appliedJob.job.status;
-            jobOfUser.appliedAt = appliedJob.createdAt;
-            jobOfUser.jobName = appliedJob.job.title;
-            jobOfUser.jobId = appliedJob.job.id;
+            jobOfUser.isFinished = _appliedJob.job.status == JobStatus.DONE ? true : false;
+            jobOfUser.isJoined = _appliedJob.applyStatus == JobApplyStatus.APPROVED ? true : false;
+            jobOfUser.rejectMessage = _appliedJob.rejectMessage;
+            jobOfUser.jobApplyStatus = _appliedJob.applyStatus;
+            jobOfUser.jobStatus = _appliedJob.job.status;
+            jobOfUser.appliedAt = _appliedJob.createdAt;
+            jobOfUser.jobName = _appliedJob.job.title;
+            jobOfUser.jobId = _appliedJob.job.id;
             jobOfUser.jobEmployeeStatus = null;
             jobOfUser.joinedAt = null;
+            jobOfUser.salary = 0;
             return jobOfUser;
           }),
           totalRecords: totalRecords,
@@ -203,7 +204,7 @@ export class UsersService {
       }
       case 'joined': {
         const records = getJobsOfUserQueries.records != undefined ? getJobsOfUserQueries.records : 10;
-        const [joinedJobs, totalRecords] = await this.jobEmployeeRepositoty.findAndCount({
+        const [_joinedJobs, totalRecords] = await this.jobEmployeeRepositoty.findAndCount({
           relations: ['job', 'user'],
           where: {
             userId: getJobsOfUserParams.userId,
@@ -224,19 +225,19 @@ export class UsersService {
         });
 
         return {
-          jobsOfUser: joinedJobs.map((joinedJob) => {
+          jobsOfUser: _joinedJobs.map((_joinedJob) => {
             const jobOfUser = new JobOfUser();
-            jobOfUser.isFinished = joinedJob.job.status == JobStatus.DONE ? true : false;
-            jobOfUser.jobEmployeeStatus = joinedJob.jobEmployeeStatus;
-            jobOfUser.jobStatus = joinedJob.job.status;
-            jobOfUser.joinedAt = joinedJob.createdAt;
-            jobOfUser.jobName = joinedJob.job.title;
-            jobOfUser.jobId = joinedJob.job.id;
+            jobOfUser.isFinished = _joinedJob.job.status == JobStatus.DONE ? true : false;
+            jobOfUser.jobEmployeeStatus = _joinedJob.jobEmployeeStatus;
+            jobOfUser.jobStatus = _joinedJob.job.status;
+            jobOfUser.joinedAt = _joinedJob.createdAt;
+            jobOfUser.jobName = _joinedJob.job.title;
+            jobOfUser.jobId = _joinedJob.job.id;
+            jobOfUser.salary = _joinedJob.salary;
             jobOfUser.jobApplyStatus = null;
             jobOfUser.rejectMessage = null;
-            jobOfUser.isJoined = true;
             jobOfUser.appliedAt = null;
-
+            jobOfUser.isJoined = true;
             return jobOfUser;
           }),
           totalRecords: totalRecords,
