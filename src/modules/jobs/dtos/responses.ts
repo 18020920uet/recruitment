@@ -95,6 +95,9 @@ export class CandidateOfJob {
   @AutoMap()
   @ApiProperty()
   rejectMessage: string;
+
+  @AutoMap()
+  deletedAt: Date | null;
 }
 
 export class EmployeeOfJob {
@@ -166,6 +169,11 @@ export class GetCandidatesOfJobResponse {
 }
 
 export class FinishJobResponse {
+  @ApiProperty({ type: 'boolean' })
+  status: boolean;
+}
+
+export class RemoveApplicationResponse {
   @ApiProperty({ type: 'boolean' })
   status: boolean;
 }

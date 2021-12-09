@@ -1,4 +1,4 @@
-import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { UserEntity } from '@Entities/user.entity';
@@ -51,4 +51,7 @@ export class JobCandidateRelation {
   @ManyToOne(() => UserEntity)
   @JoinColumn([{ name: 'editor_id', referencedColumnName: 'id' }])
   editor: UserEntity;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date;
 }

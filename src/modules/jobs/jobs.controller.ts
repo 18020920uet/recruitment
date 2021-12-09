@@ -30,13 +30,16 @@ import { RequireRole } from '@Common/decorators/require-role.decorator';
 import { JobsService } from './jobs.service';
 
 import {
+  ChangeEmployeeStatusJobParams,
   RemoveEmployeeFromJobParams,
   ChangeJobApplyStatusRequest,
   GetCandidatesOfJobQuerires,
   ChangeJobApplyStatusParams,
   GetEmployeesOfJobQuerires,
   GetCandidatesOfJobParams,
+  CompletedJobByUserParams,
   GetEmployeesOfJobParams,
+  RemoveApplicationParams,
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
@@ -177,7 +180,7 @@ export class JobsController {
   @ApiBearerAuth('access-token')
   @ApplicationApiCreateResponse(CandidateOfJob)
   @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
-  @ApiForbiddenResponse({ description: 'Forbidden|Already apply', type: ForbiddenResponse })
+  @ApiForbiddenResponse({ description: 'Forbidden|Already apply|', type: ForbiddenResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async applyJob(
@@ -186,6 +189,43 @@ export class JobsController {
     @Body() applyJobRequest: ApplyJobRequest,
   ): Promise<CandidateOfJob> {
     return await this.jobsService.applyOrReapplyJob(_currentUser, applyJobParams, applyJobRequest);
+  }
+
+  @Delete(':jobId/removeApplication')
+  @RequireRole(Role.FREELANCE)
+  @UseGuards(JwtAuthenticationGuard, FreelanceGuard)
+  @ApiOperation({ summary: 'Cancel application by User' })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiCreateResponse(CandidateOfJob)
+  @ApiNotFoundResponse({ description: 'Not found job', type: NotFoundResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
+  @ApiForbiddenResponse({ description: "Can't remove application", type: ForbiddenResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async removeApplication(
+    @CurrentUser() _currentUser: UserEntity,
+    @Param() removeApplicationParams: RemoveApplicationParams,
+  ): Promise<CandidateOfJob> {
+    return await this.jobsService.removeApplication(_currentUser, removeApplicationParams);
+  }
+
+  @Post(':jobId/completedByUser')
+  @RequireRole(Role.FREELANCE)
+  @UseGuards(JwtAuthenticationGuard, FreelanceGuard)
+  @ApiOperation({ summary: 'Completed job by freelance' })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiCreateResponse(EmployeeOfJob)
+  @ApiNotFoundResponse({ description: 'Not found job', type: NotFoundResponse })
+  @ApiForbiddenResponse({
+    description: 'Forbidden|Job is done|No permission to change state|All ready completed',
+    type: ForbiddenResponse,
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized', type: UnauthorizedResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async completedByUser(
+    @CurrentUser() _currentUser: UserEntity,
+    @Param() completedJobByUserParams: CompletedJobByUserParams,
+  ): Promise<EmployeeOfJob> {
+    return await this.jobsService.completedJobByUser(_currentUser, completedJobByUserParams);
   }
 
   @Get(':jobId/candidates')
@@ -241,6 +281,25 @@ export class JobsController {
     return await this.jobsService.getEmployeesOfJob(getEmployeesOfJobParams, getEmployeesOfJobQuerires);
   }
 
+  @Put(':jobId/employees/:employeeId/:employeeStatus')
+  @RequireRole(Role.COMPANY)
+  @RequireCompanyRole(CompanyRole.OWNER, CompanyRole.EMPLOYEE)
+  @UseGuards(JwtAuthenticationGuard, CompanyGuard, CompanyRoleGuard)
+  @ApiOperation({ summary: "Remove a job's employee" })
+  @ApiBearerAuth('access-token')
+  @ApplicationApiOkResponse(EmployeeOfJob)
+  @ApiForbiddenResponse({ description: 'Forbidden Resources|Employee had been removed', type: ForbiddenResponse })
+  @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
+  @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async changeEmployeeStatusJob(
+    @CurrentUser() _currentUser: UserEntity,
+    @CurrentCompany() _currentCompany: CompanyEntity,
+    @Param() changeEmployeeStatusJobParams: ChangeEmployeeStatusJobParams,
+  ): Promise<EmployeeOfJob> {
+    return await this.jobsService.changeEmployeeStatusJob(_currentUser, _currentCompany, changeEmployeeStatusJobParams);
+  }
+
   @Delete(':jobId/employees/:employeeId')
   @RequireRole(Role.COMPANY)
   @RequireCompanyRole(CompanyRole.OWNER, CompanyRole.EMPLOYEE)
@@ -248,10 +307,7 @@ export class JobsController {
   @ApiOperation({ summary: "Remove a job's employee" })
   @ApiBearerAuth('access-token')
   @ApplicationApiOkResponse(EmployeeOfJob)
-  @ApiForbiddenResponse({
-    description: 'Forbidden Resources|Employee had been removed',
-    type: ForbiddenResponse,
-  })
+  @ApiForbiddenResponse({ description: 'Forbidden Resources|Employee had been removed', type: ForbiddenResponse })
   @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })

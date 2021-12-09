@@ -1,4 +1,4 @@
-import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { PrimaryColumn, Column, Entity, JoinColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
 import { AutoMap } from '@automapper/classes';
 
 import { UserEntity } from '@Entities/user.entity';

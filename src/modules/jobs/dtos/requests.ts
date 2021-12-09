@@ -1,4 +1,4 @@
-import { IsArray, IsString, Min, Max, IsOptional, MinLength, MaxLength } from 'class-validator';
+import { IsArray, IsString, Min, Max, IsOptional, MinLength, MaxLength, IsEnum } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -257,4 +257,26 @@ export class RemoveEmployeeFromJobParams {
 export class FinishJobParams {
   @ApiProperty()
   jobId: number;
+}
+
+export class CompletedJobByUserParams {
+  @ApiProperty()
+  jobId: number;
+}
+
+export class RemoveApplicationParams {
+  @ApiProperty()
+  jobId: number;
+}
+
+export class ChangeEmployeeStatusJobParams {
+  @ApiProperty()
+  jobId: number;
+
+  @ApiProperty()
+  employeeId: string;
+
+  @IsEnum(['Working', 'Done'])
+  @ApiProperty({ type: 'string', enum: ['Working', 'Done']})
+  employeeStatus: string;
 }

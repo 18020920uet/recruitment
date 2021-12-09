@@ -1,5 +1,6 @@
 export enum JobEmployeeStatus {
   DONE = 'Done',
   WORKING = 'Working',
-  REMOVE = 'Remove',
+  REMOVED = 'Removed',
+  COMPLETEDBYUSER = 'Completed by user',
 }

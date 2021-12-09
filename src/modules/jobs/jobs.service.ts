@@ -17,13 +17,16 @@ import { UserEntity } from '@Entities/user.entity';
 import { JobEntity } from '@Entities/job.entity';
 
 import {
+  ChangeEmployeeStatusJobParams,
   RemoveEmployeeFromJobParams,
   ChangeJobApplyStatusRequest,
   GetCandidatesOfJobQuerires,
   ChangeJobApplyStatusParams,
   GetEmployeesOfJobQuerires,
+  CompletedJobByUserParams,
   GetCandidatesOfJobParams,
   GetEmployeesOfJobParams,
+  RemoveApplicationParams,
   GetJobDetailParams,
   UpdateJobRequest,
   CreateJobRequest,
@@ -355,21 +358,30 @@ export class JobsService {
     let _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
       where: { jobId: applyJobParams.jobId, user: _currentUser },
       relations: ['user'],
+      withDeleted: true,
     });
 
-    if (_jobCandidateRelation && _jobCandidateRelation.applyStatus != JobApplyStatus.REJECTED) {
+    if (
+      _jobCandidateRelation &&
+      (_jobCandidateRelation.applyStatus == JobApplyStatus.APPROVED ||
+        _jobCandidateRelation.applyStatus == JobApplyStatus.WAITING)
+    ) {
       throw new ForbiddenException('Already apply');
     }
 
     if (!_jobCandidateRelation) {
       _jobCandidateRelation = new JobCandidateRelation();
+      _jobCandidateRelation.createdAt = new Date();
       _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
       _jobCandidateRelation.updatedAt = _jobCandidateRelation.createdAt;
       _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
-      _jobCandidateRelation.createdAt = new Date();
       _jobCandidateRelation.user = _currentUser;
       _jobCandidateRelation.job = _job;
-    } else if (_jobCandidateRelation && _jobCandidateRelation.applyStatus == JobApplyStatus.REJECTED) {
+    } else if (_jobCandidateRelation) {
+      if (_jobCandidateRelation.applyStatus == JobApplyStatus.REMOVED) {
+        _jobCandidateRelation.createdAt = new Date();
+        _jobCandidateRelation.deletedAt = null;
+      }
       _jobCandidateRelation.introduceMessage = applyJobRequest.introduceMessage;
       _jobCandidateRelation.applyStatus = JobApplyStatus.WAITING;
       _jobCandidateRelation.updatedAt = new Date();
@@ -481,7 +493,7 @@ export class JobsService {
         where: { jobId: _jobCandidateRelation.job, userId: _jobCandidateRelation.userId },
       });
 
-      if (_jobEmployeeRelation && _jobEmployeeRelation.jobEmployeeStatus != JobEmployeeStatus.REMOVE) {
+      if (_jobEmployeeRelation && _jobEmployeeRelation.jobEmployeeStatus != JobEmployeeStatus.REMOVED) {
         throw new ForbiddenException('User is an employee');
       }
 
@@ -509,6 +521,8 @@ export class JobsService {
     _currentCompany: CompanyEntity,
     removeEmployeeFromJobParams: RemoveEmployeeFromJobParams,
   ): Promise<EmployeeOfJob> {
+    const _job = await this.jobRepository.findOne({ id: removeEmployeeFromJobParams.jobId });
+
     const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
       where: {
         userId: removeEmployeeFromJobParams.employeeId,
@@ -517,7 +531,7 @@ export class JobsService {
       relations: ['user', 'job', 'job.company'],
     });
 
-    if (!_jobEmployeeRelation) {
+    if (!_job || !_jobEmployeeRelation) {
       throw new NotFoundException('Not found');
     }
 
@@ -525,7 +539,7 @@ export class JobsService {
       throw new ForbiddenException('Forbidden Resource');
     }
 
-    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVE) {
+    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVED) {
       throw new ForbiddenException('Employee had been removed');
     }
 
@@ -538,7 +552,7 @@ export class JobsService {
       _jobCandidateRelation.applyStatus = JobApplyStatus.REJECTED;
       _jobCandidateRelation.editor = _currentUser;
 
-      _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.REMOVE;
+      _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.REMOVED;
       _jobEmployeeRelation.updatedAt = new Date();
       _jobEmployeeRelation.editor = _currentUser;
 
@@ -601,6 +615,63 @@ export class JobsService {
     };
   }
 
+  async completedJobByUser(
+    _currentUser: UserEntity,
+    completedJobByUserParams: CompletedJobByUserParams,
+  ): Promise<EmployeeOfJob> {
+    const _job = await this.jobRepository.findOne({ id: completedJobByUserParams.jobId });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
+      where: { jobId: completedJobByUserParams.jobId, userId: _currentUser.id },
+    });
+
+    if (_job.status == JobStatus.DONE || _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.DONE) {
+      throw new ForbiddenException('Job is done');
+    }
+
+    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVED) {
+      throw new ForbiddenException('No permission to change state');
+    }
+
+    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER) {
+      throw new ForbiddenException('All ready completed');
+    }
+
+    _jobEmployeeRelation.jobEmployeeStatus = JobEmployeeStatus.COMPLETEDBYUSER;
+
+    await this.jobEmployeeRepositoty.save(_jobEmployeeRelation);
+    return this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation);
+  }
+
+  async removeApplication(
+    _currentUser: UserEntity,
+    removeApplicationParams: RemoveApplicationParams,
+  ): Promise<CandidateOfJob> {
+    const _job = await this.jobRepository.findOne({ id: removeApplicationParams.jobId });
+
+    const _jobCandidateRelation = await this.jobCandidateRepositoty.findOne({
+      where: { jobId: removeApplicationParams.jobId, userId: _currentUser.id },
+    });
+
+    if (!_job || !_jobCandidateRelation) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_jobCandidateRelation.applyStatus != JobApplyStatus.WAITING) {
+      throw new ForbiddenException("Can't remove application");
+    }
+
+    _jobCandidateRelation.applyStatus = JobApplyStatus.REMOVED;
+    _jobCandidateRelation.deletedAt = new Date();
+
+    await this.jobCandidateRepositoty.save(_jobCandidateRelation);
+    return this.mapper.map(_jobCandidateRelation, CandidateOfJob, JobCandidateRelation);
+  }
+
   async finishJob(
     _currentUser: UserEntity,
     _currentCompany: CompanyEntity,
@@ -624,7 +695,10 @@ export class JobsService {
       _job.status = JobStatus.DONE;
 
       const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
-        where: { jobId: finishJobParams.jobId, jobEmployeeStatus: JobEmployeeStatus.WORKING },
+        where: {
+          jobId: finishJobParams.jobId,
+          jobEmployeeStatus: In[(JobEmployeeStatus.WORKING, JobEmployeeStatus.COMPLETEDBYUSER)],
+        },
       });
 
       for (const _jobEmployeeRelation of _jobEmployeeRelations) {
@@ -639,5 +713,38 @@ export class JobsService {
     return {
       status: true,
     };
+  }
+
+  async changeEmployeeStatusJob(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    changeEmployeeStatusJobParams: ChangeEmployeeStatusJobParams,
+  ): Promise<EmployeeOfJob> {
+    const _job = await this.jobRepository.findOne({ id: changeEmployeeStatusJobParams.jobId });
+
+    const _jobEmployeeRelation = await this.jobEmployeeRepositoty.findOne({
+      where: {
+        userId: changeEmployeeStatusJobParams.employeeId,
+        jobId: changeEmployeeStatusJobParams.jobId,
+      },
+      relations: ['user', 'job', 'job.company'],
+    });
+
+    if (!_job || !_jobEmployeeRelation) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_jobEmployeeRelation.job.company.id != _currentCompany.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    if (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.REMOVED) {
+      throw new ForbiddenException('Employee had been removed');
+    }
+
+    _jobEmployeeRelation.jobEmployeeStatus = changeEmployeeStatusJobParams.employeeStatus as JobEmployeeStatus;
+
+    await this.jobEmployeeRepositoty.save(_jobEmployeeRelation);
+    return this.mapper.map(_jobEmployeeRelation, EmployeeOfJob, JobEmployeeRelation);
   }
 }
