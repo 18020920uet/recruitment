@@ -4,6 +4,7 @@ import { AutoMap } from '@automapper/classes';
 import { AreaEntity } from '@Entities/area.entity';
 
 import { Company } from '@Shared/responses/company';
+import { Skill } from '@Shared/responses/skill';
 import { Job } from '@Shared/responses/job';
 
 export class CompanyInformation {
@@ -76,4 +77,70 @@ export class GetJobsOfCompanyResponse {
 
   @ApiProperty()
   totalRecods: number;
+}
+
+export class AreaCount extends AreaEntity {
+  @ApiProperty()
+  total: number;
+}
+
+export class SkillCount extends Skill {
+  @ApiProperty()
+  total: number;
+}
+
+export class GetCompanyAnalysisResponse {
+  @ApiProperty()
+  currentEmployeesWorking: number;
+
+  @ApiProperty()
+  totalReviewsWritten: number;
+
+  @ApiProperty()
+  totalHiredEmployees: number;
+
+  @ApiProperty()
+  currentWorkingJobs: number;
+
+  @ApiProperty()
+  totalCancelJobs: number;
+
+  @ApiProperty()
+  totalPostedJobs: number;
+
+  @ApiProperty()
+  totalSalaryPay: number;
+
+  @ApiProperty()
+  totalDoneJobs: number;
+
+  @ApiProperty()
+  totalPendingJobs: number;
+
+  @ApiProperty()
+  totalAwaitJobs: number;
+
+  @ApiProperty()
+  totalReviews: number;
+
+  @ApiProperty()
+  rate: number;
+
+  @ApiProperty()
+  highestJobSalaryPay: number;
+
+  @ApiProperty()
+  lowestJobSalaryPay: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  highestReviewPoint: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  lowestReviewPoint: number;
+
+  @ApiProperty({ type: [AreaCount] })
+  areas: AreaCount[];
+
+  @ApiProperty({ type: [SkillCount] })
+  skills: SkillCount[];
 }

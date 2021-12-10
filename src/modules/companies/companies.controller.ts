@@ -30,7 +30,7 @@ import { JwtAuthenticationGuard } from '@Common/guard/jwt-authentication.guard';
 import { CompanyRoleGuard } from '@Common/guard/company-role.guard';
 import { CompanyGuard } from '@Common/guard/company.guard';
 
-import { GetCompanyDetailResponse, GetJobsOfCompanyResponse } from './dtos/responses';
+import { GetCompanyAnalysisResponse, GetCompanyDetailResponse, GetJobsOfCompanyResponse } from './dtos/responses';
 import {
   GetCompaniesFilterWithTheFirstCharacterInNameQueries,
   UpdateCompanyInformationRequest,
@@ -38,6 +38,7 @@ import {
   GetJobsOfCompanyQueries,
   GetCompanyDetailParams,
   GetJobsOfCompanyParams,
+  GetCompanyAnalysisParams,
 } from './dtos/requests';
 import { RequireRole } from '@Common/decorators/require-role.decorator';
 
@@ -117,5 +118,16 @@ export class CompaniesController {
     @Query() getJobsOfCompanyQueries: GetJobsOfCompanyQueries,
   ): Promise<GetJobsOfCompanyResponse> {
     return this.companiesService.getJobsOfCompany(getJobsOfCompanyParams, getJobsOfCompanyQueries);
+  }
+
+  @Get(':companyId/analysis')
+  @ApiOperation({ summary: 'Get a company detail' })
+  @ApplicationApiOkResponse(GetCompanyAnalysisResponse)
+  @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getCompanyAnalysis(
+    @Param() getCompanyAnalysisParams: GetCompanyAnalysisParams,
+  ): Promise<GetCompanyAnalysisResponse> {
+    return await this.companiesService.getCompanyAnalysis(getCompanyAnalysisParams);
   }
 }

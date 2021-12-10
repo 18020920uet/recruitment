@@ -105,6 +105,12 @@ export class GetJobsOfCompanyParams {
   companyId: string;
 }
 
+export class GetCompanyAnalysisParams {
+  @IsString()
+  @ApiProperty()
+  companyId: string;
+}
+
 export class GetJobsOfCompanyQueries {
   @IsOptional()
   @IsString()

@@ -12,6 +12,7 @@ import { Job } from '@Shared/responses/job';
 import { JobStatus } from '@Shared/enums/job-status';
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
+import { Skill } from '@Shared/responses/skill';
 
 export class DeleteReviewResponse {
   status: boolean;
@@ -83,35 +84,6 @@ export class GetUserProfileResponse {
   jobs: Job[];
 }
 
-export class GetUserAnalysisResponse extends UserJobsAnalysis {
-  @ApiProperty({ description: 'Total salary of all job' })
-  totalSalary: number;
-
-  @ApiProperty()
-  highestJobSalary: number;
-
-  @ApiProperty()
-  lowestJobSalary: number;
-
-  @ApiProperty({ description: 'Min = 0, max = 5' })
-  highestReviewPoint: number;
-
-  @ApiProperty({ description: 'Min = 0, max = 5' })
-  lowestReviewPoint: number;
-
-  @ApiProperty()
-  totalReviewsByCompany: number;
-
-  @ApiProperty()
-  totalReviewsWritten: number;
-
-  @ApiProperty({ description: 'Recommendation percent: reviewPoint / totalReviewsByCompany' })
-  recommendation: number;
-
-  @ApiProperty()
-  rate: number;
-}
-
 export class JobOfUser {
   @ApiProperty()
   jobId: number;
@@ -153,4 +125,50 @@ export class GetJobsOfUserResponse {
 
   @ApiProperty()
   totalRecords: number;
+}
+
+
+export class AreaCount extends AreaEntity {
+  @ApiProperty()
+  total: number;
+}
+
+export class SkillCount extends Skill {
+  @ApiProperty()
+  total: number;
+}
+
+export class GetUserAnalysisResponse extends UserJobsAnalysis {
+  @ApiProperty({ description: 'Total salary of all job' })
+  totalSalary: number;
+
+  @ApiProperty()
+  highestJobSalary: number;
+
+  @ApiProperty()
+  lowestJobSalary: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  highestReviewPoint: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  lowestReviewPoint: number;
+
+  @ApiProperty()
+  totalReviewsByCompany: number;
+
+  @ApiProperty()
+  totalReviewsWritten: number;
+
+  @ApiProperty({ description: 'Recommendation percent: reviewPoint / totalReviewsByCompany' })
+  recommendation: number;
+
+  @ApiProperty()
+  rate: number;
+
+  @ApiProperty({ type: [AreaCount] })
+  areas: AreaCount[];
+
+  @ApiProperty({ type: [SkillCount] })
+  skills: SkillCount[];
 }

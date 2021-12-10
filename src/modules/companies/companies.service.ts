@@ -4,8 +4,7 @@ import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 import fs from 'fs';
 
-// import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
-// import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { CompanyRepository } from '@Repositories/company.repository';
 import { JobRepository } from '@Repositories/job.repository';
 
@@ -23,18 +22,28 @@ import {
   GetJobsOfCompanyQueries,
   GetCompanyDetailParams,
   GetJobsOfCompanyParams,
+  GetCompanyAnalysisParams,
 } from './dtos/requests';
-import { GetCompanyDetailResponse, GetJobsOfCompanyResponse, JobOfCompany } from './dtos/responses';
+import {
+  GetCompanyAnalysisResponse,
+  GetCompanyDetailResponse,
+  GetJobsOfCompanyResponse,
+  JobOfCompany,
+} from './dtos/responses';
 
 import { Company } from '@Shared/responses/company';
+import { JobStatus } from '@Shared/enums/job-status';
+import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
+import { ReviewRepository } from '@Repositories/review.repository';
+import { ReviewBy } from '@Shared/enums/review-by';
 
 @Injectable()
 export class CompaniesService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
-    // private jobCandidateRepositoty: JobCandidateRepositoty,
-    // private jobEmployeeRepositoty: JobEmployeeRepositoty,
+    private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private companyRepository: CompanyRepository,
+    private reviewRepository: ReviewRepository,
     private jobRepository: JobRepository,
   ) {}
 
@@ -69,7 +78,6 @@ export class CompaniesService {
     getJobsOfCompanyParams: GetJobsOfCompanyParams,
     getJobsOfCompanyQueries: GetJobsOfCompanyQueries,
   ): Promise<GetJobsOfCompanyResponse> {
-    console.log(getJobsOfCompanyQueries.withDeleted);
     const _company = await this.companyRepository.findOne({ id: getJobsOfCompanyParams.companyId });
 
     if (!_company) {
@@ -170,5 +178,118 @@ export class CompaniesService {
     });
 
     return this.mapper.map(_company, GetCompanyDetailResponse, CompanyEntity);
+  }
+
+  async getCompanyAnalysis(getCompanyAnalysisParams: GetCompanyAnalysisParams): Promise<GetCompanyAnalysisResponse> {
+    const _company = await this.companyRepository.findOne({ id: getCompanyAnalysisParams.companyId });
+    if (!_company) {
+      throw new NotFoundException('Not found');
+    }
+
+    const _jobs = await this.jobRepository.find({
+      where: { company: { id: _company.id } },
+      relations: ['area', 'skills'],
+    });
+
+    const response = new GetCompanyAnalysisResponse();
+    response.totalPostedJobs = _jobs.length;
+
+    response.areas = [];
+    response.skills = [];
+
+    response.currentWorkingJobs = 0;
+    response.totalPendingJobs = 0;
+    response.totalCancelJobs = 0;
+    response.totalAwaitJobs = 0;
+    response.totalDoneJobs = 0;
+
+    response.lowestJobSalaryPay = _jobs.length != 0 ? _jobs[0].salary : 0;
+    response.highestJobSalaryPay = 0;
+    response.totalSalaryPay = 0;
+
+    for (const _job of _jobs) {
+      if (_job.status == JobStatus.DONE) {
+        response.totalDoneJobs++;
+        if (_job.salary > response.highestJobSalaryPay) {
+          response.highestJobSalaryPay = _job.salary;
+        }
+        if (_job.salary < response.lowestJobSalaryPay) {
+          response.lowestJobSalaryPay = _job.salary;
+        }
+        response.totalSalaryPay += _job.salary;
+      } else if (_job.status == JobStatus.CANCEL) {
+        response.totalCancelJobs++;
+      } else if (_job.status == JobStatus.INPROGRESS) {
+        response.currentWorkingJobs++;
+      } else if (_job.status == JobStatus.PENDING) {
+        response.totalPendingJobs++;
+      } else if (_job.status == JobStatus.AWAIT) {
+        response.totalAwaitJobs++;
+      }
+
+      const areaIndex = response.areas.findIndex((area) => area.id == _job.area.id);
+      if (areaIndex == -1) {
+        response.areas.push({
+          countryId: _job.area.countryId,
+          name: _job.area.name,
+          id: _job.area.id,
+          total: 1,
+        });
+      } else {
+        response.areas[areaIndex].total++;
+      }
+
+      for (const _skill of _job.skills) {
+        const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
+        if (skillIndex == -1) {
+          response.skills.push({
+            id: _skill.id,
+            name: _skill.name,
+            total: 1,
+          });
+        } else {
+          response.skills[skillIndex].total++;
+        }
+      }
+    }
+
+    const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
+      where: { job: { companyId: _company.id } },
+      relations: ['job', 'job.company'],
+    });
+
+    response.currentEmployeesWorking = _jobEmployeeRelations.filter(
+      (_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.WORKING,
+    ).length;
+    response.totalHiredEmployees = _jobEmployeeRelations.length;
+
+    response.highestReviewPoint = 0;
+    response.lowestReviewPoint = 0;
+
+    response.totalReviews = _company.totalReviews;
+    response.rate = _company.totalReviews == 0 ? 0 : _company.reviewPoint / (_company.totalReviews * 5);
+    const _reviews = await this.reviewRepository.find({
+      where: { job: { companyId: _company.id } },
+      relations: ['job', 'job.company'],
+    });
+
+    response.totalReviewsWritten = _reviews.filter((_review) => _review.reviewBy == ReviewBy.COMPANY).length;
+
+    const _reviewsByUser = _reviews.filter((_review) => _review.reviewBy == ReviewBy.FREELANCE);
+
+    response.highestReviewPoint = 0;
+    response.lowestReviewPoint = _reviewsByUser.length != 0 ? _reviewsByUser[0].rate : 0;
+
+    for (const _review of _reviewsByUser) {
+      if (_review.rate < response.lowestReviewPoint) {
+        response.lowestReviewPoint = _review.rate;
+      }
+
+      if (_review.rate > response.highestReviewPoint) {
+        response.highestReviewPoint = _review.rate;
+      }
+    }
+
+    return response;
   }
 }

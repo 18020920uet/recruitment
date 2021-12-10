@@ -313,51 +313,113 @@ export class UsersService {
 
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
       where: { userId: userId },
-      relations: ['job'],
+      relations: ['job', 'job.area', 'job.skills'],
     });
-    const _jobCandidateRelations = await this.jobCandidateRepositoty.find({
-      where: { userId: userId },
-      relations: ['job'],
-    });
+    const _jobCandidateRelations = await this.jobCandidateRepositoty.find({ where: { userId: userId }});
+
+    const response = new GetUserAnalysisResponse();
+    response.currentAppliedJobs = 0;
+    response.totalApprovedJobs = 0;
+    response.totalRejectedJobs = 0;
 
     const _reviewsWritten = await this.reviewRepository.count({ where: { reviewer: { id: userId } } });
     const _reviewsUserByCompany = await this.reviewRepository.find({ where: { reviewee: { id: userId } } });
 
-    const currentAppliedJobs = _jobCandidateRelations.filter((_jCR) => _jCR.applyStatus == JobApplyStatus.WAITING);
-    const totalApprovedJobs = _jobCandidateRelations.filter((_jCR) => _jCR.applyStatus == JobApplyStatus.APPROVED);
-    const totalRejectedJobs = _jobCandidateRelations.filter((_jCR) => _jCR.applyStatus == JobApplyStatus.REJECTED);
-    const currentWorkingJobs = _jobEmployeeRelations.filter(
-      (_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.WORKING,
-    );
-    const doneJobs = _jobEmployeeRelations.filter((_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.DONE);
-    const removedJobs = _jobEmployeeRelations.filter((_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.REMOVED);
-    const onTimeJobs = _jobEmployeeRelations.filter(
-      (_jER) =>
-        (_jER.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
-          _jER.jobEmployeeStatus == JobEmployeeStatus.DONE) &&
-        _jER.updatedAt < new Date(_jER.job.endDate),
-    );
+    for (const _jobCandidateRelation of _jobCandidateRelations) {
+      switch (_jobCandidateRelation.applyStatus) {
+        case JobApplyStatus.APPROVED: {
+          response.totalApprovedJobs++;
+          break;
+        }
+        case JobApplyStatus.REJECTED: {
+          response.totalRejectedJobs++;
+          break;
+        }
+        case JobApplyStatus.WAITING: {
+          response.currentAppliedJobs++;
+          break;
+        }
+      }
+    }
 
-    const salary = doneJobs.map((doneJob) => doneJob.salary);
-    const highestJobSalary = Math.max.apply(Math, salary);
-    const lowestJobSalary = Math.min.apply(Math, salary);
+    response.currentWorkingJobs = 0;
+    response.totalDoneJobs = 0;
+    response.totalTimeRemovedFromJob = 0;
+    response.totalOnTimeJobs = 0;
+
+    response.totalSalary = 0;
+    response.highestJobSalary = 0;
+    response.lowestJobSalary = _jobEmployeeRelations.length != 0 ? _jobEmployeeRelations[0].salary : 0;
+
+    response.areas = [];
+    response.skills = [];
+
+    for (const _jobEmployeeRelation of _jobEmployeeRelations) {
+      switch (_jobEmployeeRelation.jobEmployeeStatus) {
+        case JobEmployeeStatus.WORKING: {
+          response.currentWorkingJobs++;
+          break;
+        }
+        case JobEmployeeStatus.DONE: {
+          response.totalSalary += _jobEmployeeRelation.salary;
+
+          if (_jobEmployeeRelation.salary < response.lowestJobSalary) {
+            response.lowestJobSalary = _jobEmployeeRelation.salary;
+          }
+
+          if (_jobEmployeeRelation.salary > response.highestJobSalary) {
+            response.highestJobSalary = _jobEmployeeRelation.salary;
+          }
+
+          const _area = _jobEmployeeRelation.job.area;
+          const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
+          if (areaIndex == -1) {
+            response.areas.push({
+              countryId: _area.countryId,
+              name: _area.name,
+              id: _area.id,
+              total: 1,
+            });
+          } else {
+            response.areas[areaIndex].total++;
+          }
+
+          for (const _skill of _jobEmployeeRelation.job.skills) {
+            const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
+            if (skillIndex == -1) {
+              response.skills.push({
+                id: _skill.id,
+                name: _skill.name,
+                total: 1,
+              });
+            } else {
+              response.skills[skillIndex].total++;
+            }
+          }
+
+          response.totalDoneJobs++;
+          break;
+        }
+        case JobEmployeeStatus.REMOVED: {
+          response.totalTimeRemovedFromJob++;
+          break;
+        }
+      }
+
+      if (
+        (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
+          _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.DONE) &&
+        _jobEmployeeRelation.updatedAt < new Date(_jobEmployeeRelation.job.endDate)
+      ) {
+        response.totalOnTimeJobs++;
+      }
+    }
 
     const reviewPoint = _reviewsUserByCompany.map((review) => review.rate);
-    const totalReviewPoint = reviewPoint.reduce((previous, current) => previous + current) / reviewPoint.length;
+    const totalReviewPoint = reviewPoint.reduce((previous, current) => previous + current);
     const highestReviewPoint = Math.max.apply(Math, reviewPoint);
     const lowestReviewPoint = Math.min.apply(Math, reviewPoint);
 
-    const response = new GetUserAnalysisResponse();
-    response.currentAppliedJobs = currentAppliedJobs.length;
-    response.totalApprovedJobs = totalApprovedJobs.length;
-    response.totalRejectedJobs = totalRejectedJobs.length;
-    response.currentWorkingJobs = currentWorkingJobs.length;
-    response.totalDoneJobs = doneJobs.length;
-    response.totalTimeRemovedFromJob = removedJobs.length;
-    response.totalOnTimeJobs = onTimeJobs.length;
-    response.totalSalary = salary.reduce((previous, current) => previous + current);
-    response.highestJobSalary = highestJobSalary;
-    response.lowestJobSalary = lowestJobSalary;
     response.highestReviewPoint = highestReviewPoint;
     response.lowestReviewPoint = lowestReviewPoint;
     response.totalReviewsByCompany = _reviewsUserByCompany.length;
