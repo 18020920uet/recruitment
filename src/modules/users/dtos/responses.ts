@@ -133,7 +133,6 @@ export class GetJobsOfUserResponse {
   totalRecords: number;
 }
 
-
 export class AreaCount extends AreaEntity {
   @ApiProperty()
   total: number;

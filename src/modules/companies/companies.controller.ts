@@ -3,10 +3,10 @@ import {
   ApiInternalServerErrorResponse,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiOperation,
-  ApiTags,
-  ApiConsumes,
   ApiBearerAuth,
+  ApiOperation,
+  ApiConsumes,
+  ApiTags,
 } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
@@ -35,10 +35,10 @@ import {
   GetCompaniesFilterWithTheFirstCharacterInNameQueries,
   UpdateCompanyInformationRequest,
   UpdateCompanyInformationParams,
+  GetCompanyAnalysisParams,
   GetJobsOfCompanyQueries,
   GetCompanyDetailParams,
   GetJobsOfCompanyParams,
-  GetCompanyAnalysisParams,
 } from './dtos/requests';
 import { RequireRole } from '@Common/decorators/require-role.decorator';
 

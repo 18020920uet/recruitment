@@ -730,7 +730,7 @@ export class JobsService {
       const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
         where: {
           jobId: finishJobParams.jobId,
-          jobEmployeeStatus: In[(JobEmployeeStatus.WORKING, JobEmployeeStatus.COMPLETEDBYUSER)],
+          jobEmployeeStatus: In([JobEmployeeStatus.WORKING, JobEmployeeStatus.COMPLETEDBYUSER]),
         },
       });
 

@@ -246,7 +246,7 @@ export class UsersService {
             jobOfUser.isFinished = _joinedJob.job.status == JobStatus.DONE ? true : false;
             jobOfUser.jobEmployeeStatus = _joinedJob.jobEmployeeStatus;
             jobOfUser.wroteReview = _joinedJob.wroteReview;
-            jobOfUser.hasBeenReview = _joinedJob.hasBeenReview
+            jobOfUser.hasBeenReview = _joinedJob.hasBeenReview;
             jobOfUser.jobStatus = _joinedJob.job.status;
             jobOfUser.joinedAt = _joinedJob.createdAt;
             jobOfUser.jobName = _joinedJob.job.title;
@@ -317,7 +317,8 @@ export class UsersService {
       where: { userId: userId },
       relations: ['job', 'job.area', 'job.skills'],
     });
-    const _jobCandidateRelations = await this.jobCandidateRepositoty.find({ where: { userId: userId }});
+
+    const _jobCandidateRelations = await this.jobCandidateRepositoty.find({ where: { userId: userId } });
 
     const response = new GetUserAnalysisResponse();
     response.currentAppliedJobs = 0;
@@ -373,29 +374,48 @@ export class UsersService {
             response.highestJobSalary = _jobEmployeeRelation.salary;
           }
 
-          const _area = _jobEmployeeRelation.job.area;
-          const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
-          if (areaIndex == -1) {
-            response.areas.push({
-              countryId: _area.countryId,
-              name: _area.name,
-              id: _area.id,
-              total: 1,
-            });
-          } else {
-            response.areas[areaIndex].total++;
-          }
-
-          for (const _skill of _jobEmployeeRelation.job.skills) {
-            const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
-            if (skillIndex == -1) {
-              response.skills.push({
-                id: _skill.id,
-                name: _skill.name,
+          if (_jobEmployeeRelation.job.area) {
+            const _area = _jobEmployeeRelation.job.area;
+            const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
+            if (areaIndex == -1) {
+              response.areas.push({
+                countryId: _area.countryId,
+                name: _area.name,
+                id: _area.id,
                 total: 1,
               });
             } else {
-              response.skills[skillIndex].total++;
+              response.areas[areaIndex].total++;
+            }
+          }
+
+          if (_jobEmployeeRelation.job.area) {
+            const _area = _jobEmployeeRelation.job.area;
+            const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
+            if (areaIndex == -1) {
+              response.areas.push({
+                countryId: _area.countryId,
+                name: _area.name,
+                id: _area.id,
+                total: 1,
+              });
+            } else {
+              response.areas[areaIndex].total++;
+            }
+          }
+
+          if (_jobEmployeeRelation.job.skills) {
+            for (const _skill of _jobEmployeeRelation.job.skills) {
+              const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
+              if (skillIndex == -1) {
+                response.skills.push({
+                  id: _skill.id,
+                  name: _skill.name,
+                  total: 1,
+                });
+              } else {
+                response.skills[skillIndex].total++;
+              }
             }
           }
 

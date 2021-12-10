@@ -26,7 +26,7 @@ export class JobDetail extends Job {
 
   @AutoMap()
   @ApiProperty()
-  updateAt: Date;
+  updatedAt: Date;
 
   @AutoMap({ typeFn: () => User })
   @ApiProperty()

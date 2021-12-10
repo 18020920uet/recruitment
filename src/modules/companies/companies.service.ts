@@ -19,10 +19,10 @@ import {
   GetCompaniesFilterWithTheFirstCharacterInNameQueries,
   UpdateCompanyInformationRequest,
   UpdateCompanyInformationParams,
+  GetCompanyAnalysisParams,
   GetJobsOfCompanyQueries,
   GetCompanyDetailParams,
   GetJobsOfCompanyParams,
-  GetCompanyAnalysisParams,
 } from './dtos/requests';
 import {
   GetCompanyAnalysisResponse,
@@ -227,35 +227,39 @@ export class CompaniesService {
         response.totalAwaitJobs++;
       }
 
-      const areaIndex = response.areas.findIndex((area) => area.id == _job.area.id);
-      if (areaIndex == -1) {
-        response.areas.push({
-          countryId: _job.area.countryId,
-          name: _job.area.name,
-          id: _job.area.id,
-          total: 1,
-        });
-      } else {
-        response.areas[areaIndex].total++;
-      }
-
-      for (const _skill of _job.skills) {
-        const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
-        if (skillIndex == -1) {
-          response.skills.push({
-            id: _skill.id,
-            name: _skill.name,
+      if (_job.area) {
+        const areaIndex = response.areas.findIndex((area) => area.id == _job.area.id);
+        if (areaIndex == -1) {
+          response.areas.push({
+            countryId: _job.area.countryId,
+            name: _job.area.name,
+            id: _job.area.id,
             total: 1,
           });
         } else {
-          response.skills[skillIndex].total++;
+          response.areas[areaIndex].total++;
+        }
+      }
+
+      if (_job.skills) {
+        for (const _skill of _job.skills) {
+          const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
+          if (skillIndex == -1) {
+            response.skills.push({
+              id: _skill.id,
+              name: _skill.name,
+              total: 1,
+            });
+          } else {
+            response.skills[skillIndex].total++;
+          }
         }
       }
     }
 
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
       where: { job: { companyId: _company.id } },
-      relations: ['job', 'job.company'],
+      relations: ['job'],
     });
 
     response.currentEmployeesWorking = _jobEmployeeRelations.filter(

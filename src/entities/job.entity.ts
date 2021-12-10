@@ -93,6 +93,7 @@ export class JobEntity {
   @Column({ name: 'creator_id', nullable: true })
   creatorId: string;
 
+  @AutoMap({ typeFn: () => UserEntity })
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'creator_id' })
   creator: UserEntity;
@@ -100,6 +101,7 @@ export class JobEntity {
   @Column({ name: 'last_updater_id', nullable: true })
   updaterId: string;
 
+  @AutoMap({ typeFn: () => UserEntity })
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'last_updater_id' })
   lastUpdater: UserEntity;
@@ -128,6 +130,7 @@ export class JobEntity {
   @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date;
 
+  @AutoMap()
   @DeleteDateColumn()
   deletedAt: Date;
 
