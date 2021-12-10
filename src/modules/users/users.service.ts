@@ -245,11 +245,13 @@ export class UsersService {
             const jobOfUser = new JobOfUser();
             jobOfUser.isFinished = _joinedJob.job.status == JobStatus.DONE ? true : false;
             jobOfUser.jobEmployeeStatus = _joinedJob.jobEmployeeStatus;
+            jobOfUser.wroteReview = _joinedJob.wroteReview;
+            jobOfUser.hasBeenReview = _joinedJob.hasBeenReview
             jobOfUser.jobStatus = _joinedJob.job.status;
             jobOfUser.joinedAt = _joinedJob.createdAt;
             jobOfUser.jobName = _joinedJob.job.title;
-            jobOfUser.jobId = _joinedJob.job.id;
             jobOfUser.salary = _joinedJob.salary;
+            jobOfUser.jobId = _joinedJob.job.id;
             jobOfUser.jobApplyStatus = null;
             jobOfUser.rejectMessage = null;
             jobOfUser.appliedAt = null;

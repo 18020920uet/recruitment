@@ -117,6 +117,12 @@ export class JobOfUser {
 
   @ApiProperty()
   salary: number;
+
+  @ApiProperty()
+  hasBeenReview: boolean;
+
+  @ApiProperty()
+  wroteReview: boolean;
 }
 
 export class GetJobsOfUserResponse {
