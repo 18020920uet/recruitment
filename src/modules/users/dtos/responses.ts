@@ -48,13 +48,25 @@ export class GetUsersResponse {
 
 export class UserJobsAnalysis {
   @ApiProperty()
-  totalJobs: number;
+  currentAppliedJobs: number;
+
+  @ApiProperty()
+  totalApprovedJobs: number;
+
+  @ApiProperty({ description: 'Apply for job but got rejected' })
+  totalRejectedJobs: number;
+
+  @ApiProperty()
+  currentWorkingJobs: number;
 
   @ApiProperty()
   totalDoneJobs: number;
 
-  @ApiProperty()
-  totalAppliedJobs: number;
+  @ApiProperty({ description: 'Total time got remove of job' })
+  totalTimeRemovedFromJob: number;
+
+  @ApiProperty({ description: 'Total time completed job before deadline' })
+  totalOnTimeJobs: number;
 }
 
 export class GetUserProfileResponse {
@@ -69,6 +81,35 @@ export class GetUserProfileResponse {
 
   @ApiProperty({ type: [Job] })
   jobs: Job[];
+}
+
+export class GetUserAnalysisResponse extends UserJobsAnalysis {
+  @ApiProperty({ description: 'Total salary of all job' })
+  totalSalary: number;
+
+  @ApiProperty()
+  highestJobSalary: number;
+
+  @ApiProperty()
+  lowestJobSalary: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  highestReviewPoint: number;
+
+  @ApiProperty({ description: 'Min = 0, max = 5' })
+  lowestReviewPoint: number;
+
+  @ApiProperty()
+  totalReviewsByCompany: number;
+
+  @ApiProperty()
+  totalReviewsWritten: number;
+
+  @ApiProperty({ description: 'Recommendation percent: reviewPoint / totalReviewsByCompany' })
+  recommendation: number;
+
+  @ApiProperty()
+  rate: number;
 }
 
 export class JobOfUser {

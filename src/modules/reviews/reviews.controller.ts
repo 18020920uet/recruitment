@@ -244,7 +244,7 @@ export class ReviewsController {
   @ApiNotFoundResponse({ description: 'Cannot find review of job', type: NotFoundResponse })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   @ApiOperation({ summary: 'Get review of job from user or company' })
-  async getReviewOfJob (@Param() getReviewOfJobParams: GetReviewOfJobParams): Promise<Review> {
+  async getReviewOfJob(@Param() getReviewOfJobParams: GetReviewOfJobParams): Promise<Review> {
     return await this.reviewsService.getReviewOfJob(getReviewOfJobParams);
   }
 }

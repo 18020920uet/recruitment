@@ -277,6 +277,6 @@ export class ChangeEmployeeStatusJobParams {
   employeeId: string;
 
   @IsEnum(['Working', 'Done'])
-  @ApiProperty({ type: 'string', enum: ['Working', 'Done']})
+  @ApiProperty({ type: 'string', enum: ['Working', 'Done'] })
   employeeStatus: string;
 }

@@ -753,6 +753,4 @@ export class JobsService {
       status: true,
     };
   }
-
-
 }

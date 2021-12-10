@@ -19,13 +19,19 @@ import { ApplicationApiOkResponse } from '@Common/decorators/swagger.decorator';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 
 import {
+  GetUserAnalysisParams,
   GetUserProfileParams,
   GetJobsOfUserQueries,
   GetJobsOfUserParams,
   GetUsersQuery,
   GetCvParam,
 } from './dtos/requests';
-import { GetUserProfileResponse, GetJobsOfUserResponse, GetUsersResponse } from './dtos/responses';
+import {
+  GetUserAnalysisResponse,
+  GetUserProfileResponse,
+  GetJobsOfUserResponse,
+  GetUsersResponse,
+} from './dtos/responses';
 
 import { UsersService } from './users.service';
 
@@ -50,6 +56,17 @@ export class UsersController {
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
   async getUserProfile(@Param() getUserProfileParams: GetUserProfileParams): Promise<GetUserProfileResponse> {
     return await this.usersService.getUserProfile(getUserProfileParams);
+  }
+
+  @Get(':userId/analysis')
+  @ApiOperation({ summary: 'Get user detail' })
+  @ApplicationApiOkResponse(GetUserAnalysisResponse)
+  @ApiNotFoundResponse({ description: 'Not found user', type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getUserJobsAnalysisDetail(
+    @Param() getUserAnalysisParams: GetUserAnalysisParams,
+  ): Promise<GetUserAnalysisResponse> {
+    return await this.usersService.getUserAnalysis(getUserAnalysisParams);
   }
 
   @Get(':userId/jobs/:type')

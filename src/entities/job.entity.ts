@@ -45,7 +45,7 @@ export class JobEntity {
   title: string;
 
   @AutoMap()
-  @Column({  default: 0 })
+  @Column({ default: 0 })
   salary: number;
 
   @AutoMap()

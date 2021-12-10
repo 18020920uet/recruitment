@@ -70,6 +70,11 @@ export class GetUserProfileParams {
   userId: string;
 }
 
+export class GetUserAnalysisParams {
+  @ApiProperty()
+  userId: string;
+}
+
 export class GetJobsOfUserParams {
   @ApiProperty()
   userId: string;
