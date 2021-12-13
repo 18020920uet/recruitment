@@ -23,9 +23,14 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { UserModule } from '@Modules/user/user.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
+import { CompanyRepository } from '@Repositories/company.repository';
+import { UserRepository } from '@Repositories/user.repository';
+import { JobRepository } from '@Repositories/job.repository';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([JobRepository, UserRepository, CompanyRepository, JobEmployeeRepositoty]),
     MulterModule.register({ dest: 'public' }),
     ConfigModule.forRoot({
       envFilePath: process.env.NODE_ENV == 'development' ? `.env.${process.env.NODE_ENV}` : '.env',
@@ -34,15 +39,15 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     }),
     AutomapperModule.forRoot({ options: [{ name: 'classMapper', pluginInitializer: classes }], singular: true }),
     TypeOrmModule.forRootAsync(typeOrmConfigAsync),
-    AccountModule,
     AuthenticationModule,
-    UserModule,
     ResourcesModule,
-    UsersModule,
     CompaniesModule,
-    JobsModule,
-    AdminModule,
+    AccountModule,
     ReviewsModule,
+    AdminModule,
+    UsersModule,
+    UserModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
