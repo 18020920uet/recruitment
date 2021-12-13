@@ -292,7 +292,7 @@ export class UsersService {
         _jER.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
         _jER.jobEmployeeStatus == JobEmployeeStatus.DONE
       ) {
-        if (_jER.job.endDate != null && _jER.updatedAt < new Date(_jER.job.endDate)) {
+        if (_jER.job != null && _jER.job.endDate != null && _jER.updatedAt < new Date(_jER.job.endDate)) {
           return _jER;
         }
       }
