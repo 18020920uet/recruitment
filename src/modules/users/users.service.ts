@@ -393,7 +393,7 @@ export class UsersService {
             }
           }
 
-          if (_jobEmployeeRelation.job_jobEmployeeRelation.job.skills) {
+          if (_jobEmployeeRelation.job && _jobEmployeeRelation.job.skills) {
             for (const _skill of _jobEmployeeRelation.job.skills) {
               const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
               if (skillIndex == -1) {
