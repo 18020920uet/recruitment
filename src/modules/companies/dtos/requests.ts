@@ -79,15 +79,10 @@ export class UpdateCompanyInformationRequest {
   @ApiProperty({ description: 'mm-dd-yyyy' })
   dateOfEstablishment: string;
 
-  @Transform(({ value }) =>
-    String(value)
-      .split(',')
-      .filter((v) => v),
-  )
   @ApiProperty({
     type: 'array',
     items: { type: 'string' },
-    description: 'Format: "addresses=23 Cau giay,24 Cau giay"',
+    description: '',
     required: false,
   })
   addresses: string[];
