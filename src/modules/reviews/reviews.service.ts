@@ -72,6 +72,15 @@ export class ReviewsService {
       throw new ForbiddenException('This job is not completed yet');
     }
 
+    const _reviewCheck = await this.reviewRepository.findOne({
+      jobId: createReviewForJobFromUserParams.jobId,
+      reviewerId: _currentUser.id
+    });
+
+    if (_reviewCheck) {
+      throw new ForbiddenException('You had written review for this job');
+    }
+
     const _review = new ReviewEntity();
     _review.comment = createReviewOfJobFromUserRequest.comment;
     _review.rate = createReviewOfJobFromUserRequest.rate;
@@ -207,6 +216,15 @@ export class ReviewsService {
       throw new ForbiddenException('User are not employee of this job');
     }
 
+    const _reviewCheck = await this.reviewRepository.findOne({
+      jobId: createReviewOfJobFromCompanyParams.jobId,
+      revieweeId: createReviewOfJobFromCompanyParams.userId
+    });
+
+    if (_reviewCheck) {
+      throw new ForbiddenException('User had been review for this jobs');
+    }
+
     const _review = new ReviewEntity();
     _review.comment = createReviewOfJobFromCompanyRequest.comment;
     _review.rate = createReviewOfJobFromCompanyRequest.rate;
@@ -261,15 +279,7 @@ export class ReviewsService {
     // Cập nhật điểm
     _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - oldPoint + _review.rate;
 
-    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({
-      where: { userId: _review.reviewee.id, jobId: _review.job.id },
-      relations: ['user'],
-    });
-
-    _jobEmployeeRelation.hasBeenReview = false;
-
     await getManager().transaction(async (transactionalEntityManager) => {
-      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_review.reviewee);
       await transactionalEntityManager.save(_review);
     });
@@ -300,7 +310,15 @@ export class ReviewsService {
     _review.reviewee.reviewPoint = _review.reviewee.reviewPoint - _review.rate;
     _review.reviewee.totalReviews -= 1;
 
+    const _jobEmployeeRelation = await this.jobEmployeeRepository.findOne({
+      where: { userId: _review.reviewee.id, jobId: _review.job.id },
+      relations: ['user'],
+    });
+
+    _jobEmployeeRelation.hasBeenReview = false;
+
     await getManager().transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(_jobEmployeeRelation);
       await transactionalEntityManager.save(_review.reviewee);
       await transactionalEntityManager.save(_review);
     });

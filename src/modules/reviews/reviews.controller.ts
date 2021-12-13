@@ -70,7 +70,7 @@ export class ReviewsController {
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
   @ApiForbiddenResponse({
-    description: "You are not this job's employee|This job is not completed yet",
+    description: "You are not this job's employee|This job is not completed yet|You had written review for this job",
     type: ForbiddenResponse,
   })
   @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
@@ -132,7 +132,7 @@ export class ReviewsController {
   @ApiBadRequestResponse({ description: 'Validation fail', type: ValidationFailResponse })
   @ApiNotFoundResponse({ description: "Can't find job|Can't find user", type: NotFoundResponse })
   @ApiForbiddenResponse({
-    description: 'No permission to write review|User are not employee of this job',
+    description: 'No permission to write review|User are not employee of this job|User had been review for this job',
     type: ForbiddenResponse,
   })
   @ApiUnauthorizedResponse({ description: 'Token expired or no token', type: UnauthorizedResponse })
