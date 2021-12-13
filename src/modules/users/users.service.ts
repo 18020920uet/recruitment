@@ -422,6 +422,7 @@ export class UsersService {
         _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.DONE
       ) {
         if (
+          _jobEmployeeRelation.job &&
           _jobEmployeeRelation.job.endDate != null &&
           _jobEmployeeRelation.updatedAt < new Date(_jobEmployeeRelation.job.endDate)
         ) {

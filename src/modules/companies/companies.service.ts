@@ -146,10 +146,8 @@ export class CompaniesService {
           ? await getRepository(BusinessFieldEntity).find({ id: In(updateCompanyInformationRequest.businessFieldIds) })
           : [];
 
-      const socialNetworks = JSON.parse(String(updateCompanyInformationRequest.socialNetworks));
-
       _company.information.dateOfEstablishment = updateCompanyInformationRequest.dateOfEstablishment;
-      _company.information.socialNetworks = socialNetworks;
+      _company.information.socialNetworks = updateCompanyInformationRequest.socialNetworks;
       _company.information.numberOfEmployees = updateCompanyInformationRequest.numberOfEmployees;
       _company.information.phoneNumber = updateCompanyInformationRequest.phoneNumber;
       _company.information.description = updateCompanyInformationRequest.description;
