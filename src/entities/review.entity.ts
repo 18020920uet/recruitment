@@ -21,7 +21,7 @@ export class ReviewEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @AutoMap()
+  @AutoMap(({ typeFn: () => UserEntity }))
   @ManyToOne(() => UserEntity)
   @JoinColumn([{ name: 'reviewer_id', referencedColumnName: 'id' }])
   reviewer: UserEntity;
@@ -30,7 +30,7 @@ export class ReviewEntity {
   @Column({ name: 'reviewer_id' })
   reviewerId: string;
 
-  @AutoMap()
+  @AutoMap(({ typeFn: () => UserEntity }))
   @ManyToOne(() => UserEntity)
   @JoinColumn([{ name: 'reviewee_id', referencedColumnName: 'id' }])
   reviewee: UserEntity;
