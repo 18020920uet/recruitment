@@ -378,7 +378,7 @@ export class UsersService {
             response.highestJobSalary = _jobEmployeeRelation.salary;
           }
 
-          if (_jobEmployeeRelation.job.area) {
+          if (_jobEmployeeRelation.job && _jobEmployeeRelation.job.area) {
             const _area = _jobEmployeeRelation.job.area;
             const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
             if (areaIndex == -1) {
@@ -393,22 +393,7 @@ export class UsersService {
             }
           }
 
-          if (_jobEmployeeRelation.job.area) {
-            const _area = _jobEmployeeRelation.job.area;
-            const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
-            if (areaIndex == -1) {
-              response.areas.push({
-                countryId: _area.countryId,
-                name: _area.name,
-                id: _area.id,
-                total: 1,
-              });
-            } else {
-              response.areas[areaIndex].total++;
-            }
-          }
-
-          if (_jobEmployeeRelation.job.skills) {
+          if (_jobEmployeeRelation.job_jobEmployeeRelation.job.skills) {
             for (const _skill of _jobEmployeeRelation.job.skills) {
               const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
               if (skillIndex == -1) {
