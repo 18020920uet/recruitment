@@ -19,13 +19,17 @@ import {
   GetCompaniesFilterWithTheFirstCharacterInNameQueries,
   UpdateCompanyInformationRequest,
   UpdateCompanyInformationParams,
+  UpdateCompanyPhotosParams,
   GetCompanyAnalysisParams,
+  ChangeCompanyLogoParams,
   GetJobsOfCompanyQueries,
   GetCompanyDetailParams,
   GetJobsOfCompanyParams,
 } from './dtos/requests';
 import {
+  UpdateCompanyPhotosResponse,
   GetCompanyAnalysisResponse,
+  ChangeCompanyLogoResponse,
   GetCompanyDetailResponse,
   GetJobsOfCompanyResponse,
   JobOfCompany,
@@ -110,7 +114,6 @@ export class CompaniesService {
     _currentCompany: CompanyEntity,
     updateCompanyInformationParams: UpdateCompanyInformationParams,
     updateCompanyInformationRequest: UpdateCompanyInformationRequest,
-    files: { logo?: Express.Multer.File[]; photos?: Express.Multer.File[] },
   ): Promise<GetCompanyDetailResponse> {
     const _company = await this.companyRepository.findOne({
       where: { id: updateCompanyInformationParams.companyId },
@@ -156,28 +159,70 @@ export class CompaniesService {
         updateCompanyInformationRequest.addresses != undefined && updateCompanyInformationRequest.addresses.length != 0
           ? updateCompanyInformationRequest.addresses.join('|')
           : '';
-
-      if (files.logo != undefined && files.logo.length == 1) {
-        if (_company.logo != '') {
-          fs.unlinkSync(`./public/companies/logos/${_company.logo}`);
-        }
-        _company.logo = files.logo[0].filename;
-      }
-
-      if (files.photos != undefined && files.photos.length != 0) {
-        if (_company.information.photos != '') {
-          const oldPhotos = _company.information.photos.split('|').filter((photo) => photo);
-          for (const oldPhoto of oldPhotos) {
-            fs.unlinkSync(`./public/companies/photos/${oldPhoto}`);
-          }
-        }
-        _company.information.photos = files.photos.map((photo) => photo.filename).join('|');
-      }
-
       await transactionalEntityManager.save(_company);
     });
 
     return this.mapper.map(_company, GetCompanyDetailResponse, CompanyEntity);
+  }
+
+  async changeCompanyLogo(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    changeCompanyLogoParams: ChangeCompanyLogoParams,
+    logo: Express.Multer.File,
+  ): Promise<ChangeCompanyLogoResponse> {
+    const _company = await this.companyRepository.findOne({
+      where: { id: changeCompanyLogoParams.companyId },
+    });
+
+    if (!_company) {
+      throw new NotFoundException('Not found');
+    }
+
+    if (_company.id != _currentCompany.id) {
+      throw new ForbiddenException('Forbidden Resource');
+    }
+
+    if (_company.logo != '') {
+      fs.unlinkSync(`./public/companies/logos/${_company.logo}`);
+    }
+    _company.logo = logo.filename;
+
+    await this.companyRepository.save(_company);
+
+    const response = new ChangeCompanyLogoResponse();
+    response.logo = `${process.env.HOST}/public/companies/logos/${_company.logo}`;
+    return response;
+  }
+
+  async updateCompanyPhotos(
+    _currentUser: UserEntity,
+    _currentCompany: CompanyEntity,
+    updateCompanyPhotosParams: UpdateCompanyPhotosParams,
+    photos: Express.Multer.File[],
+  ): Promise<UpdateCompanyPhotosResponse> {
+    const _company = await this.companyRepository.findOne({
+      where: { id: updateCompanyPhotosParams.companyId },
+      relations: ['information'],
+    });
+
+    if (photos != undefined && photos.length != 0) {
+      if (_company.information.photos != '') {
+        const oldPhotos = _company.information.photos.split('|').filter((photo) => photo);
+        for (const oldPhoto of oldPhotos) {
+          fs.unlinkSync(`./public/companies/photos/${oldPhoto}`);
+        }
+      }
+      _company.information.photos = photos.map((photo) => photo.filename).join('|');
+    }
+    const response = new UpdateCompanyPhotosResponse();
+    response.photos = [];
+
+    for (const photo of photos) {
+      response.photos.push(`${process.env.HOST}/public/companies/photos/${photo.filename}`);
+    }
+
+    return response;
   }
 
   async getCompanyAnalysis(getCompanyAnalysisParams: GetCompanyAnalysisParams): Promise<GetCompanyAnalysisResponse> {

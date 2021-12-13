@@ -144,3 +144,11 @@ export class GetCompanyAnalysisResponse {
   @ApiProperty({ type: [SkillCount] })
   skills: SkillCount[];
 }
+
+export class UpdateCompanyPhotosResponse {
+  photos: string[];
+}
+
+export class ChangeCompanyLogoResponse {
+  logo: string;
+}

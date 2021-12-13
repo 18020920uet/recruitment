@@ -31,14 +31,8 @@ export class UpdateCompanyInformationParams {
 }
 
 export class UpdateCompanyInformationRequest {
-  @ApiProperty({ type: 'string', format: 'binary', required: false })
-  logo: any;
-
   @ApiProperty()
   name: string;
-
-  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }, required: false })
-  photos: any[];
 
   @Type(() => Number)
   @ApiProperty()
@@ -141,4 +135,26 @@ export class GetJobsOfCompanyQueries {
   @Min(1)
   @ApiProperty({ type: 'number', required: false, minimum: 1, description: 'Auto = 10, records > 0' })
   records: number;
+}
+
+export class UpdateCompanyPhotosParams {
+  @IsString()
+  @ApiProperty()
+  companyId: string;
+}
+
+export class UpdateCompanyPhotosRequest {
+  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' }, required: false })
+  photos: any[];
+}
+
+export class ChangeCompanyLogoParams {
+  @IsString()
+  @ApiProperty()
+  companyId: string;
+}
+
+export class ChangeCompanyLogoRequest {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  logo: any;
 }
