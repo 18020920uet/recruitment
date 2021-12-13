@@ -446,7 +446,8 @@ export class UsersService {
     }
 
     const reviewPoint = _reviewsUserByCompany.map((review) => review.rate);
-    const totalReviewPoint = reviewPoint.reduce((previous, current) => previous + current);
+    const totalReviewPoint =
+      reviewPoint.length == 0 ? 0 : reviewPoint.reduce((previous, current) => previous + current);
     const highestReviewPoint = Math.max.apply(Math, reviewPoint);
     const lowestReviewPoint = Math.min.apply(Math, reviewPoint);
 
@@ -455,7 +456,7 @@ export class UsersService {
     response.totalReviewsByCompany = _reviewsUserByCompany.length;
     response.totalReviewsWritten = _reviewsWritten;
     response.recommendation = Math.floor((totalReviewPoint / (reviewPoint.length * 5)) * 100);
-    response.rate = totalReviewPoint / reviewPoint.length;
+    response.rate = reviewPoint.length == 0 ? 0 : totalReviewPoint / reviewPoint.length;
     return response;
   }
 }
