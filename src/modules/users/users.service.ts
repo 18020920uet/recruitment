@@ -287,12 +287,16 @@ export class UsersService {
     );
     const doneJobs = _jobEmployeeRelations.filter((_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.DONE);
     const removedJobs = _jobEmployeeRelations.filter((_jER) => _jER.jobEmployeeStatus == JobEmployeeStatus.REMOVED);
-    const onTimeJobs = _jobEmployeeRelations.filter(
-      (_jER) =>
-        (_jER.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
-          _jER.jobEmployeeStatus == JobEmployeeStatus.DONE) &&
-        _jER.updatedAt < new Date(_jER.job.endDate),
-    );
+    const onTimeJobs = _jobEmployeeRelations.filter((_jER) => {
+      if (
+        _jER.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
+        _jER.jobEmployeeStatus == JobEmployeeStatus.DONE
+      ) {
+        if (_jER.job.endDate != null && _jER.updatedAt < new Date(_jER.job.endDate)) {
+          return _jER;
+        }
+      }
+    });
 
     const response = new UserJobsAnalysis();
     response.currentAppliedJobs = currentAppliedJobs.length;
@@ -429,11 +433,15 @@ export class UsersService {
       }
 
       if (
-        (_jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
-          _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.DONE) &&
-        _jobEmployeeRelation.updatedAt < new Date(_jobEmployeeRelation.job.endDate)
+        _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.COMPLETEDBYUSER ||
+        _jobEmployeeRelation.jobEmployeeStatus == JobEmployeeStatus.DONE
       ) {
-        response.totalOnTimeJobs++;
+        if (
+          _jobEmployeeRelation.job.endDate != null &&
+          _jobEmployeeRelation.updatedAt < new Date(_jobEmployeeRelation.job.endDate)
+        ) {
+          response.totalOnTimeJobs++;
+        }
       }
     }
 
