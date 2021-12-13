@@ -74,7 +74,7 @@ export class ReviewsService {
 
     const _reviewCheck = await this.reviewRepository.findOne({
       jobId: createReviewForJobFromUserParams.jobId,
-      reviewerId: _currentUser.id
+      reviewerId: _currentUser.id,
     });
 
     if (_reviewCheck) {
@@ -218,7 +218,7 @@ export class ReviewsService {
 
     const _reviewCheck = await this.reviewRepository.findOne({
       jobId: createReviewOfJobFromCompanyParams.jobId,
-      revieweeId: createReviewOfJobFromCompanyParams.userId
+      revieweeId: createReviewOfJobFromCompanyParams.userId,
     });
 
     if (_reviewCheck) {
