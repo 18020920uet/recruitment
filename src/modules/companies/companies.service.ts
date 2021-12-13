@@ -181,15 +181,20 @@ export class CompaniesService {
       throw new ForbiddenException('Forbidden Resource');
     }
 
-    if (_company.logo != '') {
-      fs.unlinkSync(`./public/companies/logos/${_company.logo}`);
+    if (logo != undefined) {
+      if (_company.logo != '') {
+        fs.unlinkSync(`./public/companies/logos/${_company.logo}`);
+      }
+      _company.logo = logo.filename;
+      await this.companyRepository.save(_company);
     }
-    _company.logo = logo.filename;
-
-    await this.companyRepository.save(_company);
 
     const response = new ChangeCompanyLogoResponse();
-    response.logo = `${process.env.HOST}/public/companies/logos/${_company.logo}`;
+    if (_company.logo != '') {
+      response.logo = `${process.env.HOST}/public/companies/logos/${_company.logo}`;
+    } else {
+      response.logo = `${process.env.HOST}/resources/images/company-logo.png`;
+    }
     return response;
   }
 
@@ -211,13 +216,21 @@ export class CompaniesService {
           fs.unlinkSync(`./public/companies/photos/${oldPhoto}`);
         }
       }
-      _company.information.photos = photos.map((photo) => photo.filename).join('|');
+      _company.information.photos = photos
+        .filter((photo) => photo)
+        .map((photo) => photo.filename)
+        .join('|');
     }
+
     const response = new UpdateCompanyPhotosResponse();
     response.photos = [];
 
-    for (const photo of photos) {
-      response.photos.push(`${process.env.HOST}/public/companies/photos/${photo.filename}`);
+    if (photos != undefined && photos.length != 0) {
+      for (const photo of photos) {
+        if (photo != undefined) {
+          response.photos.push(`${process.env.HOST}/public/companies/photos/${photo.filename}`);
+        }
+      }
     }
 
     return response;

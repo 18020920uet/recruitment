@@ -155,6 +155,6 @@ export class ChangeCompanyLogoParams {
 }
 
 export class ChangeCompanyLogoRequest {
-  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @ApiProperty({ type: 'string', format: 'binary', required: true })
   logo: any;
 }

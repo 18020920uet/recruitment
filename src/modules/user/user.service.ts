@@ -84,11 +84,13 @@ export class UserService {
   }
 
   async updateAvatar(_currentUser: UserEntity, avatar: Express.Multer.File): Promise<ChangeAvatarResponse> {
-    if (_currentUser.avatar != '') {
-      fs.unlinkSync(`./public/avatars/${_currentUser.avatar}`);
+    if (avatar != undefined) {
+      if (_currentUser.avatar != '') {
+        fs.unlinkSync(`./public/avatars/${_currentUser.avatar}`);
+      }
+      _currentUser.avatar = avatar.filename;
+      await this.userRepository.save(_currentUser);
     }
-    _currentUser.avatar = avatar.filename;
-    await this.userRepository.save(_currentUser);
     return {
       avatar: this.fileService.getAvatar(_currentUser),
     };
@@ -184,20 +186,28 @@ export class UserService {
     const _cv = await this.curriculumVitaeRepository.findOne({ where: { user: _currentUser } });
     const _certifications = _cv.certifications.split('|').filter((_certification) => _certification);
 
-    /// Remove old file
-    for (const _certification of _certifications) {
-      if (_certification != '') {
-        const path = `./public/certifications/${_certification}`;
-        fs.unlinkSync(path);
+    if (certifications != undefined && certifications.length != 0) {
+      /// Remove old file
+      for (const _certification of _certifications) {
+        if (_certification != '') {
+          const path = `./public/certifications/${_certification}`;
+          fs.unlinkSync(path);
+        }
       }
+
+      const newCertifications = certifications
+        .filter((certification) => certification)
+        .map((certification) => certification.filename);
+      _cv.certifications = newCertifications.join('|');
+      await this.curriculumVitaeRepository.save(_cv);
     }
 
-    const newCertifications = certifications.map((certification) => certification.filename);
-    _cv.certifications = newCertifications.join('|');
-    await this.curriculumVitaeRepository.save(_cv);
-    return {
-      certifications: newCertifications.map((_c) => this.fileService.getCertification(_c)),
-    };
+    const response = new UpdateCertificationsResponse();
+    response.certifications = _cv.certifications
+      .split('|')
+      .filter((certification) => certification)
+      .map((certification) => this.fileService.getCertification(certification));
+    return response;
   }
 
   async updateCertification(
