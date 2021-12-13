@@ -7,18 +7,42 @@ import { AreaEntity } from '@Entities/area.entity';
 import { CurriculumVitaeSkill } from '@Shared/responses/curriculum-vitae-skill';
 import { CurriculumVitae } from '@Shared/responses/curriculum-vitae';
 import { Review } from '@Shared/responses/review';
-import { User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 import { JobStatus } from '@Shared/enums/job-status';
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
 import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 import { Skill } from '@Shared/responses/skill';
+import { Role } from '@Shared/enums/role';
 
 export class DeleteReviewResponse {
   status: boolean;
 }
 
-export class FreeLancer extends User {
+export class FreeLancer {
+  @AutoMap()
+  @ApiProperty()
+  id: string;
+
+  @AutoMap()
+  @ApiProperty()
+  email: string;
+
+  @AutoMap()
+  @ApiProperty()
+  firstName: string;
+
+  @AutoMap()
+  @ApiProperty()
+  lastName: string;
+
+  @AutoMap()
+  @ApiProperty()
+  role: Role;
+
+  @AutoMap()
+  @ApiProperty()
+  avatar: string;
+
   @AutoMap()
   @ApiProperty()
   briefIntroduce: string;
@@ -31,7 +55,6 @@ export class FreeLancer extends User {
   @ApiProperty()
   area: AreaEntity;
 
-  @AutoMap()
   @ApiProperty()
   rate: number;
 

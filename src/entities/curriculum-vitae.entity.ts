@@ -107,9 +107,6 @@ export class CurriculumVitaeEntity {
   @Column({ default: 0, type: 'real' })
   rate: number;
 
-  @Column({ name: 'uncounted_star', default: 0, type: 'real' })
-  uncountedStar: number;
-
   @Column({ name: 'area_id', nullable: true })
   areaId: number;
 
