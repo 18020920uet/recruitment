@@ -269,12 +269,12 @@ export class UsersService {
 
   async getUserJobsAnalysis(userId: string): Promise<UserJobsAnalysis> {
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
-      where: { userId: userId },
+      where: { userId: userId, job: { deletedAt: Not(IsNull()) } },
       relations: ['job'],
     });
 
     const _jobCandidateRelations = await this.jobCandidateRepositoty.find({
-      where: { userId: userId },
+      where: { userId: userId, job: { deletedAt: Not(IsNull()) } },
       relations: ['job'],
     });
 
@@ -300,12 +300,12 @@ export class UsersService {
 
     const response = new UserJobsAnalysis();
     response.currentAppliedJobs = currentAppliedJobs.length;
+    response.currentWorkingJobs = currentWorkingJobs.length;
     response.totalApprovedJobs = totalApprovedJobs.length;
     response.totalRejectedJobs = totalRejectedJobs.length;
-    response.currentWorkingJobs = currentWorkingJobs.length;
-    response.totalDoneJobs = doneJobs.length;
     response.totalTimeRemovedFromJob = removedJobs.length;
     response.totalOnTimeJobs = onTimeJobs.length;
+    response.totalDoneJobs = doneJobs.length;
     return response;
   }
 
@@ -318,7 +318,10 @@ export class UsersService {
     const userId = _user.id;
 
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
-      where: { userId: userId },
+      where: {
+        userId: userId,
+        job: { deletedAt: Not(IsNull()) },
+      },
       relations: ['job', 'job.area', 'job.skills'],
     });
 
