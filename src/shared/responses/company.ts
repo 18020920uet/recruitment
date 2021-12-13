@@ -12,7 +12,6 @@ export class Company {
   @ApiProperty()
   name: string;
 
-  @AutoMap()
   @ApiProperty()
   stars: number;
 

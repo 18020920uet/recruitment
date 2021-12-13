@@ -155,10 +155,18 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           (review: Review) => review.company.logo,
           mapFrom((_review: ReviewEntity) => this.fileService.getLogo(_review.job.company)),
         );
-      mapper.createMap(CompanyEntity, Company).forMember(
-        (company: Company) => company.logo,
-        mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
-      );
+      mapper
+        .createMap(CompanyEntity, Company)
+        .forMember(
+          (company: Company) => company.logo,
+          mapFrom((_company: CompanyEntity) => this.fileService.getLogo(_company)),
+        )
+        .forMember(
+          (company: Company) => company.stars,
+          mapFrom((_company: CompanyEntity) =>
+            _company.totalReviews != 0 ? _company.reviewPoint / _company.totalReviews : _company.stars,
+          ),
+        );
       mapper
         .createMap(CompanyEntity, CompanyOwner)
         .forMember(
@@ -263,6 +271,14 @@ export class ApplicationMapperProfile extends AutomapperProfile {
               experience: skillRelation.experience,
             }));
           }),
+        )
+        .forMember(
+          (freelancer: FreeLancer) => freelancer.rate,
+          mapFrom((_curriculumVitae: CurriculumVitaeEntity) =>
+            _curriculumVitae.user.totalReviews != 0
+              ? _curriculumVitae.user.reviewPoint / _curriculumVitae.user.totalReviews
+              : _curriculumVitae.rate,
+          ),
         );
       mapper.createMap(JobCandidateRelation, CandidateOfJob);
       mapper.createMap(JobEmployeeRelation, EmployeeOfJob).forMember(
