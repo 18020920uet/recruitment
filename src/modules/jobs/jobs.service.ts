@@ -724,6 +724,10 @@ export class JobsService {
       throw new ForbiddenException('Job is done');
     }
 
+    if (_job.status == JobStatus.CANCEL) {
+      throw new ForbiddenException('Job is cancelled');
+    }
+
     await getManager().transaction(async (transactionalEntityManager) => {
       _job.status = JobStatus.DONE;
 
