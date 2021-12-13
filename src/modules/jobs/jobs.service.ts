@@ -228,7 +228,7 @@ export class JobsService {
     _job.endDate = createJobRequest.endDate;
     _job.salary = createJobRequest.salary;
     _job.title = createJobRequest.title;
-    _job.status = JobStatus.PENDING;
+    _job.status = JobStatus.AWAIT;
     _job.company = _currentCompany;
     _job.creator = _currentUser;
 
