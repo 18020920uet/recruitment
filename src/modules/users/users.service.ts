@@ -269,12 +269,12 @@ export class UsersService {
 
   async getUserJobsAnalysis(userId: string): Promise<UserJobsAnalysis> {
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
-      where: { userId: userId, job: { deletedAt: Not(IsNull()) } },
+      where: { userId: userId, job: { deletedAt: IsNull() } },
       relations: ['job'],
     });
 
     const _jobCandidateRelations = await this.jobCandidateRepositoty.find({
-      where: { userId: userId, job: { deletedAt: Not(IsNull()) } },
+      where: { userId: userId, job: { deletedAt: IsNull() } },
       relations: ['job'],
     });
 
