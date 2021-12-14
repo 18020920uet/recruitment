@@ -320,7 +320,7 @@ export class UsersService {
     const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
       where: {
         userId: userId,
-        job: { deletedAt: Not(IsNull()) },
+        job: { deletedAt: IsNull() },
       },
       relations: ['job', 'job.area', 'job.skills'],
     });
@@ -352,14 +352,14 @@ export class UsersService {
       }
     }
 
-    response.currentWorkingJobs = 0;
-    response.totalDoneJobs = 0;
     response.totalTimeRemovedFromJob = 0;
+    response.currentWorkingJobs = 0;
     response.totalOnTimeJobs = 0;
+    response.totalDoneJobs = 0;
 
-    response.totalSalary = 0;
-    response.highestJobSalary = 0;
     response.lowestJobSalary = _jobEmployeeRelations.length != 0 ? _jobEmployeeRelations[0].salary : 0;
+    response.highestJobSalary = 0;
+    response.totalSalary = 0;
 
     response.areas = [];
     response.skills = [];
@@ -379,36 +379,6 @@ export class UsersService {
 
           if (_jobEmployeeRelation.salary > response.highestJobSalary) {
             response.highestJobSalary = _jobEmployeeRelation.salary;
-          }
-
-          if (_jobEmployeeRelation.job && _jobEmployeeRelation.job.area) {
-            const _area = _jobEmployeeRelation.job.area;
-            const areaIndex = response.areas.findIndex((area) => area.id == _area.id);
-            if (areaIndex == -1) {
-              response.areas.push({
-                countryId: _area.countryId,
-                name: _area.name,
-                id: _area.id,
-                total: 1,
-              });
-            } else {
-              response.areas[areaIndex].total++;
-            }
-          }
-
-          if (_jobEmployeeRelation.job && _jobEmployeeRelation.job.skills) {
-            for (const _skill of _jobEmployeeRelation.job.skills) {
-              const skillIndex = response.skills.findIndex((skill) => skill.id == _skill.id);
-              if (skillIndex == -1) {
-                response.skills.push({
-                  id: _skill.id,
-                  name: _skill.name,
-                  total: 1,
-                });
-              } else {
-                response.skills[skillIndex].total++;
-              }
-            }
           }
 
           response.totalDoneJobs++;
