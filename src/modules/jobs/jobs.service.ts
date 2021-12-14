@@ -124,7 +124,7 @@ export class JobsService {
             ? LessThanOrEqual(getJobsQueries.startDateEnd)
             : Not(IsNull()),
         workMode: getJobsQueries.workMode != undefined ? getJobsQueries.workMode : Not(IsNull()),
-        salary: getJobsQueries.salary != undefined ? getJobsQueries.salary : MoreThanOrEqual(0),
+        salary: getJobsQueries.salary != undefined ? LessThanOrEqual(getJobsQueries.salary) : MoreThanOrEqual(0),
         status:
           getJobsQueries.statuses != undefined && getJobsQueries.statuses.length != 0
             ? In(getJobsQueries.statuses)
