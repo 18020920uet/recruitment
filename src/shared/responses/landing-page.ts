@@ -1,5 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class JobInArea {
+  @ApiProperty()
+  totalJobs: number;
+
+  @ApiProperty()
+  areaId: number;
+
+  @ApiProperty()
+  areaName: string;
+
+  @ApiProperty()
+  countryId: number;
+
+  @ApiProperty()
+  countryName: string;
+}
+
 export class GetLandingPageResponse {
   @ApiProperty()
   totalJobs: number;
@@ -30,4 +47,7 @@ export class GetLandingPageResponse {
 
   @ApiProperty()
   opportunityJob: number;
+
+  @ApiProperty({ type: JobInArea })
+  jobsInArea: JobInArea[];
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { In, Not } from 'typeorm';
+import { getManager, In, Not } from 'typeorm';
 
 import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { CompanyRepository } from '@Repositories/company.repository';
@@ -41,6 +41,23 @@ export class AppService {
 
     response.totalSalaryPaid = salaries.reduce((prev, curr) => prev + curr);
     response.highestJobSalary = Math.max(...salaries);
+
+    const entityManager = getManager();
+    const _jobsInArea: any[] = await entityManager.query(
+      'SELECT COUNT(jobs.id) as job_count, area_id, areas.name as area_name, countries.id as country_id, countries.name as country_name FROM "jobs" INNER JOIN "areas" ON "jobs".area_id="areas".id INNER JOIN "countries" ON "areas".country_id="countries".id GROUP BY area_id, area_name, country_name, countries.id ORDER BY job_count DESC LIMIT 4',
+    );
+
+    response.jobsInArea = [];
+
+    for (let index = 0; index < _jobsInArea.length; index++) {
+      response.jobsInArea.push({
+        totalJobs: Number(_jobsInArea[index]['job_count']),
+        areaId: _jobsInArea[index]['area_id'],
+        areaName: _jobsInArea[index]['area_name'],
+        countryId: _jobsInArea[index]['country_id'],
+        countryName: _jobsInArea[index]['country_name'],
+      });
+    }
 
     response.opportunityJob = await this.jobRepository.count({
       where: {
