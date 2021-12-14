@@ -149,6 +149,9 @@ export class JobOfUser {
 
   @ApiProperty()
   companyId: string;
+
+  @ApiProperty()
+  companyName: string;
 }
 
 export class GetJobsOfUserResponse {
