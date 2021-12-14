@@ -146,6 +146,9 @@ export class JobOfUser {
 
   @ApiProperty()
   wroteReview: boolean;
+
+  @ApiProperty()
+  companyId: string;
 }
 
 export class GetJobsOfUserResponse {

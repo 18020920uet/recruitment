@@ -202,6 +202,7 @@ export class UsersService {
         return {
           jobsOfUser: _appliedJobs.map((_appliedJob) => {
             const jobOfUser = new JobOfUser();
+            jobOfUser.companyId = _appliedJob.job.companyId;
             jobOfUser.isFinished = _appliedJob.job.status == JobStatus.DONE ? true : false;
             jobOfUser.isJoined = _appliedJob.applyStatus == JobApplyStatus.APPROVED ? true : false;
             jobOfUser.rejectMessage = _appliedJob.rejectMessage;
@@ -243,6 +244,7 @@ export class UsersService {
         return {
           jobsOfUser: _joinedJobs.map((_joinedJob) => {
             const jobOfUser = new JobOfUser();
+            jobOfUser.companyId = _joinedJob.job.companyId;
             jobOfUser.isFinished = _joinedJob.job.status == JobStatus.DONE ? true : false;
             jobOfUser.jobEmployeeStatus = _joinedJob.jobEmployeeStatus;
             jobOfUser.wroteReview = _joinedJob.wroteReview;
