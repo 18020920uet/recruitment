@@ -96,7 +96,6 @@ export class CandidateOfJob {
   @ApiProperty()
   rejectMessage: string;
 
-  @AutoMap()
   @ApiProperty()
   deletedAt: Date | null;
 }

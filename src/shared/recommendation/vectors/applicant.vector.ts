@@ -11,7 +11,6 @@ export class ApplicantVector {
     _skillIds: number[],
     _jobSalary: number,
   ) {
-    let salary = 0;
     const rate = _user.totalReviews != 0 ? _user.reviewPoint / _user.totalReviews : 0;
     const doneAJob = _jobEmployeeRelations.length != 0 ? 1 : 0;
 
@@ -44,14 +43,7 @@ export class ApplicantVector {
             }
           }
         }
-        salary += _jobEmployeeRelation.salary;
       }
-    }
-
-    if (_jobEmployeeRelations.length != 0) {
-      salary = salary / _jobEmployeeRelations.length;
-    } else {
-      salary = _jobSalary;
     }
 
     for (const skillRelation of _cv.skillRelations) {
@@ -79,7 +71,7 @@ export class ApplicantVector {
     }
 
     // Vector [salary, rate, doneAJob, areaId, levelSkill1, levelSkill2, ...]
-    this.vector = [salary, rate, doneAJob];
+    this.vector = [rate, doneAJob];
     this.vector.push(...levelSkills);
   }
 }

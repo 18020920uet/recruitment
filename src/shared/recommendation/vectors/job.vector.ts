@@ -5,8 +5,6 @@ export class JobVector {
   public skillIds: number[];
 
   constructor(_job: JobEntity) {
-    const areaId = _job.areaId;
-    const salary = _job.salary;
     const rate =
       _job.company.totalReviews != 0 ? _job.company.reviewPoint / _job.company.totalReviews : _job.company.stars;
     const doneAJob = 1;
@@ -32,7 +30,7 @@ export class JobVector {
     }
 
     // Vector [salary, rate, doneAJob, areaId, levelSkill1, levelSkill2, ...]
-    this.vector = [salary, rate, doneAJob];
+    this.vector = [rate, doneAJob];
     this.vector.push(...levelSkills);
   }
 }

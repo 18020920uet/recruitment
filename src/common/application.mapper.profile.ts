@@ -280,11 +280,17 @@ export class ApplicationMapperProfile extends AutomapperProfile {
               : _curriculumVitae.rate,
           ),
         );
-      mapper.createMap(JobCandidateRelation, CandidateOfJob);
+      mapper.createMap(JobCandidateRelation, CandidateOfJob).forMember(
+        (recommendedCandidateOfJob: RecommendedCandidateOfJob) => recommendedCandidateOfJob.deletedAt,
+        mapFrom((_jobCandidateRelation: JobCandidateRelation) => _jobCandidateRelation.deletedAt)
+        ),
       mapper.createMap(JobCandidateRelation, RecommendedCandidateOfJob).forMember(
         (recommendedCandidateOfJob: RecommendedCandidateOfJob) => recommendedCandidateOfJob.point,
         mapFrom((_jobCandidateRelation: JobCandidateRelation) => 0),
-      );
+      ).forMember(
+        (recommendedCandidateOfJob: RecommendedCandidateOfJob) => recommendedCandidateOfJob.deletedAt,
+        mapFrom((_jobCandidateRelation: JobCandidateRelation) => _jobCandidateRelation.deletedAt)
+        ),
       mapper.createMap(JobEmployeeRelation, EmployeeOfJob).forMember(
         (employeeOfJob: EmployeeOfJob) => employeeOfJob.employeeStatus,
         mapFrom((_jobEmployeeRelation: JobEmployeeRelation) => _jobEmployeeRelation.jobEmployeeStatus),
