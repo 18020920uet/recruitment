@@ -12,7 +12,6 @@ export class ApplicantVector {
     _jobSalary: number,
   ) {
     let salary = 0;
-    const areaId = _cv.areaId;
     const rate = _user.totalReviews != 0 ? _user.reviewPoint / _user.totalReviews : 0;
     const doneAJob = _jobEmployeeRelations.length != 0 ? 1 : 0;
 
@@ -80,7 +79,7 @@ export class ApplicantVector {
     }
 
     // Vector [salary, rate, doneAJob, areaId, levelSkill1, levelSkill2, ...]
-    this.vector = [salary, rate, doneAJob, areaId];
+    this.vector = [salary, rate, doneAJob];
     this.vector.push(...levelSkills);
   }
 }

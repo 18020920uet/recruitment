@@ -32,7 +32,7 @@ export class JobVector {
     }
 
     // Vector [salary, rate, doneAJob, areaId, levelSkill1, levelSkill2, ...]
-    this.vector = [salary, rate, doneAJob, areaId];
+    this.vector = [salary, rate, doneAJob];
     this.vector.push(...levelSkills);
   }
 }
