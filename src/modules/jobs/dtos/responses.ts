@@ -97,6 +97,7 @@ export class CandidateOfJob {
   rejectMessage: string;
 
   @AutoMap()
+  @ApiProperty()
   deletedAt: Date | null;
 }
 
@@ -154,6 +155,28 @@ export class GetEmployeesOfJobResponse {
 export class GetCandidatesOfJobResponse {
   @ApiProperty({ type: [CandidateOfJob] })
   candidates: CandidateOfJob[];
+
+  @ApiProperty()
+  totalRecods: number;
+
+  @ApiProperty()
+  maxEmployees: number;
+
+  @ApiProperty()
+  totalEmployees: number;
+
+  @ApiProperty({ enum: JobStatus, enumName: 'JobStatuss' })
+  jobStatus: JobStatus;
+}
+
+export class RecommendedCandidateOfJob extends CandidateOfJob {
+  @ApiProperty()
+  point: number;
+}
+
+export class GetRecommendedCandidatesOfJobResponse {
+  @ApiProperty({ type: [RecommendedCandidateOfJob] })
+  candidates: RecommendedCandidateOfJob[];
 
   @ApiProperty()
   totalRecods: number;

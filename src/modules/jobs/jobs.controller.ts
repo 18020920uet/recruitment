@@ -30,6 +30,7 @@ import { RequireRole } from '@Common/decorators/require-role.decorator';
 import { JobsService } from './jobs.service';
 
 import {
+  GetRecommendedCandidatesOfJobParams,
   ChangeEmployeeStatusJobParams,
   RemoveEmployeeFromJobParams,
   ChangeJobApplyStatusRequest,
@@ -60,6 +61,7 @@ import {
   CandidateOfJob,
   EmployeeOfJob,
   JobDetail,
+  GetRecommendedCandidatesOfJobResponse,
 } from './dtos/responses';
 
 import { Role } from '@Shared/enums/role';
@@ -317,5 +319,16 @@ export class JobsController {
     @Param() removeEmployeeFromJobParams: RemoveEmployeeFromJobParams,
   ): Promise<EmployeeOfJob> {
     return await this.jobsService.removeEmployeeFromJob(_currentUser, _currentCompany, removeEmployeeFromJobParams);
+  }
+
+  @Get(':jobId/recommenedCandidates')
+  @ApplicationApiOkResponse(GetRecommendedCandidatesOfJobResponse)
+  @ApiOperation({ summary: "Get a job's candidates" })
+  @ApiNotFoundResponse({ description: 'Not found', type: NotFoundResponse })
+  @ApiInternalServerErrorResponse({ description: 'Server error', type: InternalServerErrorResponse })
+  async getRecommendedCandidatesOfJob(
+    @Param() getRecommendedCandidatesOfJobParams: GetRecommendedCandidatesOfJobParams,
+  ): Promise<GetRecommendedCandidatesOfJobResponse> {
+    return await this.jobsService.getRecommendedCandidatesOfJob(getRecommendedCandidatesOfJobParams);
   }
 }

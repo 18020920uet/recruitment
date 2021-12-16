@@ -27,7 +27,7 @@ import { SimpleUser, User } from '@Shared/responses/user';
 import { Job } from '@Shared/responses/job';
 
 import { CompanyInformation, GetCompanyDetailResponse, JobOfCompany } from '@Modules/companies/dtos/responses';
-import { CandidateOfJob, EmployeeOfJob, JobDetail } from '@Modules/jobs/dtos/responses';
+import { CandidateOfJob, EmployeeOfJob, JobDetail, RecommendedCandidateOfJob } from '@Modules/jobs/dtos/responses';
 import { FreeLancer } from '@Modules/users/dtos/responses';
 
 import { JobEmployeeStatus } from '@Shared/enums/job-employee-status';
@@ -281,6 +281,10 @@ export class ApplicationMapperProfile extends AutomapperProfile {
           ),
         );
       mapper.createMap(JobCandidateRelation, CandidateOfJob);
+      mapper.createMap(JobCandidateRelation, RecommendedCandidateOfJob).forMember(
+        (recommendedCandidateOfJob: RecommendedCandidateOfJob) => recommendedCandidateOfJob.point,
+        mapFrom((_jobCandidateRelation: JobCandidateRelation) => 0),
+      );
       mapper.createMap(JobEmployeeRelation, EmployeeOfJob).forMember(
         (employeeOfJob: EmployeeOfJob) => employeeOfJob.employeeStatus,
         mapFrom((_jobEmployeeRelation: JobEmployeeRelation) => _jobEmployeeRelation.jobEmployeeStatus),

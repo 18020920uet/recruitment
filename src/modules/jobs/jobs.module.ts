@@ -13,15 +13,17 @@ import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
 
 import { AuthenticationModule } from '@Modules/authentication/authentication.module';
+import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      CurriculumVitaeRepository,
+      JobCandidateRepositoty,
+      JobEmployeeRepositoty,
       ReviewRepository,
       SkillRepository,
       JobRepository,
-      JobCandidateRepositoty,
-      JobEmployeeRepositoty,
     ]),
     AuthenticationModule, // JwtAuthenticationGuard
     ConfigModule,

@@ -3,6 +3,7 @@ import { IsNull, Not, MoreThanOrEqual, In, getManager, getRepository, Like, Betw
 import { InjectMapper } from '@automapper/nestjs';
 import type { Mapper } from '@automapper/types';
 
+import { CurriculumVitaeRepository } from '@Repositories/curriculum-vitae.repository';
 import { JobCandidateRepositoty } from '@Repositories/job-candidate.repository';
 import { JobEmployeeRepositoty } from '@Repositories/job-employee.repository';
 import { JobRepository } from '@Repositories/job.repository';
@@ -16,7 +17,11 @@ import { AreaEntity } from '@Entities/area.entity';
 import { UserEntity } from '@Entities/user.entity';
 import { JobEntity } from '@Entities/job.entity';
 
+import { JobVector } from '@Shared/recommendation/vectors/job.vector';
+import { ApplicantVector } from '@Shared/recommendation/vectors/applicant.vector';
+
 import {
+  GetRecommendedCandidatesOfJobParams,
   ChangeEmployeeStatusJobParams,
   RemoveEmployeeFromJobParams,
   ChangeJobApplyStatusRequest,
@@ -47,6 +52,8 @@ import {
   CandidateOfJob,
   EmployeeOfJob,
   JobDetail,
+  GetRecommendedCandidatesOfJobResponse,
+  RecommendedCandidateOfJob,
 } from './dtos/responses';
 import { Job } from '@Shared/responses/job';
 
@@ -60,6 +67,7 @@ import { JobApplyStatus } from '@Shared/enums/job-apply-status';
 export class JobsService {
   constructor(
     @InjectMapper() private readonly mapper: Mapper,
+    private curriculumnVitaerepository: CurriculumVitaeRepository,
     private jobCandidateRepositoty: JobCandidateRepositoty,
     private jobEmployeeRepositoty: JobEmployeeRepositoty,
     private jobRepository: JobRepository,
@@ -755,6 +763,81 @@ export class JobsService {
 
     return {
       status: true,
+    };
+  }
+
+  async getRecommendedCandidatesOfJob(
+    getRecommendedCandidatesOfJobParams: GetRecommendedCandidatesOfJobParams,
+  ): Promise<GetRecommendedCandidatesOfJobResponse> {
+    const candidates: RecommendedCandidateOfJob[] = [];
+    const _job = await this.jobRepository.findOne({
+      where: {
+        id: getRecommendedCandidatesOfJobParams.jobId,
+      },
+      relations: ['skills'],
+    });
+
+    if (!_job) {
+      throw new NotFoundException('Not found');
+    }
+
+    const totalEmployess = await this.jobEmployeeRepositoty.count({
+      where: { jobId: _job.id, jobEmployeeStatus: JobEmployeeStatus.WORKING },
+    });
+
+    const [_jobCandidateRelations, totalRecods] = await this.jobCandidateRepositoty.findAndCount({
+      where: { jobId: _job.id, applyStatus: JobApplyStatus.WAITING },
+      relations: ['user', 'editor'],
+    });
+
+    const userIds = _jobCandidateRelations.map((_jobCandidateRelation) => _jobCandidateRelation.user.id);
+
+    if (userIds.length != 0) {
+      const _cvs = await this.curriculumnVitaerepository.find({
+        where: { userId: In(userIds) },
+        relations: ['skillRelations', 'skillRelations.skill'],
+      });
+
+      const _jobEmployeeRelations = await this.jobEmployeeRepositoty.find({
+        where: { userId: In(userIds), jobEmployeeStatus: JobEmployeeStatus.DONE },
+        relations: ['job', 'job.skills'],
+      });
+
+      const jobVector = new JobVector(_job);
+      const skillIds = jobVector.skillIds;
+
+      for (const userId of userIds) {
+        const _jobCandidateRelation = _jobCandidateRelations.find(
+          (_jobCandidateRelation) => _jobCandidateRelation.userId == userId,
+        );
+        const _user = _jobCandidateRelation.user;
+        const _cv = _cvs.find((_cv) => _cv.userId == userId);
+        const _userJobEmployeeRelations = _jobEmployeeRelations.filter(
+          (_jobEmployeeRelation) => _jobEmployeeRelation.userId == userId,
+        );
+        const applicantVector = new ApplicantVector(_user, _cv, _userJobEmployeeRelations, skillIds, _job.salary);
+
+        let total = 0;
+
+        for (let index = 0; index < applicantVector.vector.length; index++) {
+          total += Math.pow(applicantVector.vector[index] - jobVector.vector[index], 2);
+        }
+
+        const _candidate = this.mapper.map(_jobCandidateRelation, RecommendedCandidateOfJob, JobCandidateRelation);
+        _candidate.point = Math.sqrt(total);
+        candidates.push(_candidate);
+      }
+    }
+
+    return {
+      totalRecods: totalRecods,
+      candidates: candidates.sort(
+        (candidate1: RecommendedCandidateOfJob, candidate2: RecommendedCandidateOfJob) =>
+          candidate1.point - candidate2.point,
+      ),
+      maxEmployees: _job.maxEmployees,
+      totalEmployees: totalEmployess,
+      jobStatus: _job.status,
     };
   }
 }

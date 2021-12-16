@@ -280,3 +280,8 @@ export class ChangeEmployeeStatusJobParams {
   @ApiProperty({ type: 'string', enum: ['Working', 'Done'] })
   employeeStatus: string;
 }
+
+export class GetRecommendedCandidatesOfJobParams {
+  @ApiProperty()
+  jobId: number;
+}
