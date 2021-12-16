@@ -1,550 +1,353 @@
-enum gender {
-  non
-  male
-  female
+Table "areas" {
+  "id" integer [pk, not null]
+  "country_id" integer [not null]
+  "name" "character varying" [not null]
 }
 
-enum curriculum_vitae_experience_type {
-  work
-  volunteer
+Table "business_fields" {
+  "id" integer [pk, not null, default: `nextval('business_fields_id_seq')`]
+  "name" "character varying" [not null]
+  "description" "character varying" [not null]
 }
 
-enum user_type {
-  freelance [note: "Người tìm việc"]
-  company_owner [note: "Người chủ công ty"]
-  admin
+Table "business_fields_skills" {
+  "skill_id" integer [not null]
+  "business_field_id" integer [not null]
+
+Indexes {
+  (skill_id, business_field_id) [pk]
+  business_field_id [type: btree, name: "IDX_387532f49a9a244c212a1a3d29"]
+  skill_id [type: btree, name: "IDX_df9b0b0eec9ab66e6c0b7c9ae0"]
+}
 }
 
-enum job_salary_type {
-  competitive [note: "Thỏa thuận"]
-  detail [note: "Lương được liệt kê rõ"]
+Table "companies" {
+  "id" uuid [pk, not null, default: `uuid_generate_v4()`]
+  "logo" "character varying" [not null, default: `''`]
+  "name" "character varying" [not null]
+  "stars" real [not null]
+  "email" "character varying" [not null, default: `''`]
+  "isVerified" boolean [not null]
+  "owner_id" uuid [unique]
+  "country_id" integer [not null]
+  "area_id" integer
+  "company_information_id" uuid [unique]
+  "review_point" real [not null, default: "0"]
+  "total_reviews" integer [not null, default: "0"]
 }
 
-enum job_employment_type  {
-  all
-  fulltime
-  parttime
-  remote
-  internship
-  contact [note: "Hợp đồng"]
-  temporary [note: "Tạm thời"]
+Table "companies_business_fields" {
+  "company_id" uuid [not null]
+  "business_field_id" integer [not null]
+
+Indexes {
+  (company_id, business_field_id) [pk]
+  company_id [type: btree, name: "IDX_c41780f4ae1dd457d01a9809cb"]
+  business_field_id [type: btree, name: "IDX_fe76cf8a9b6e65b194ea17efb7"]
+}
 }
 
-enum job_status {
-  open
-  close
-  done
+Table "companies_employees" {
+  "id" integer [not null, default: `nextval('companies_employees_id_seq')`]
+  "company_id" uuid [not null]
+  "user_id" uuid [unique, not null]
+  "role" companies_employees_role_enum [not null, default: "Employee"]
+
+Indexes {
+  (id, company_id, user_id) [pk]
+}
 }
 
-enum job_experience_time {
-  all [note: "Tất cả"]
-  non [note: "Chưa có kinh nghiệm"]
-  less_than_six_month [note: "Dưới 6 tháng"]
-  less_than_one_year [note: "Dưới 1 năm"]
-  one_to_two_year [note: "1-2 năm"]
-  two_to_three_year [note: "2-3 năm"]
-  three_to_five_year [note: "3-5 năm"]
-  more_than_five_year [note: "Trên 5 năm"]
+Table "companies_roles" {
+  "id" integer [pk, not null, default: `nextval('companies_roles_id_seq')`]
+  "company_id" "character varying" [not null]
+  "user_id" "character varying" [not null]
+  "role" companies_roles_role_enum [not null, default: "Employee"]
 }
 
-enum job_level {
-  all
-  intern
-  fresher
-  experienced
-  manager
-  director
+Table "countries" {
+  "id" integer [pk, not null]
+  "name" "character varying" [not null]
+  "emoji" "character varying" [not null, default: `''`]
 }
 
-enum job_applicant_status {
-  unseen [note: "Chưa được xem"]
-  viewed [note: "Được company xem"]
-  rejected [note: "Bị từ chối"]
-  accpeted [note: "Được chấp nhận"]
+Table "curriculum_vitaes" {
+  "id" integer [pk, not null, default: `nextval('curriculum_vitaes_id_seq')`]
+  "user_id" uuid [unique, not null]
+  "gender" curriculum_vitaes_gender_enum [not null, default: "1"]
+  "date_of_birth" timestamp
+  "phone_number" "character varying"
+  "address" "character varying" [not null, default: `''`]
+  "educations" "character varying" [not null, default: `''`]
+  "certifications" "character varying" [not null, default: `''`]
+  "hobbies" "character varying" [not null, default: `''`]
+  "created_at" timestamp [not null, default: `now()`]
+  "updated_at" timestamp [not null, default: `now()`]
+  "nationality_id" integer
+  "brief_introduce" "character varying(35)" [not null, default: `''`]
+  "rate" real [not null, default: "0"]
+  "area_id" integer
+  "country_id" integer
+  "introduce" "character varying(10000)" [not null, default: `''`]
 }
 
-table users {
-  id guid [pk]
-  first_name varchar
-  last_name varchar
-  middle_name varchar
-  email varchar [not null, unique]
-  hashed_password varchar [not null]
-  user_type user_type
-  avatar varchar [note: "Link"]
+Table "curriculum_vitaes_experiences" {
+  "id" integer [not null, default: `nextval('curriculum_vitaes_experiences_id_seq')`]
+  "cv_id" integer [not null]
+  "index" integer [not null]
+  "company_email" "character varying" [not null]
+  "company_name" "character varying" [not null]
+  "start_date" timestamp [not null]
+  "end_date" timestamp [not null]
+  "role" "character varying" [not null]
+  "description" "character varying" [not null]
+  "type" curriculum_vitaes_experiences_type_enum [not null]
 
+Indexes {
+  (id, cv_id) [pk]
+}
 }
 
-table curriculum_vitaes {
-  id guid [pk]
-  photo varchar [note: "User update image and link to"]
-  user_id guid [ref: - users.id]
-  first_name varchar
-  last_name varchar
-  middle_name varchar
-  email varchar
-  gender gender
-  date_of_birth varchar [note: "19-08-2000"]
-  nationality varchar
-  phone_number varchar
-  address varchar
-  summary varchar [note: "Brief description about user"]
-  skills varchar [note: "Hoc gioi, Dep trai"]
-  education varchar [note: "07/2021 - now: An hai, 01/2021 - 07/2021: Cuoc song bap benh"]
-  certification varchar [note: "Ong trum dap da, Ke huy diet su nghiep"]
-  languages varchar [note: "id của language. Ví dụ: 1,2,3"]
-  hobbies varchar [note: "Da bong, choi game, pho da"]
+Table "curriculum_vitaes_languages" {
+  "cv_id" integer [not null]
+  "language_id" "character varying" [not null]
+
+Indexes {
+  (cv_id, language_id) [pk]
+  language_id [type: btree, name: "IDX_52cbd5bded6c3f0cda8cce737a"]
+  cv_id [type: btree, name: "IDX_f5aa3c700855201de8e05390dd"]
+}
 }
 
-table curriculum_vitae_experiences {
-  curriculum_vitae_id guid [ref: > curriculum_vitaes.id]
-  index int [increment]
-  experience_type curriculum_vitae_experience_type
-  job_title varchar [note: "Nhan vien hang 2"]
+Table "curriculum_vitaes_skills" {
+  "skill_id" integer [not null]
+  "cv_id" integer [not null]
+  "experience" curriculum_vitaes_skills_experience_enum
 
-  company_name varchar
-  company_email varchar
-  company_phone_number varchar
-
-  start_date varchar [note: "01-2021"]
-  end_date varchar [note: "02-2021"]
-
-  role varchar [note: "Vai trò trong công ty"]
-  description varchar [note: "Mô tả giới thiệu các hoạt động làm"]
-
-  indexes {
-    (index, curriculum_vitae_id) [pk]
-  }
+Indexes {
+  (skill_id, cv_id) [pk]
+}
 }
 
-table companies {
-  owner guid [ref: - users.id]
-  id int [pk, increment]
-  logo varchar [note: "Link"]
-  name varchar
-
-  email varchar [not null, unique]
-  hashed_password varchar [not null]
-
-  address varchar
-  phone_number varchar
-  website varchar
-
-  description longtext
-  requirement longtext
-  // status int [note: "0: dang hoat dong/1: chua duoc duyet/2: da bi khoa"]
-  total_jobs int
-  total_employees int
-  // is_suggest int [note: "0: not suggested, 1: suggested"]
-
-  linkedin varchar
-  bussiness_fields varchar
+Table "information_of_companies" {
+  "id" uuid [pk, not null, default: `uuid_generate_v4()`]
+  "addresses" "character varying" [not null]
+  "phone_number" "character varying"
+  "pax_number" "character varying"
+  "description" "character varying" [not null, default: `''`]
+  "photos" "character varying" [not null, default: `''`]
+  "number_of_employees" integer [not null, default: "1"]
+  "social_networks" jsonb
+  "company_id" uuid [unique, not null]
+  "date_of_establishment" "character varying" [not null]
+  "created_at" timestamp
+  "updated_at" timestamp
 }
 
-table companies_bussiness_fields {
-  company_id guid [ref: > companies.id]
-  bussiness_field_id int [ref: - bussiness_fields.id]
+Table "jobs" {
+  "id" integer [pk, not null, default: `nextval('jobs_id_seq')`]
+  "company_id" uuid [not null]
+  "title" "character varying(100)" [not null]
+  "salary" integer [not null, default: "0"]
+  "description" "character varying" [not null]
+  "min_employees" integer [not null, default: "0"]
+  "max_employees" integer [not null, default: "0"]
+  "status" jobs_status_enum [not null, default: "Await"]
+  "experience" jobs_experience_enum
+  "work_mode" jobs_work_mode_enum [not null, default: "Hybrid"]
+  "startDate" date [not null]
+  "endDate" date [not null]
+  "created_at" timestamp [not null]
+  "updated_at" timestamp
+  "area_id" integer [not null]
+  "creator_id" uuid
+  "last_updater_id" uuid
+  "deletedAt" timestamp
 
-  indexes {
-    (company_id, bussiness_field_id) [pk]
-  }
+Indexes {
+  title [type: btree, name: "IDX_00f1309a74e7cc6d028d3f63e8"]
+}
 }
 
-table bussiness_fields [note: "chuyen nganh"] {
-  id int [pk, increment]
-  name varchar
+Table "jobs_business_fields" {
+  "job_id" integer [not null]
+  "business_field_id" integer [not null]
+
+Indexes {
+  (job_id, business_field_id) [pk]
+  job_id [type: btree, name: "IDX_c35acfda7d9fe013b9b793215c"]
+  business_field_id [type: btree, name: "IDX_eeabffa49aa709ef74724102da"]
+}
 }
 
-table positions {
-  id guid [pk]
-  name varchar
+Table "jobs_candidates" {
+  "job_id" integer [not null]
+  "user_id" uuid [not null]
+  "created_at" timestamp [not null]
+  "updated_at" timestamp
+  "apply_status" jobs_candidates_apply_status_enum [not null, default: "Waiting"]
+  "intorduce_message" "character varying(1000)" [not null]
+  "reject_message" "character varying(1000)"
+  "editor_id" uuid
+  "deleted_at" timestamp
+
+Indexes {
+  (job_id, user_id) [pk]
+}
 }
 
-table cities {
-  id int [pk, increment]
-  name varchar
+Table "jobs_employees" {
+  "job_id" integer [not null]
+  "user_id" uuid [not null]
+  "created_at" timestamp [not null]
+  "updated_at" timestamp
+  "job_employee_status" jobs_employees_job_employee_status_enum [not null, default: "Working"]
+  "editor_id" uuid
+  "wrote_review" boolean [not null, default: false]
+  "has_been_review" boolean [not null, default: false]
+  "salary" real [not null, default: "0"]
+
+Indexes {
+  (job_id, user_id) [pk]
+}
 }
 
-table languages {
-  id int [pk, increment]
-  language varchar
+Table "jobs_skills" {
+  "job_id" integer [not null]
+  "skill_id" integer [not null]
+
+Indexes {
+  (job_id, skill_id) [pk]
+  job_id [type: btree, name: "IDX_447196318490b98d5ea9e01b9b"]
+  skill_id [type: btree, name: "IDX_70e15c636c0476053925bcbdfc"]
+}
 }
 
-
-table jobs {
-  id guid [pk]
-  company_id guid [ref: > companies.id]
-
-  title varchar
-  description longtext [note: "Mô tả công việc"]
-
-  // info
-  salary_type job_salary_type
-  min_salary double
-  max_salary double
-  working_type job_employment_type
-  level job_level
-
-  // Requirements
-  gender gender
-  quantity int [note: "Số lượng"]
-  experience_time job_experience_time
-  job_requirements varchar [note: "Các kĩ năng,thông tin kinh nghiệm yêu cầu"]
-  offers varchar [note: "Các lợi ích được nhà tuyển dụng đưa ra"]
-
-  status job_status
-  is_urgent_job boolean [note: "Việc cần người ngay"]
-
-  // note xem cái này là gì
-  // is_suggest int danh sách job đã apply[note: "0: not suggested, 1: suggested"]
-  // view int
-
-  position_id guid [ref: > positions.id]
-
-  created_date datetime
-  deadline_date datetime
+Table "languages" {
+  "id" "character varying" [pk, not null]
+  "name" "character varying" [not null]
 }
 
-table jobs_languages [note: "Công việc có thể có các yêu cầu về ngôn ngữ khác nhau"] {
-  job_id guid [ref: > jobs.id]
-  language_id int [ref: - languages.id]
-
-  indexes {
-    (job_id, language_id) [pk]
-  }
+Table "migrations" {
+  "id" integer [pk, not null, default: `nextval('migrations_id_seq')`]
+  "timestamp" bigint [not null]
+  "name" "character varying" [not null]
 }
 
-table jobs_bussiness_fields [note: "Một công việc có thể enum gender {
-  non
-  male
-  female
+Table "nationalities" {
+  "id" integer [pk, not null, default: `nextval('nationalities_id_seq')`]
+  "name" "character varying" [not null]
 }
 
-enum curriculum_vitae_experience_type {
-  work
-  volunteer
+Table "reviews" {
+  "id" integer [pk, not null, default: `nextval('reviews_id_seq')`]
+  "reviewer_id" uuid [not null]
+  "reviewee_id" uuid
+  "rate" real [not null]
+  "created_at" timestamp [not null, default: `now()`]
+  "updated_at" timestamp [default: `now()`]
+  "review_by" "character varying" [not null, default: "Freelance"]
+  "job_id" integer [not null]
+  "deleted_at" timestamp
+  "comment" "character varying(5000)" [not null]
 }
 
-enum user_type {
-  freelance
-  admin
+Table "skills" {
+  "id" integer [pk, not null]
+  "name" "character varying" [not null]
+  "description" "character varying" [not null, default: `''`]
 }
 
-enum job_salary_type {
-  competitive [note: "Thỏa thuận"]
-  detail [note: "Lương được liệt kê rõ"]
+Table "users" {
+  "id" uuid [pk, not null, default: `uuid_generate_v4()`]
+  "email" "character varying" [not null]
+  "password" "character varying" [not null]
+  "first_name" "character varying" [not null]
+  "last_name" "character varying" [not null]
+  "is_activated" boolean [not null]
+  "last_reset_password" timestamp
+  "activate_code" "character varying" [not null]
+  "activate_date" timestamp
+  "reset_code" "character varying"
+  "is_lock" boolean [not null]
+  "last_login" timestamp
+  "login_failed_strike" integer [not null]
+  "role" users_role_enum [not null, default: "2"]
+  "avatar" "character varying" [not null, default: `''`]
+  "total_reviews" integer [not null, default: "0"]
+  "review_point" real [not null, default: "0"]
 }
 
-enum job_employment_type  {
-  all
-  fulltime
-  parttime
-  remote
-  internship
-  contact [note: "Hợp đồng"]
-  temporary [note: "Tạm thời"]
-}
+Ref:"business_fields"."id" < "business_fields_skills"."business_field_id" [update: cascade, delete: cascade]
 
-enum job_status {
-  open
-  close
-  done
-}
+Ref:"skills"."id" < "business_fields_skills"."skill_id" [update: cascade, delete: cascade]
 
-enum job_experience_time {
-  all [note: "Tất cả"]
-  non [note: "Chưa có kinh nghiệm"]
-  less_than_six_month [note: "Dưới 6 tháng"]
-  less_than_one_year [note: "Dưới 1 năm"]
-  one_to_two_year [note: "1-2 năm"]
-  two_to_three_year [note: "2-3 năm"]
-  three_to_five_year [note: "3-5 năm"]
-  more_than_five_year [note: "Trên 5 năm"]
-}
+Ref:"information_of_companies"."id" < "companies"."company_information_id"
 
-enum job_level {
-  all
-  intern
-  fresher
-  experienced
-  manager
-  director
-}
+Ref:"countries"."id" < "companies"."country_id"
 
-enum job_applicant_status {
-  unseen [note: "Chưa được xem"]
-  viewed [note: "Được company xem"]
-  rejected [note: "Bị từ chối"]
-  accpeted [note: "Được chấp nhận"]
-}
+Ref:"users"."id" < "companies"."owner_id"
 
-table users {
-  id guid [pk]
-  first_name varchar
-  last_name varchar
-  middle_name varchar
-  email varchar [not null, unique]
-  hashed_password varchar [not null]
-  user_type user_type
-  avatar varchar [note: "Link"]
-}
+Ref:"areas"."id" < "companies"."area_id"
 
-table curriculum_vitaes {
-  id guid [pk]
-  photo varchar [note: "User update image and link to"]
-  user_id guid [ref: - users.id]
-  first_name varchar
-  last_name varchar
-  middle_name varchar
-  email varchar
-  gender gender
-  date_of_birth varchar [note: "19-08-2000"]
-  nationality varchar
-  phone_number varchar
-  address varchar
-  summary varchar [note: "Brief description about user"]
-  skills varchar [note: "Hoc gioi, Dep trai"]
-  education varchar [note: "07/2021 - now: An hai, 01/2021 - 07/2021: Cuoc song bap benh"]
-  certification varchar [note: "Ong trum dap da, Ke huy diet su nghiep"]
-  languages varchar [note: "id của language. Ví dụ: 1,2,3"]
-  hobbies varchar [note: "Da bong, choi game, pho da"]
-}
+Ref:"companies"."id" < "companies_business_fields"."company_id" [update: cascade, delete: cascade]
 
-table curriculum_vitae_experiences {
-  curriculum_vitae_id guid [ref: > curriculum_vitaes.id]
-  index int [increment]
-  experience_type curriculum_vitae_experience_type
-  job_title varchar [note: "Nhan vien hang 2"]
+Ref:"business_fields"."id" < "companies_business_fields"."business_field_id" [update: cascade, delete: cascade]
 
-  company_name varchar
-  company_email varchar
-  company_phone_number varchar
+Ref:"users"."id" < "companies_employees"."user_id" [delete: cascade]
 
-  start_date varchar [note: "01-2021"]
-  end_date varchar [note: "02-2021"]
+Ref:"companies"."id" < "companies_employees"."company_id" [delete: cascade]
 
-  role varchar [note: "Vai trò trong công ty"]
-  description varchar [note: "Mô tả giới thiệu các hoạt động làm"]
+Ref:"nationalities"."id" < "curriculum_vitaes"."nationality_id"
 
-  indexes {
-    (index, curriculum_vitae_id) [pk]
-  }
-}
+Ref:"users"."id" < "curriculum_vitaes"."user_id" [delete: cascade]
 
-table companies {
-  id int [pk, increment]
-  logo varchar [note: "Link"]
-  name varchar
+Ref:"areas"."id" < "curriculum_vitaes"."area_id"
 
-  email varchar [not null, unique]
-  hashed_password varchar [not null]
+Ref:"countries"."id" < "curriculum_vitaes"."country_id"
 
-  address varchar
-  phone_number varchar
-  website varchar
+Ref:"curriculum_vitaes"."id" < "curriculum_vitaes_experiences"."cv_id" [update: restrict, delete: cascade]
 
-  description longtext
-  requirement longtext
-  // status int [note: "0: dang hoat dong/1: chua duoc duyet/2: da bi khoa"]
-  total_jobs int
-  total_employees int
-  // is_suggest int [note: "0: not suggested, 1: suggested"]
+Ref:"languages"."id" < "curriculum_vitaes_languages"."language_id" [update: cascade, delete: cascade]
 
-  linkedin varchar
-  bussiness_fields varchar
-}
+Ref:"curriculum_vitaes"."id" < "curriculum_vitaes_languages"."cv_id" [update: cascade, delete: cascade]
 
-table companies_bussiness_fields {
-  company_id guid [ref: > companies.id]
-  bussiness_field_id int [ref: - bussiness_fields.id]
+Ref:"skills"."id" < "curriculum_vitaes_skills"."skill_id"
 
-  indexes {
-    (company_id, bussiness_field_id) [pk]
-  }
-}
+Ref:"curriculum_vitaes"."id" < "curriculum_vitaes_skills"."cv_id" [update: cascade, delete: cascade]
 
-table bussiness_fields [note: "chuyen nganh"] {
-  id int [pk, increment]
-  name varchar
-}
+Ref:"companies"."id" < "information_of_companies"."company_id" [delete: cascade]
 
-table positions {
-  id guid [pk]
-  name varchar
-}
+Ref:"companies"."id" < "jobs"."company_id" [delete: cascade]
 
-table cities {
-  id int [pk, increment]
-  name varchar
-}
+Ref:"areas"."id" < "jobs"."area_id"
 
-table languages {
-  id int [pk, increment]
-  language varchar
-}
+Ref:"users"."id" < "jobs"."creator_id"
 
+Ref:"users"."id" < "jobs"."last_updater_id"
 
-table jobs {
-  id guid [pk]
-  company_id guid [ref: > companies.id]
+Ref:"jobs"."id" < "jobs_business_fields"."job_id" [update: cascade, delete: cascade]
 
-  title varchar
-  description longtext [note: "Mô tả công việc"]
+Ref:"business_fields"."id" < "jobs_business_fields"."business_field_id" [update: cascade, delete: cascade]
 
-  // info
-  salary_type job_salary_type
-  min_salary double
-  max_salary double
-  working_type job_employment_type
-  level job_level
+Ref:"users"."id" < "jobs_candidates"."user_id" [delete: cascade]
 
-  // Requirements
-  gender gender
-  quantity int [note: "Số lượng"]
-  experience_time job_experience_time
-  job_requirements varchar [note: "Các kĩ năng,thông tin kinh nghiệm yêu cầu"]
-  offers varchar [note: "Các lợi ích được nhà tuyển dụng đưa ra"]
+Ref:"jobs"."id" < "jobs_candidates"."job_id" [delete: cascade]
 
-  status job_status
-  is_urgent_job boolean [note: "Việc cần người ngay"]
+Ref:"users"."id" < "jobs_candidates"."editor_id"
 
-  // note xem cái này là gì
-  // is_suggest int [note: "0: not suggested, 1: suggested"]
-  // view int
+Ref:"users"."id" < "jobs_employees"."user_id" [delete: cascade]
 
-  position_id guid [ref: > positions.id]
+Ref:"jobs"."id" < "jobs_employees"."job_id" [delete: cascade]
 
-  created_date datetime
-  deadline_date datetime
-}
+Ref:"users"."id" < "jobs_employees"."editor_id"
 
-table jobs_languages [note: "Công việc có thể có các yêu cầu về ngôn ngữ khác nhau"] {
-  job_id guid [ref: > jobs.id]
-  language_id int [ref: - languages.id]
+Ref:"jobs"."id" < "jobs_skills"."job_id" [update: cascade, delete: cascade]
 
-  indexes {
-    (job_id, language_id) [pk]
-  }
-}
+Ref:"skills"."id" < "jobs_skills"."skill_id" [update: cascade, delete: cascade]
 
-table jobs_bussiness_fields [note: "Một công việc có thể liên quan đến nhiều chuyên ngành"] {
-  job_id guid [ref: > jobs.id]
-  bussiness_field_id int [ref: - bussiness_fields.id]
+Ref:"jobs"."id" < "reviews"."job_id" [delete: cascade]
 
-  indexes {
-    (job_id, bussiness_field_id) [pk]
-  }
-}
+Ref:"users"."id" < "reviews"."reviewer_id"
 
-table jobs_cities [note: "Có thể tuyển việc cho nhiều chi nhánh khác nhau"] {
-  job_id guid [ref: > jobs.id]
-  city_id int [ref: - cities.id]
-
-  indexes {
-    (job_id, city_id) [pk]
-  }
-}
-
-table jobs_applicants {
-  id guid
-  user_id guid [ref: > users.id]
-  job_id guid [ref: > jobs.id]
-  created_date datetime
-  status job_applicant_status
-  introduce varchar
-
-  indexes {
-    (user_id, job_id) [unique]
-    id [pk]
-  }
-}
-
-table users_followed_jobs {
-  user_id guid [ref: > users.id]
-  job_id guid [ref: > jobs.id]
-  created_date datetime
-
-  indexes {
-    (user_id, job_id) [pk]
-  }
-}
-
-table users_followed_companies {
-  user_id guid [ref: > users.id]
-  company_id guid [ref: > companies.id]
-  created_date datetime
-
-  indexes {
-    (user_id, company_id) [pk]
-  }
-}liên quan đến nhiều chuyên ngành"] {
-  job_id guid [ref: > jobs.id]
-  bussiness_field_id int [ref: - bussiness_fields.id]
-
-  indexes {
-    (job_id, bussiness_field_id) [pk]
-  }
-}
-
-table jobs_cities [note: "Có thể tuyển việc cho nhiều chi nhánh khác nhau"] {
-  job_id guid [ref: > jobs.id]
-  city_id int [ref: - cities.id]
-
-  indexes {
-    (job_id, city_id) [pk]
-  }
-}
-
-table jobs_applicants {
-  id guid
-  user_id guid [ref: > users.id]
-  job_id guid [ref: > jobs.id]
-  created_date datetime
-  status job_applicant_status
-  introduce varchar
-
-  indexes {
-    (user_id, job_id) [unique]
-    id [pk]
-  }
-}
-
-table users_followed_jobs {
-  user_id guid [ref: > users.id]
-  job_id guid [ref: > jobs.id]
-  created_date datetime
-
-  indexes {
-    (user_id, job_id) [pk]
-  }
-}
-
-table users_followed_companies {
-  user_id guid [ref: > users.id]
-  company_id guid [ref: > companies.id]
-  created_date datetime
-
-  indexes {
-    (user_id, company_id) [pk]
-  }
-}
-
-table users_reviews {
-  company_id guid [ref: - companies.id]
-  user_id guid [ref: > users.id]
-  star float
-  review string
-  created_date datetime
-  updated_date datetime
-  deleted_date datetime
-}
-
-table companies_reviews {
-  company_id guid [ref: > companies.id]
-  user_id guid [ref: < users.id]
-  star float
-  review string
-  created_date datetime
-  updated_date datetime
-  deleted_date datetime
-}
+Ref:"users"."id" < "reviews"."reviewee_id"
