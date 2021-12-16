@@ -774,7 +774,7 @@ export class JobsService {
       where: {
         id: getRecommendedCandidatesOfJobParams.jobId,
       },
-      relations: ['skills'],
+      relations: ['skills', 'company'],
     });
 
     if (!_job) {
